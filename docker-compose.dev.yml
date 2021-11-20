@@ -1,0 +1,89 @@
+version: "3.3"
+services:
+  alice:
+    container_name: alice 
+    build:
+      context: ./images/node
+      args:
+        - BRANCH=da-poc
+        - PROFILE=release
+    image: da:poc 
+    tmpfs: /tmp
+    volumes:
+      - alice-state:/da/state
+    ports:
+      - 9946:9946
+    command: 
+      --validator
+      --alice
+      --chain local
+      --base-path /da/state
+      --name MATIC_VALIDATOR_1
+      --node-key 0000000000000000000000000000000000000000000000000000000000000001
+      --execution Native
+      --in-peers 2
+      --out-peers 2
+      --port 30333 
+      --no-prometheus
+      --rpc-cors all
+      --unsafe-rpc-external
+      --unsafe-ws-external
+      --ws-port 9946
+  bob:
+    container_name: bob 
+    image: da:poc 
+    tmpfs: /tmp
+    volumes:
+      - bob-state:/da/state
+    depends_on:
+      - alice
+    command:
+      --validator
+      --bob
+      --chain local
+      --base-path /da/state
+      --name MATIC_VALIDATOR_2
+      --node-key 0000000000000000000000000000000000000000000000000000000000000002
+      --execution Native
+      --in-peers 2
+      --out-peers 2
+      --port 30333 
+      --bootnodes /dns4/alice/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
+      --no-prometheus
+      --rpc-cors all
+
+  # Use `docker attach` (and `Ctrl-p` + `Ctrl-q` to detach).
+  charlie:
+    container_name: charlie 
+    image: da:debug-poc 
+    build:
+      context: ./images/node
+      args:
+        - BRANCH=da-poc
+        - PROFILE=debug
+    tmpfs: /tmp
+    volumes:
+      - charlie-state:/da/state
+    depends_on:
+      - alice
+    command:
+      --validator
+      --chalie
+      --chain local
+      --base-path /da/state
+      --name MATIC_VALIDATOR_2
+      --node-key 0000000000000000000000000000000000000000000000000000000000000003
+      --execution Native
+      --in-peers 2
+      --out-peers 2
+      --port 30333 
+      --bootnodes /dns4/alice/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
+      --no-prometheus
+      --rpc-cors all
+
+volumes:
+  alice-state:
+  bob-state:
+  charlie-state:
+
+# vim: ts=2:et
