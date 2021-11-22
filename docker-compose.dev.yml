@@ -6,17 +6,22 @@ services:
       context: ./images/node
       args:
         - BRANCH=da-poc
-        - PROFILE=release
     image: da:poc 
     tmpfs: /tmp
     volumes:
       - alice-state:/da/state
+      - ./volume/dev/local.chain_spec.json:/da/chain_spec.json:ro
     ports:
-      - 9946:9946
+      - 9944:9944
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     command: 
       --validator
       --alice
-      --chain local
+      --chain /da/chain_spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_1
       --node-key 0000000000000000000000000000000000000000000000000000000000000001
@@ -28,19 +33,25 @@ services:
       --rpc-cors all
       --unsafe-rpc-external
       --unsafe-ws-external
-      --ws-port 9946
+      --ws-port 9944
   bob:
     container_name: bob 
     image: da:poc 
     tmpfs: /tmp
     volumes:
       - bob-state:/da/state
+      - ./volume/dev/local.chain_spec.json:/da/chain_spec.json:ro
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     depends_on:
       - alice
     command:
       --validator
       --bob
-      --chain local
+      --chain /da/chain_spec.json 
       --base-path /da/state
       --name MATIC_VALIDATOR_2
       --node-key 0000000000000000000000000000000000000000000000000000000000000002
@@ -64,14 +75,15 @@ services:
     tmpfs: /tmp
     volumes:
       - charlie-state:/da/state
+      - ./volume/dev/local.chain_spec.json:/da/chain_spec.json:ro
     depends_on:
       - alice
     command:
       --validator
-      --chalie
-      --chain local
+      --charlie
+      --chain /da/chain_spec.json 
       --base-path /da/state
-      --name MATIC_VALIDATOR_2
+      --name MATIC_VALIDATOR_3
       --node-key 0000000000000000000000000000000000000000000000000000000000000003
       --execution Native
       --in-peers 2
