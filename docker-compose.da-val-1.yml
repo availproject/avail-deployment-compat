@@ -1,0 +1,38 @@
+version: "3.3"
+services:
+  validator1:
+    container_name: validator1 
+    image: da:poc3 
+    tmpfs: /tmp
+    volumes:
+      - validator1-state:/da/state
+      - ./volume/stage/customSpec.json:/da/chain_spec.json:ro
+      - ./volume/stage/validator1/keystore:/da/keystore
+    ports:
+      - 9944:9944
+      - 9933:9933
+      - 30333:30333
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    command: 
+      --validator
+      --chain /da/chain_spec.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_1
+      --node-key 0000000000000000000000000000000000000000000000000000000000000001
+      --keystore-path /da/keystore
+      --execution Native
+      --in-peers 10 
+      --out-peers 10
+      --rpc-cors all
+      --port 30333 
+      --ws-port 9944
+      --rpc-port 9933
+
+volumes:
+  validator1-state:
+
+# vim: ts=2:et

@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+  full_node:
+    container_name: full_node
+    image: da:poc3 
+    tmpfs: /tmp
+    volumes:
+      - full_node-state:/da/state
+      - ./volume/stage/customSpec.json:/da/chain_spec.json:ro
+    ports:
+      - 9933:9933
+      - 9944:9944
+      - 30333:30333
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    command: 
+      --chain /da/chain_spec.json
+      --base-path /da/state
+      --name MATIC_FULLNODE
+      --keystore-path /da/keystore
+      --bootnodes /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
+      --bootnodes /ip4/3.218.2.152/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL 
+      --bootnodes /ip4/3.230.45.76/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz
+      --execution Native
+      --in-peers 10 
+      --out-peers 10
+      --port 30333 
+      --ws-port 9944
+      --rpc-port 9933
+
+volumes:
+  full_node-state:
+
+# vim: ts=2:et
