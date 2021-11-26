@@ -36,7 +36,7 @@ services:
     container_name: dapp 
     build:
       context: ./images/dapp
-    image: da-dap:master
+    image: da-app:master
     volumes:
       - dapp_html:/html/
 
