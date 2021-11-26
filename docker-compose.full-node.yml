@@ -22,14 +22,15 @@ services:
       --name MATIC_FULLNODE
       --keystore-path /da/keystore
       --bootnodes /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
-      --bootnodes /ip4/3.218.2.152/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL 
-      --bootnodes /ip4/3.230.45.76/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz
       --execution Native
       --in-peers 10 
       --out-peers 10
       --port 30333 
       --ws-port 9944
+      --ws-external
       --rpc-port 9933
+      --rpc-external
+      --rpc-cors all
 
   dapp:
     container_name: dapp 
@@ -39,18 +40,24 @@ services:
     volumes:
       - dapp_html:/html/
 
+  web:
+    container_name: web
+    image: nginx:alpine
+    environment:
+      - WS_URL=wss://polygon-da-explorer.matic.today/ws
+    volumes:  
+      - dapp_html:/usr/share/nginx/html/
+
   proxy:
     container_name: proxy
     image: kong:2.6.0-alpine
     env_file: env/proxy.env
     depends_on:
       - full_node
+      - web
     volumes:
-      - dapp_html:/proxy/html/dapp
-      #- /etc/letsencrypt/:/proxy/certs
       - ./volume/proxy/certs/:/proxy/certs:ro
       - ./volume/proxy/kong.yml:/proxy/kong.yml:ro
-      - ./volume/proxy/dapp_nginx.template:/proxy/dapp_nginx.template:ro
     ports:
       - 443:8443
       - 80:8000

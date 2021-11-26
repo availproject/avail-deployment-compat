@@ -11,10 +11,39 @@
 
 _format_version: "2.1"
 
-#plugins:
-#- name: acme
-#  config: 
-#    account_email: miguel@polygon.technology
-#    domains:  ["polygon-da.matic.today"]
-#    tos_accepted: true
-
+services:
+ - name: full_node_ws 
+   url: http://full_node:9944
+   tags: ["da"]
+   routes:
+   - name: ws_route
+     protocols: ["https", "http"]
+     paths: ["/ws"]
+     request_buffering: false
+     response_buffering: false
+     snis: ["polygon-da-explorer.matic.today"]
+     strip_path: true
+     preserve_host: true
+ 
+ - name: web 
+   url: http://web
+   tags: ["da"]
+   routes:
+   - name: web_root_route
+     protocols: ["https", "http"]
+     paths: ["/"]
+     request_buffering: false
+     response_buffering: false
+     snis: ["polygon-da-explorer.matic.today"]
+     preserve_host: true
+    
+certificates:
+  - tags: ["da"]
+    cert: |
+      -----BEGIN CERTIFICATE-----
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      -----END PRIVATE KEY-----
+    snis:
+      - name: "polygon-da-explorer.matic.today"
