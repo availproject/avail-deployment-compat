@@ -1,0 +1,23 @@
+# ---------------------
+# dapp_nginx.template
+# ---------------------
+
+  # Kong's Proxy server block
+  server {
+    server_name polygon-da-explorer.matic.today;
+    listen 0.0.0.0:8000;
+
+    # SSL
+    listen 0.0.0.0:8443 ssl http2; 
+    ssl_certificate /proxy/certs/live/polygon-da-explorer.matic.today/fullchain.pem;
+    ssl_certificate_key /proxy/certs/live/polygon-da-explorer.matic.today/privkey.pem;
+    include /proxy/certs/options-ssl-nginx.conf;
+    ssl_dhparam /proxy/certs/ssl-dhparams.pem;
+
+    # here, we declare our custom location serving our website
+    # (or API portal) which we can optimize for serving static assets
+    location / {
+      root /proxy/html/dapp;
+      index index.htm index.html;
+    }
+  }

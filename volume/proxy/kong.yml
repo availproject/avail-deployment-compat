@@ -1,0 +1,20 @@
+# ------------------------------------------------------------------------------
+# This is an example file to get you started with using
+# declarative configuration in Kong.
+# ------------------------------------------------------------------------------
+
+# Metadata fields start with an underscore (_)
+# Fields that do not start with an underscore represent Kong entities and attributes
+
+# _format_version is mandatory,
+# it specifies the minimum version of Kong that supports the format
+
+_format_version: "2.1"
+
+#plugins:
+#- name: acme
+#  config: 
+#    account_email: miguel@polygon.technology
+#    domains:  ["polygon-da.matic.today"]
+#    tos_accepted: true
+
