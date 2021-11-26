@@ -31,7 +31,32 @@ services:
       --ws-port 9944
       --rpc-port 9933
 
+  dapp:
+    container_name: dapp 
+    build:
+      context: ./images/dapp
+    image: da-dap:master
+    volumes:
+      - dapp_html:/html/
+
+  proxy:
+    container_name: proxy
+    image: kong:2.6.0-alpine
+    env_file: env/proxy.env
+    depends_on:
+      - full_node
+    volumes:
+      - dapp_html:/proxy/html/dapp
+      #- /etc/letsencrypt/:/proxy/certs
+      - ./volume/proxy/certs/:/proxy/certs:ro
+      - ./volume/proxy/kong.yml:/proxy/kong.yml:ro
+      - ./volume/proxy/dapp_nginx.template:/proxy/dapp_nginx.template:ro
+    ports:
+      - 443:8443
+      - 80:8000
+
 volumes:
   full_node-state:
+  dapp_html:
 
 # vim: ts=2:et
