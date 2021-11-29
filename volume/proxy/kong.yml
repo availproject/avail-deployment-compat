@@ -25,8 +25,8 @@ services:
      strip_path: true
      preserve_host: true
  
- - name: web 
-   url: http://web
+ - name: dapp 
+   url: http://dapp
    tags: ["da"]
    routes:
    - name: web_root_route

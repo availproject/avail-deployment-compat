@@ -23,9 +23,7 @@ RUN \
 RUN mv apps/packages/apps/build /html && \
 	rm -rf apps
 
-# Phase 1: Binary deploy 
+# Phase 1: Web Service deployment with static 
 # ========================= 
-FROM alpine:3
-
-COPY --from=builder /html /html
-CMD ["ls", "-al", "/html"]
+FROM nginx:alpine
+COPY --from=builder /html /usr/share/nginx/html

@@ -37,16 +37,8 @@ services:
     build:
       context: ./images/dapp
     image: da-app:master
-    volumes:
-      - dapp_html:/html/
-
-  web:
-    container_name: web
-    image: nginx:alpine
     environment:
       - WS_URL=wss://polygon-da-explorer.matic.today/ws
-    volumes:  
-      - dapp_html:/usr/share/nginx/html/
 
   proxy:
     container_name: proxy
@@ -54,7 +46,7 @@ services:
     env_file: env/proxy.env
     depends_on:
       - full_node
-      - web
+      - dapp
     volumes:
       - ./volume/proxy/certs/:/proxy/certs:ro
       - ./volume/proxy/kong.yml:/proxy/kong.yml:ro
@@ -64,6 +56,5 @@ services:
 
 volumes:
   full_node-state:
-  dapp_html:
 
 # vim: ts=2:et
