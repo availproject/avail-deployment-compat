@@ -21,9 +21,8 @@ services:
      paths: ["/ws"]
      request_buffering: false
      response_buffering: false
-     snis: ["polygon-da-explorer.matic.today"]
      strip_path: true
-     preserve_host: true
+     # preserve_host: true
  
  - name: dapp 
    url: http://dapp
@@ -34,16 +33,25 @@ services:
      paths: ["/"]
      request_buffering: false
      response_buffering: false
-     snis: ["polygon-da-explorer.matic.today"]
-     preserve_host: true
-    
-certificates:
-  - tags: ["da"]
-    cert: |
-      -----BEGIN CERTIFICATE-----
-      -----END CERTIFICATE-----
-    key: |
-      -----BEGIN PRIVATE KEY-----
-      -----END PRIVATE KEY-----
-    snis:
-      - name: "polygon-da-explorer.matic.today"
+     strip_path: true
+     # preserve_host: true
+
+ - name: acme-dummy
+   url: http://127.0.0.1:65535
+   routes:
+   - name: acme-dummy
+     protocols: ["http"]
+     paths: ["/.well-known/acme-challenge"]
+
+
+plugins:
+  - name: acme
+    config:
+      account_email: miguel@polygon.technology
+      domains: ["polygon-da-explorer.matic.today"]
+      tos_accepted: true
+      # api_uri: https://acme-staging-v02.api.letsencrypt.org/directory
+      storage: "redis"
+      storage_config:
+        redis:
+          host: redis

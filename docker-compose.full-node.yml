@@ -40,6 +40,14 @@ services:
     environment:
       - WS_URL=wss://polygon-da-explorer.matic.today/ws
 
+  # Redis is used to store certificates
+  redis:
+    container_name: redis
+    image:  redis:6-alpine
+    command: "redis-server --save 60 1"
+    volumes:
+      - ./volume/redis/data:/data
+
   proxy:
     container_name: proxy
     image: kong:2.6.0-alpine
@@ -47,8 +55,8 @@ services:
     depends_on:
       - full_node
       - dapp
+      - redis
     volumes:
-      - ./volume/proxy/certs/:/proxy/certs:ro
       - ./volume/proxy/kong.yml:/proxy/kong.yml:ro
     ports:
       - 443:8443
