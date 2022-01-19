@@ -13,16 +13,23 @@
 
 Testnet is using the following chain spec file: [customSpec.json](./volume/stage/customSpec.json)
 
-## Boostrap nodes
+## Boot nodes
 
- - 
+ - Validator 1: 
+    /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWRfAFixXQ2VQ6yNPuoc3UTP8CjN4z8kw1eU5fnuQpPygu
+
+ - Validator 2:
+    /ip4/3.218.2.152/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL
+
+ - Validator 3:
+    /ip4/3.230.45.76/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz
 
 
 # How to Build Data Availability
 
 ## Option A: Build a Docker image
 
-The easieest waty to build 
+The easiest way to build 
 
     $ docker-compose -f docker-compose.stage.yml build validator1
 
@@ -38,7 +45,7 @@ The easieest waty to build
     $ cargo build --release -p node-template
 
 3. _Optional_ If you want to run your node in the QA testnet you will need the customized chain spec
-   file and add a boostrap node
+   file and add a bootstrap node
 
     $ ./target/release/node-template --chain  --bootnodes /ip4/54.160.87.220/tcp/30333/p2p/
 

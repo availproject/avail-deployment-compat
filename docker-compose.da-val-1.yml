@@ -22,7 +22,7 @@ services:
       --chain /da/chain_spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_1
-      --node-key 0000000000000000000000000000000000000000000000000000000000000001
+      --node-key 8629f26b23e2a955e27af310caa923f23eaf6df84941b69141e1d1961c0f2f7a 
       --keystore-path /da/keystore
       --execution Native
       --in-peers 10 
