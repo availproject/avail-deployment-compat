@@ -4,10 +4,10 @@
 
 | Name    | Node IP  | P2P Discovery Address | Running |
 | ------  | ---- | --------------------- | ------- |
-| Validator 1 | 54.160.87.220 |  | `cd da-deployment && docker-compose.da-val-1.yml`  |
-| Validator 2 | 3.218.2.152  |  | `cd da-deployment && docker-compose.da-val-2.yml`  |
-| Validator 3 | 3.230.45.76 |  | `cd da-deployment && docker-compose.da-val-3.yml`  |
-| Full Node | https://polygon-da-explorer.matic.today/ |  |  |
+| Validator 1 | 54.160.87.220 |  | `cd da-deployment && docker-compose -f docker-compose.da-val-1.yml up -d`  |
+| Validator 2 | 3.218.2.152  |  | `cd da-deployment && docker-compose -f docker-compose.da-val-2.yml up -d`  |
+| Validator 3 | 3.230.45.76 |  | `cd da-deployment && docker-compose -f docker-compose.da-val-3.yml up -d`  |
+| Full Node | https://polygon-da-explorer.matic.today/ |  | `cd da-deployment && docker-compose -f docker-compose.da-val-3.yml up -d`  |
 
 ## Custom 
 
@@ -16,7 +16,7 @@ Testnet is using the following chain spec file: [customSpec.json](./volume/stage
 ## Boot nodes
 
  - Validator 1: 
-    /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWRfAFixXQ2VQ6yNPuoc3UTP8CjN4z8kw1eU5fnuQpPygu
+    /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv
 
  - Validator 2:
     /ip4/3.218.2.152/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL
@@ -106,5 +106,7 @@ the output would be something like:
     == Compressed
      No compressed runtime found
 
-3. Now you only need to replace the WASM file in your `target/release` folder and rebuild the 
+3. Now you only need to replace the WASM file in your `target/release` folder and rebuild the node
+   binary. Another option is to replace the WASM code in `genesis > runtime > frameSystem > code` in
+   your `chain.spec` file.
 

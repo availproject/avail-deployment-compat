@@ -7,6 +7,7 @@ services:
     volumes:
       - validator1-state:/da/state
       - ./volume/stage/customSpec.json:/da/chain_spec.json:ro
+      - ./volume/stage/validator1/node.private.key:/da/node.key:ro
       - ./volume/stage/validator1/keystore:/da/keystore
     ports:
       - 9944:9944
@@ -22,7 +23,7 @@ services:
       --chain /da/chain_spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_1
-      --node-key 0000000000000000000000000000000000000000000000000000000000000001
+      --node-key-file /da/node.key
       --keystore-path /da/keystore
       --execution Native
       --in-peers 10 
