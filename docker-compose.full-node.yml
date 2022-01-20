@@ -21,7 +21,7 @@ services:
       --base-path /da/state
       --name MATIC_FULLNODE
       --keystore-path /da/keystore
-      --bootnodes /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
+      --bootnodes /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv
       --execution Native
       --in-peers 10 
       --out-peers 10

@@ -25,7 +25,7 @@ services:
       --name MATIC_VALIDATOR_3
       --node-key-file /da/node.key
       --keystore-path /da/keystore
-      --bootnodes /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp 
+      --bootnodes /ip4/54.160.87.220/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv
       --bootnodes /ip4/3.218.2.152/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL
       --execution Native
       --in-peers 10 
