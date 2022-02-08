@@ -1,5 +1,25 @@
 # Data Availability Deployments 
 
+# avail-deploy - for testing purposes
+
+Steps to run:
+
+1. Make sure you have access to Avail private repos through `ssh`. Then, 
+``` 
+cd images/client
+docker build --ssh default .
+```
+After this run following command from the root:
+
+``` 
+cd ../..
+docker build -t client -f images/light/Dockerfile .
+```
+
+```
+docker-compose -f docker-compose.light.client.yml up 
+```
+
 ## Current Testnet Deployment
 
 | Name    | Node IP  | P2P Discovery Address | Running |

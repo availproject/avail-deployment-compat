@@ -1,0 +1,24 @@
+version: "3.3"
+services: 
+  client: 
+    container_name: light-client
+    # build:  
+    #    context: ./images/light
+    image: client
+    volumes: 
+      - light-client:/avail/state
+    
+    command: bash -c "cd avail-light && cargo run"
+    ports: 
+      - 9000:7000
+      - 11000:11000
+    networks:
+      - avail
+
+volumes:
+  light-client:
+
+networks:
+  avail:
+    name: avail-network
+    driver: bridge
