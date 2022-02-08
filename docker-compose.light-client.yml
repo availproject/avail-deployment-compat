@@ -2,23 +2,36 @@ version: "3.3"
 services: 
   client: 
     container_name: light-client
-    # build:  
-    #    context: ./images/light
-    image: client
+    build:  
+        context: ./images/client
+        args:
+          - BRANCH=feature/app-specific-data-retrieval_2
+    image: client:asdr
     volumes: 
       - light-client:/avail/state
-    
-    command: bash -c "cd avail-light && cargo run"
     ports: 
       - 9000:7000
       - 11000:11000
-    networks:
-      - avail
+    depends_on:
+      - data_avail
+    environment:
+      - FULL_NODE_RPC='http://data_avail:9933'
+      - FULL_NODE_WS='ws://data_avail:9944'
+
+  data_avail:
+    container_name: data_avail
+    build:
+      context: ./images/da
+      args:
+        - BRANCH=feature/app-specific-data-retrieval
+    image: da:asdr
+    volumes:
+      - da_state:/da/state
+    command:
+      --dev
+      --tmp
+
 
 volumes:
   light-client:
-
-networks:
-  avail:
-    name: avail-network
-    driver: bridge
+  da_state:
