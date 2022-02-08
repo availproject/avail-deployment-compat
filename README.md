@@ -17,7 +17,7 @@ docker build -t client -f images/light/Dockerfile .
 ```
 
 ```
-docker-compose -f docker-compose.light.client.yml up 
+docker-compose -f docker-compose.light-client.yml up 
 ```
 
 ## Current Testnet Deployment
