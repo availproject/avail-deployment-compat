@@ -1,25 +1,5 @@
 # Data Availability Deployments 
 
-# avail-deploy - for testing purposes
-
-Steps to run:
-
-1. Make sure you have access to Avail private repos through `ssh`. Then, 
-``` 
-cd images/client
-docker build --ssh default .
-```
-After this run following command from the root:
-
-``` 
-cd ../..
-docker build -t client -f images/light/Dockerfile .
-```
-
-```
-docker-compose -f docker-compose.light-client.yml up 
-```
-
 ## Current Testnet Deployment
 
 | Name    | Node IP  | P2P Discovery Address | Running |
@@ -130,3 +110,20 @@ the output would be something like:
    binary. Another option is to replace the WASM code in `genesis > runtime > frameSystem > code` in
    your `chain.spec` file.
 
+# Development Environment
+
+## Build and Run Light Client and Data-Avail in Dev.
+
+1. Build images, `client:asdr`(usign branch `feature/app-specific-data-retrieval_2`) and `da:asdr`
+   (using branch `feature/app-specific-data-retrieval`):
+
+    $ export DOCKER_BUILDKIT = 1
+    $ docker build --ssh default -t client:asdr --build-arg BRANCH=feature/app-specific-data-retrieval_2 -f images/client/Dockerfile images/client/
+    ...
+    $ docker build --ssh default -t da:asdr --build-arg BRANCH=feature/app-specific-data-retrieval -f images/da/Dockerfile images/da
+    ...
+
+2. Run the services using `docker-compose.light-client.yml`:
+
+    $ docker-compose -f docker-compose.light-client.yml up 
+    ...
