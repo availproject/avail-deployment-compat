@@ -15,8 +15,8 @@ services:
     depends_on:
       - data_avail
     environment:
-      - FULL_NODE_RPC='http://data_avail:9933'
-      - FULL_NODE_WS='ws://data_avail:9944'
+      - FULL_NODE_RPC="http://data_avail:9933"
+      - FULL_NODE_WS="ws://data_avail:9944"
 
   data_avail:
     container_name: data_avail

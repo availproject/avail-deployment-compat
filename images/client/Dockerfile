@@ -37,16 +37,16 @@ COPY --from=builder /avail-light /avail-light
 COPY ./resources/* /avail-light
 
 ENV \
-	HTTP_SERVER_HOST='127.0.0.1' \
+	HTTP_SERVER_HOST="127.0.0.1" \
 	HTTP_SERVER_PORT=7000 \
 	IPFS_SEED=1 \
 	IPFS_PORT=37000 \
-	IPFS_PATH='avail_ipfs_store' \
-	FULL_NODE_RPC='http://host.docker.internal:9933' \
-	FULL_NODE_WS='ws://host.docker.internal:9944' \
+	IPFS_PATH="avail_ipfs_store" \
+	FULL_NODE_RPC="http://host.docker.internal:9933" \
+	FULL_NODE_WS="ws://host.docker.internal:9944" \
 	APP_ID=0 \
 	CONFIDENCE=92.0 \
-	AVAIL_PATH='avail_path' \
+	AVAIL_PATH="avail_path" \
 	BOOTSTRAPS=[]
 
 WORKDIR avail-light
