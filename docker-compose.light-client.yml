@@ -17,6 +17,14 @@ services:
     environment:
       - FULL_NODE_RPC="http://data_avail:9933"
       - FULL_NODE_WS="ws://data_avail:9944"
+      - RUST_BACKTRACE=1
+    entrypoint: [ 
+      "wait-for-it", 
+      "-t", "10",
+      "data_avail:9944", 
+      "--", 
+      "/avail-light/start.sh"
+    ]
 
   data_avail:
     container_name: data_avail
@@ -30,7 +38,12 @@ services:
     command:
       --dev
       --tmp
-
+      --ws-port=9944
+      --ws-external
+      --rpc-port=9933
+      --rpc-cors=all
+      --rpc-methods=Unsafe
+      --rpc-external
 
 volumes:
   light-client:

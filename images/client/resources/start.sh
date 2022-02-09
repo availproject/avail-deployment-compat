@@ -4,12 +4,12 @@
 echo "## File config-template.yaml "
 echo "##############################"
 cat < ./config-template.yaml
-envsubst < ./config-template.yaml > ./config.yml
+envsubst < ./config-template.yaml > ./config.yaml
 echo ""
 
 echo "## Generated config.yaml"
 echo "##############################"
-cat < ./config.yml
+cat < ./config.yaml
 echo ""
 
 # Run the light-client

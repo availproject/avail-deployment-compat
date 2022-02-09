@@ -30,7 +30,7 @@ FROM debian:buster-slim
 
 # Install ssh client and git
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base && \
+	apt-get install -y libssl1.1 gettext-base wait-for-it && \
 	rm -rf /var/lib/apt/lists 
 
 COPY --from=builder /avail-light /avail-light
