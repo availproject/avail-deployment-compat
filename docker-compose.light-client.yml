@@ -1,0 +1,50 @@
+version: "3.3"
+services: 
+  client: 
+    container_name: light-client
+    build:  
+        context: ./images/client
+        args:
+          - BRANCH=feature/app-specific-data-retrieval_2
+    image: client:asdr
+    volumes: 
+      - light-client:/avail/state
+    ports: 
+      - 9000:7000
+      - 11000:11000
+    depends_on:
+      - data_avail
+    environment:
+      - FULL_NODE_RPC="http://data_avail:9933"
+      - FULL_NODE_WS="ws://data_avail:9944"
+      - RUST_BACKTRACE=1
+    entrypoint: [ 
+      "wait-for-it", 
+      "-t", "10",
+      "data_avail:9944", 
+      "--", 
+      "/avail-light/start.sh"
+    ]
+
+  data_avail:
+    container_name: data_avail
+    build:
+      context: ./images/da
+      args:
+        - BRANCH=feature/app-specific-data-retrieval
+    image: da:asdr
+    volumes:
+      - da_state:/da/state
+    command:
+      --dev
+      --tmp
+      --ws-port=9944
+      --ws-external
+      --rpc-port=9933
+      --rpc-cors=all
+      --rpc-methods=Unsafe
+      --rpc-external
+
+volumes:
+  light-client:
+  da_state:
