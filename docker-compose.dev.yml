@@ -3,10 +3,10 @@ services:
   alice:
     container_name: alice 
     build:
-      context: ./images/node
+      context: ./images/da
       args:
-        - BRANCH=da-poc
-    image: da:poc 
+        - BRANCH=miguel/mat-3347-new-chain-spec-for-dev-testnet
+    image: da:latest
     tmpfs: /tmp
     volumes:
       - alice-state:/da/state
