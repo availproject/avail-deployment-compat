@@ -12,12 +12,14 @@ ARG BRANCH=master
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 RUN --mount=type=ssh \
+	mkdir -p /da/bin && \
+	mkdir -p /da/genesis && \
 	# Build DA \
 	git clone --branch ${BRANCH} git@github.com:maticnetwork/avail.git && \
+	cp -r avail/misc/genesis /da && \
 	cd avail && \
 	cargo build --release && \
 	# Install binaries \ 
-	mkdir -p /da/bin && \
 	mv target/release/data-avail /da/bin && \
 	# and clean \
 	cd .. && \
