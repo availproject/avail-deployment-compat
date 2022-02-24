@@ -1,0 +1,36 @@
+version: "3.3"
+services: 
+  light_client: 
+    image: client:asdr
+    volumes: 
+      - light_client_state:/avail-light/ipfs_store
+    environment:
+      - HTTP_SERVER_HOST=0.0.0.0
+      - FULL_NODE_RPC="http://polygon-da-explorer.matic.today:9933"
+      - FULL_NODE_WS="wss://polygon-da-explorer.matic.today/ws"
+      - IPFS_PATH=/avail-light/ipfs_store
+
+  # Redis is used to store certificates
+  redis:
+    image:  redis:6-alpine
+    command: "redis-server --save 60 1"
+    volumes:
+      - ./volume/redis/data:/data
+
+  # HTTPS proxy
+  proxy:
+    image: kong:2.6.0-alpine
+    env_file: env/proxy.env
+    depends_on:
+      - light_client
+      - redis
+    volumes:
+      - ./volume/proxy/kong.polygon-da-light.yml:/proxy/kong.yml:ro
+    ports:
+      - 443:8443
+      - 80:8000
+
+volumes:
+  light_client_state:
+
+# vim: ts=2:et
