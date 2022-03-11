@@ -1,0 +1,103 @@
+# Setting up something that replicates the testnet enviroment
+version: "3.3"
+services:
+  validator1:
+    container_name: validator1
+    image: 0xpolygon/avail:1.0.0
+    tmpfs: /tmp
+    entrypoint: /da/exec/da.sh
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./ansible/roles/bootnode/templates/genesis:/da/genesis:ro
+      - ./volume/testnet/validator1/state:/da/state
+      - ./volume/testnet/validator1/node.key:/da/node.key:ro
+      - ./volume/testnet/validator1/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/validator1/keystore:/da/keystore
+    ports:
+      - 30331:30331
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_1
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --execution Native
+      --in-peers 10
+      --out-peers 10
+      --rpc-cors all
+      --port 30331
+      --ws-port 9944
+      --rpc-port 9933
+  validator2:
+    container_name: validator2
+    image: 0xpolygon/avail:1.0.0
+    tmpfs: /tmp
+    entrypoint: /da/exec/da.sh
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./ansible/roles/bootnode/templates/genesis:/da/genesis:ro
+      - ./volume/testnet/validator2/state:/da/state
+      - ./volume/testnet/validator2/node.key:/da/node.key:ro
+      - ./volume/testnet/validator2/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/validator2/keystore:/da/keystore
+    ports:
+      - 30332:30332
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_2
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --bootnodes /dns/validator1/tcp/30331/p2p/12D3KooWRg59seAwHLVE7EYzEBnigNadYXc6uTB75Xt1UNJQyAyE
+      --execution Native
+      --in-peers 10
+      --out-peers 10
+      --port 30332
+      --rpc-cors all
+      --ws-port 9944
+      --rpc-port 9933
+  validator3:
+    container_name: validator3
+    image: 0xpolygon/avail:1.0.0
+    tmpfs: /tmp
+    entrypoint: /da/exec/da.sh
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./ansible/roles/bootnode/templates/genesis:/da/genesis:ro
+      - ./volume/testnet/validator3/state:/da/state
+      - ./volume/testnet/validator3/node.key:/da/node.key:ro
+      - ./volume/testnet/validator3/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/validator3/keystore:/da/keystore
+    ports:
+      - 30333:30333
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_3
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --bootnodes /dns/validator1/tcp/30331/p2p/12D3KooWRg59seAwHLVE7EYzEBnigNadYXc6uTB75Xt1UNJQyAyE
+      --bootnodes /dns/validator2/tcp/30332/p2p/12D3KooWK3qXbpMJXTvFbqdp81AsjnEwiGQih2rDzF7YvmcTbHYg
+      --execution Native
+      --in-peers 10
+      --out-peers 10
+      --port 30333
+      --rpc-cors all
+      --ws-port 9944
+      --rpc-port 9933
+

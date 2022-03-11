@@ -9,3 +9,4 @@ app_id = ${APP_ID}
 confidence = ${CONFIDENCE}
 avail_path = "${AVAIL_PATH}"
 bootstraps = ${BOOTSTRAPS}
+log_level = ${LOG_LEVEL} 

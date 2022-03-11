@@ -1,0 +1,9 @@
+---
+node_port: 30333
+node_ws_port: 9944
+node_rpc_port: 9933
+node_base_path: /volumes/{{ node_name }}
+
+prometheus:
+  port: 9615
+  endpoint: "metrics"

@@ -1,0 +1,8 @@
+---
+- name: Stop the avail container
+  hosts: all
+  tasks:
+    - name: Stop avail docker image
+      community.docker.docker_container:
+        name: da-client
+        state: stopped

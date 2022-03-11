@@ -1,0 +1,14 @@
+---
+- name: Creation of host file peers
+  hosts: all
+  become: yes
+  tasks:
+  - name: "Build hosts file"
+    lineinfile:
+      dest: /etc/hosts
+      regexp: '.*{{ item }}$'
+      line: "{{ item }} {{ hostvars[item].tags.Name }}"
+      state: present
+    when: hostvars[inventory_hostname].tags.Name is defined
+    with_items: "{{ groups['all'] }}"
+

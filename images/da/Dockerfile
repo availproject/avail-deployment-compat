@@ -6,19 +6,16 @@ RUN apt-get update && \
 	apt-get install -y git openssh-client && \
 	rm -rf /var/lib/apt/lists 
  
-ARG BRANCH=master
+ARG BRANCH=main
 
-# Download public key for github.com
-RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-RUN --mount=type=ssh \
+RUN \
 	mkdir -p /da/bin && \
 	mkdir -p /da/genesis && \
 	# Build DA \
-	git clone --branch ${BRANCH} git@github.com:maticnetwork/avail.git && \
+	git clone --branch ${BRANCH} https://github.com/maticnetwork/avail.git && \
 	cp -r avail/misc/genesis /da && \
 	cd avail && \
-	cargo build --release && \
+	cargo build --release -p data-avail && \
 	# Install binaries \ 
 	mv target/release/data-avail /da/bin && \
 	# and clean \
@@ -30,6 +27,10 @@ RUN --mount=type=ssh \
 # ========================= 
 FROM debian:buster-slim
 
+RUN apt-get update && \
+	apt-get install -y curl && \
+	rm -rf /var/lib/apt/lists 
+ 
 COPY --from=builder /da/ /da
 WORKDIR /da
 

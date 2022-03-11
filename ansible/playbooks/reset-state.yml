@@ -1,0 +1,23 @@
+---
+- name: Delete the avail state directories
+  hosts: all
+  become: yes
+  tasks:
+  - name: Removing state folder
+    file:
+      state: absent
+      path: "/volumes/{{ item }}/state"
+    with_items: 
+      - bootnode-1
+      - bootnode-2
+      - bootnode-3
+      - explorer-1
+  - name: Removing state folder
+    file:
+      state: absent
+      path: "/volumes/{{ item }}/keystore"
+    with_items: 
+      - bootnode-1
+      - bootnode-2
+      - bootnode-3
+      - explorer-1

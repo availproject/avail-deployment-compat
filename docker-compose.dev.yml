@@ -6,18 +6,13 @@ services:
       context: ./images/da
       args:
         - BRANCH=miguel/mat-3347-new-chain-spec-for-dev-testnet
-    image: da:latest
+    image: da:mat-3347
     tmpfs: /tmp
     volumes:
       - alice-state:/da/state
       - ./volume/dev/local.chain_spec.json:/da/chain_spec.json:ro
     ports:
       - 9944:9944
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
     command: 
       --validator
       --alice
@@ -36,16 +31,11 @@ services:
       --ws-port 9944
   bob:
     container_name: bob 
-    image: da:poc 
+    image: da:mat-3347
     tmpfs: /tmp
     volumes:
       - bob-state:/da/state
       - ./volume/dev/local.chain_spec.json:/da/chain_spec.json:ro
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
     depends_on:
       - alice
     command:
@@ -63,39 +53,8 @@ services:
       --no-prometheus
       --rpc-cors all
 
-  # Use `docker attach` (and `Ctrl-p` + `Ctrl-q` to detach).
-  charlie:
-    container_name: charlie 
-    image: da:debug-poc 
-    build:
-      context: ./images/node
-      args:
-        - BRANCH=da-poc
-        - PROFILE=debug
-    tmpfs: /tmp
-    volumes:
-      - charlie-state:/da/state
-      - ./volume/dev/local.chain_spec.json:/da/chain_spec.json:ro
-    depends_on:
-      - alice
-    command:
-      --validator
-      --charlie
-      --chain /da/chain_spec.json 
-      --base-path /da/state
-      --name MATIC_VALIDATOR_3
-      --node-key 0000000000000000000000000000000000000000000000000000000000000003
-      --execution Native
-      --in-peers 2
-      --out-peers 2
-      --port 30333 
-      --bootnodes /dns4/alice/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
-      --no-prometheus
-      --rpc-cors all
-
 volumes:
   alice-state:
   bob-state:
-  charlie-state:
 
 # vim: ts=2:et

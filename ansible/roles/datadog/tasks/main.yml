@@ -1,0 +1,29 @@
+---
+- name: Install docker python package
+  ansible.builtin.pip:
+    name: docker
+
+- name: Pull datadog docker image and run
+  community.docker.docker_container:
+    name: dd-agent
+    image: "datadog/agent:latest"
+    memory: 256MB
+    memory_swap: 256MB
+    cpu_shares: 20
+    pull: true
+    state: started
+    restart_policy: always
+    volumes: "{{ datadog_volumes }}"
+    env:
+      DD_API_KEY: "{{ datadog_api_key|default('FAKE_KEY') }}"
+      DD_TAGS: "network:avail-testnet"
+      DD_PROCESS_AGENT_ENABLED: "true"
+      DD_LOGS_STDOUT: "true"
+      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
+      DD_ENV: "testnet"
+      DD_LOGS_ENABLED: "true"
+      DD_CONTAINER_EXCLUDE: "image:datadog/agent"
+    published_ports:
+      - "8125:8125/udp"
+      - "8126:8126"
+  tags: datadog_agent

@@ -1,0 +1,35 @@
+namespace: /polygon
+
+
+da-validator-1:
+  defines: runnable
+  inherits: ./da-validator-genesis
+  variables:
+    self_id: "da-validator-1"
+    node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-1") parse-json get-member("keynode") get-member("sk")
+    name: MATIC_VALIDATOR_1
+    volume-data: /mnt/volume/da/upgrade/1/
+    cmds: <- " --reserved-nodes /dns4/" get-hostname("/polygon/da-validator-2", "da-node") "/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL --reserved-nodes /dns4/" get-hostname("/polygon/da-validator-3", "da-node") "/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz " concat-all
+
+da-validator-2:
+  defines: runnable
+  inherits: ./da-validator-genesis
+  variables:
+    self_id: "da-validator-2" 
+    node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-2") parse-json get-member("keynode") get-member("sk")
+    name: MATIC_VALIDATOR_2
+    volume-data: /mnt/volume/da/upgrade/2
+    cmds: <- "--bootnodes /dns4/" get-hostname("/polygon/da-validator-1", "da-node") "/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv --reserved-nodes /dns4/" get-hostname("/polygon/da-validator-3", "da-node") "/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz " concat-all
+
+da-validator-3:
+  defines: runnable
+  inherits: ./da-validator-genesis
+  variables:
+    self_id: "da-validator-3"
+    node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-3") parse-json get-member("keynode") get-member("sk")
+    name: MATIC_VALIDATOR_3
+    volume-data: /mnt/volume/da/upgrade/3
+    cmds: <- "--bootnodes /dns4/" get-hostname("/polygon/da-validator-1", "da-node") "/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv --reserved-nodes /dns4/" get-hostname("/polygon/da-validator-2", "da-node") "/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL " concat-all
+
+
+

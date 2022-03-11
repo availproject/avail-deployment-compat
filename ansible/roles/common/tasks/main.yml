@@ -1,0 +1,29 @@
+- name: create mountpoint
+  ansible.builtin.file:
+    path: /volumes
+    state: directory
+
+- name: create the partition (nitro hypervisor)
+  community.general.parted:
+    device: /dev/nvme1n1
+    number: 1
+    label: "gpt"
+    part_start: "0%"
+    part_end: "100%"
+    name: "data"
+    state: present
+
+- name: format to ext4 (nitro hypervisor)
+  community.general.filesystem:
+    dev: /dev/nvme1n1p1
+    fstype: ext4
+
+- name: refresh metadata
+  ansible.builtin.setup: {}
+
+- name: mount the partition (nitro hypervisor)
+  ansible.posix.mount:
+    path: /volumes
+    src: "UUID={{ ansible_devices['nvme1n1']['partitions']['nvme1n1p1']['uuid'] }}"
+    fstype: ext4
+    state: "mounted"

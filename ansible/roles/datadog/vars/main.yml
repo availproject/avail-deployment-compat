@@ -1,0 +1,9 @@
+---
+datadog_volumes:
+  - /var/run/docker.sock:/var/run/docker.sock
+  - /proc:/host/proc
+  - /etc/datadog-agent/conf.d/:/conf.d:ro
+  - /etc/passwd:/etc/passwd:ro
+  - /sys/fs/cgroup:/host/sys/fs/cgroup
+
+datadog_api_key: "{{ lookup('onepassword', 'Datadog API Key', field='credential', vault='Avail Testnet') }}"

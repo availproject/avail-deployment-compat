@@ -1,0 +1,15 @@
+- name: "load {{key_type}} private key into {{container}}"
+  community.docker.docker_container_exec:
+    container: "{{container}}"
+    debug: yes
+    argv: 
+      - /da/bin/data-avail 
+      - key 
+      - insert 
+      - "--chain=/da/genesis/testnet.chain.spec.raw.json"
+      - "--base-path=/da/state"
+      - "--keystore-path=/da/keystore"
+      - "--suri={{ sk }}"
+      - "--key-type={{ key_type }}"
+      - "--scheme={{ scheme }}"
+

@@ -1,0 +1,104 @@
+- hosts: bootnode_1
+  become: true
+  roles:
+    - common
+    - datadog
+    - role: bootnode
+      tags: bootnodes
+      vars:
+        node_name: bootnode-1
+        node_boot_nodes: []
+        node_reserved_nodes:
+          - /ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead
+          - /ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh
+
+- hosts: bootnode_2
+  become: true
+  roles:
+    - common
+    - datadog
+    - role: bootnode
+      tags: bootnodes
+      vars:
+        node_name: bootnode-2
+        node_reserved_nodes:
+            - /ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh
+        node_boot_nodes:
+            - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC
+
+- hosts: bootnode_3
+  become: true
+  roles:
+    - common
+    - datadog
+    - role: bootnode
+      tags: bootnodes
+      vars:
+        node_name: bootnode-3
+        node_reserved_nodes:
+            - /ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead
+        node_boot_nodes:
+            - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC
+
+- hosts: explorer_1
+  become: true
+  roles:
+    - common
+    - datadog
+    - role: explorer
+      tags: explorers
+      vars:
+        node_name: explorer-1
+        node:
+          vault_secret_path: "da/testnet/da-explorer-1"
+          ws_max_connections: 1000
+          in_peers: 50
+          out_peers: 50
+          web_domain: "testnet.polygonavail.net"
+          boot_nodes:
+            - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC
+            - /ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead
+            - /ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh
+    - role: lc
+      tags: lc
+      vars:
+        node_name: "light-client-1"
+        target:
+          node_rpc: "http://3.213.146.89:9933"
+          node_ws: "wss://testnet.polygonavail.net/ws"
+
+
+# More validators
+# - hosts: da-val-2
+#   become: true
+#   tags: validators
+#   vars:
+#     base_path: /volumes/da
+#     validators:
+#       - { id: "da-validator-4", port: 30334 }
+#       - { id: "da-validator-5", port: 30335 }
+#   tasks:
+#     - include_role:
+#         name: validators
+#       vars:
+#         id: "{{ item.id }}"
+#         port: "{{ item.port }}"
+#       with_items: 
+#         - "{{ validators }}"
+
+# - hosts: da-val-3
+#   become: true
+#   tags: validators
+#   vars:
+#     base_path: /volumes/da
+#     validators:
+#       - { id: "da-validator-6", port: 30334 }
+#       - { id: "da-validator-7", port: 30335 }
+#   tasks:
+#     - include_role:
+#         name: validators
+#       vars:
+#         id: "{{ item.id }}"
+#         port: "{{ item.port }}"
+#       with_items: 
+#         - "{{ validators }}"
