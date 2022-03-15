@@ -6,7 +6,7 @@ RUN apt-get update && \
 	apt-get install -y git openssh-client && \
 	rm -rf /var/lib/apt/lists 
  
-ARG BRANCH=master
+ARG BRANCH=main
 
 RUN \
 	mkdir -p /da/bin && \
