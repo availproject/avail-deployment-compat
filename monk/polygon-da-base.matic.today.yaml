@@ -1,0 +1,152 @@
+namespace: /polygon
+
+# TODO
+#  - Include `dumb-init` in the DA image.
+da-common-node:
+  metadata:
+    defines: metadata
+    name: Data-Avail Testnet
+    description: Data-Avail Testnet Common Node
+    email: miguel@polygon.technology
+  containers:
+    defines: containers
+    da-node: 
+      image: da:ava-33
+      user: root
+      entrypoint: /da/bin/da.sh
+      paths:
+        - <- `${volume-data}/state:/da/state`
+        - <- `${volume-data}/keystore:/da/keystore`
+  variables:
+    defines: variables
+    self_id:
+      type: string
+      value: "" 
+    chain_spec:
+      type: string
+      value: '/da/genesis/testnet.chain.spec.raw.json'
+    name:
+      type: string
+      value: DA_VALIDATOR
+    node_key:
+      type: string
+      value: ""
+    in_peers:
+      type: int
+      value: 10
+    out_peers:
+      type: int
+      value: 10
+    p2p_port:
+      type: int
+      value: 30333
+    ws_port:
+      type: int
+      value: 9944
+    rpc_port:
+      type: int
+      value: 9933
+    bootnode:
+      type: string
+      value: "" 
+    m_val:
+      type: string 
+      value: ""
+    cmds:
+      type: string
+      value: ""
+    m_da_val_1_node:
+      type: string
+      value: <- get-hostname("/polygon/da-validator-1", "da-node")
+    m_da_val_2_node:
+      type: string
+      value: <- get-hostname("/polygon/da-validator-2", "da-node")
+    m_da_val_3_node:
+      type: string
+      value: <- get-hostname("/polygon/da-validator-3", "da-node")
+ 
+    volume-data:
+      type: string
+      value: <- `${moncc-volume-path}/da`
+
+
+#  Data-Avail Validators
+#  ===============================
+
+da-validator:
+  defines: runnable
+  inherits: ./da-common-node
+  containers:
+    defines: containers
+    da-node: 
+      hooks:
+        container-started: load-keys
+  #      container-stopping: clean-keys
+  actions:
+    defines: actions
+    insert-key:
+      description: "Insert key into keystore"
+      arguments:
+        type:
+          type: string
+          description: Key type like 'gran', 'babe', 'imol', 'audi', or 'auth' 
+        suri:
+          type: string
+          description: Secrect URI 
+        scheme:
+          type: string
+          description: Key Scheme, like 'Sr25519', 'Ed25519', etc. 
+      code: |
+        exec( "da-node", "/da/bin/data-avail", "key", "insert", `--chain=${chain_spec}`, "--base-path=/da/state", "--keystore-path=/da/keystore", `--suri=${args["suri"]}`, `--key-type=${args["type"]}`, `--scheme=${args["scheme"]}`)
+        { type: $args["type"], scheme: $args["scheme"] } to-json
+
+    insert-session-keys:
+      description: "Insert Dev key into keystore"
+      arguments:
+        suri:
+          type: string
+          description: Like '//Alice', '//Bob'. 
+      code: |
+        []
+        act(`polygon/${self_id}/insert-key`, "type", "babe", "suri", $args["suri"], "scheme", "Sr25519") parse-json append
+        act(`polygon/${self_id}/insert-key`, "type", "gran", "suri", $args["suri"], "scheme", "Ed25519") parse-json append
+        act(`polygon/${self_id}/insert-key`, "type", "imon", "suri", $args["suri"], "scheme", "Sr25519") parse-json append
+        act(`polygon/${self_id}/insert-key`, "type", "audi", "suri", $args["suri"], "scheme", "Sr25519") parse-json append
+        act(`polygon/${self_id}/insert-key`, "type", "auth", "suri", $args["suri"], "scheme", "Sr25519") parse-json append
+        to-json
+
+    load-keys:
+      description: Load keys from Vault
+      code: |
+        act("polygon/da-vault/get_as_json", "path", `secret/da/testnet/${self_id}`) parse-json set-tmp("m_val") to-json
+        act(`polygon/${self_id}/insert-session-keys`, "suri", $m_val["sk"]) 
+
+    clean-keys:
+      description: "Remove keys from key store"
+      code: exec( "da-node", "rm", "-rf", "/da/keystore/*")
+
+  files:
+    defines: files
+    da-val-def:
+      container: da-node 
+      path: /da/bin/da.sh
+      mode: 755 
+      contents: |
+        #!/bin/bash
+        cat /da/bin/da.sh ;
+        /da/bin/data-avail \
+          --validator \
+          --chain {{ v "chain_spec" }} \
+          --base-path /da/state \
+          --name {{ v "name" }} \
+          --node-key {{ v "node_key" }} \
+          --keystore-path /da/keystore \
+          --execution Native \
+          --offchain-worker Always \
+          --in-peers  {{ v "in_peers" }} \
+          --out-peers {{ v "out_peers" }} \
+          --port {{ v "p2p_port" }} \
+          --ws-port {{ v "ws_port" }} \
+          --rpc-port {{ v "rpc_port" }} {{ v "cmds" }}
+
+

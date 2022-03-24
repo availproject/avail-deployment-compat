@@ -1,0 +1,236 @@
+namespace: /polygon
+
+da-validator-1:
+  defines: runnable
+  inherits: ./da-validator
+  variables:
+    self_id: "da-validator-1"
+    node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-1") parse-json get-member("keynode") get-member("sk")
+    name: MATIC_VALIDATOR_1
+    volume-data: /mnt/volume/da/validator/1
+    cmds: <- `--force-authoring --reserved-nodes /dns4/${m_da_val_2_node}/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL --reserved-nodes /dns4/${m_da_val_3_node}/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz `
+
+da-validator-2:
+  defines: runnable
+  inherits: ./da-validator
+  variables:
+    self_id: "da-validator-2" 
+    node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-2") parse-json get-member("keynode") get-member("sk")
+    name: MATIC_VALIDATOR_2
+    volume-data: /mnt/volume/da/validator/2
+    cmds: <- `--bootnodes /dns4/${m_da_val_1_node}/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv  --reserved-nodes /dns4/${m_da_val_3_node}/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz `
+
+da-validator-3:
+  defines: runnable
+  inherits: ./da-validator
+  variables:
+    self_id: "da-validator-3"
+    node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-3") parse-json get-member("keynode") get-member("sk")
+    name: MATIC_VALIDATOR_3
+    volume-data: /mnt/volume/da/validator/3
+    cmds: <- `--bootnodes /dns4/${m_da_val_1_node}/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv --reserved-nodes /dns4/${m_da_val_2_node}/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL ` 
+
+#  Secure Vault 
+#  ===============================
+
+da-vault:
+  defines: runnable
+  inherits: vault/latest
+  containers:
+    defines: containers
+    vault:
+      image-tag: 1.9.4
+      # entrypoint: "docker-entrypoint.sh server"
+      ports:
+        - 0.0.0.0:8200:8200
+      environment:
+        - VAULT_CLI_NO_COLOR=1
+        - SKIP_SETCAP=1
+        - <- `VAULT_DEV_ROOT_TOKEN_ID=${root-token}`
+        - <- `VAULT_TOKEN=${root-token}`
+  variables:
+    root-token: "da-root-test"
+    volume-data: /mnt/volume/vault
+  actions:
+    defines: actions
+    get_as_json:
+      description: Get value as Json
+      arguments:
+        path:
+          type: string
+          description: Value path
+      code: exec("vault", "/bin/sh", "-c", `VAULT_TOKEN=${root-token} VAULT_CLI_NO_COLOR=true vault kv get -address=http://127.0.0.1:8200 -format=json ${args["path"]}`) trim parse-json get-member("data") get-member("data") to-json
+  files:
+    defines: files
+    da-val-def:
+      container: vault 
+     # path: /vault/config/local.json
+      path: /local.json
+      mode: 644
+      contents: |
+        {
+          "backend": {
+            "file": {
+              "path": "/vault/file"
+            }
+          },
+          "listener": {
+            "tcp":{
+              "address": "0.0.0.0:8200",
+              "tls_disable": 1
+            }
+          },
+          "ui": true,
+          "disable_mlock": true,
+          "default_lease_ttl": "168h", 
+          "max_lease_ttl": "720h"
+        }
+
+# TODO
+#  - Vault to AWS volume.
+
+# Explorer Node
+# ======================================
+
+da-explorer:
+  defines: runnable
+  inherits: ./da-common-node
+  containers:
+    defines: containers
+    dapp:
+      image: dapp:asdr
+      environment:
+        - <- `WS_URL=ws://${full_node}:${ws_port}`
+    redis:
+      image:  redis:6-alpine
+      entrypoint: "redis-server --save 60 1"
+      paths:
+        - <- `${volume-data}/redis/data:/data`
+    proxy:
+      image: kong:2.6.0-alpine
+      environment:
+        # General
+        - KONG_PROXY_ACCESS_LOG=/dev/stdout
+        - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+        - KONG_PROXY_ERROR_LOG=/dev/stderr
+        - KONG_ADMIN_ERROR_LOG=/dev/stderr
+        - KONG_ADMIN_LISTEN=0.0.0.0:8001
+        # Proxy DB-less & Declarative
+        - KONG_DATABASE=off
+        - KONG_DECLARATIVE_CONFIG=/proxy/kong.yml
+        # Acme Plugin
+        - KONG_LUA_SSL_TRUSTED_CERTIFICATE=system
+      ports:
+        - 0.0.0.0:80:8000
+        - 0.0.0.0:443:8443
+
+  variables:
+    defines: variables
+    web_domain:
+      type: string
+      value: "polygon-da-explorer.matic.today"
+    full_node:
+      type: string
+      value: ""
+    dapp:
+      type: string
+      value: ""
+    redis:
+      type: string
+      value: ""
+    ws_max_connections:
+      type: int
+      value: 10000
+  files:
+    defines: files
+    da-exp-def:
+      container: da-node 
+      path: /da/bin/da.sh
+      mode: 755 
+      contents: |
+        #!/bin/bash
+        cat /da/bin/da.sh ;
+        /da/bin/data-avail \
+          --chain {{ v "chain_spec" }} \
+          --base-path /da/state \
+          --name {{ v "name" }} \
+          --node-key {{ v "node_key" }} \
+          --execution Native \
+          --sync Fast \
+          --ws-max-connections {{ v "ws_max_connections" }} \
+          --in-peers  {{ v "in_peers" }} \
+          --out-peers {{ v "out_peers" }} \
+          --port {{ v "p2p_port" }} \
+          --ws-port {{ v "ws_port" }} \
+          --ws-external \
+          --rpc-port {{ v "rpc_port" }} \
+          --rpc-cors all \
+          --rpc-external \
+          --bootnodes /dns4/{{ v "m_da_val_1_node" }}/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv \
+          --reserved-nodes /dns4/{{ v "m_da_val_2_node" }}/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL \
+          --reserved-nodes /dns4/{{ v "m_da_val_3_node" }}/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz \
+          --reserved-only \
+          {{ v "cmds" }}
+    kong_yml:
+      container: proxy
+      path: /proxy/kong.yml
+      mode: 444
+      contents: |
+        _format_version: "2.1"
+        services:
+          - name: full_node_ws 
+            url: http://{{ v "full_node" }}:{{ v "ws_port" }}
+            routes:
+            - name: ws_route
+              protocols: ["https", "http"]
+              paths: ["/ws"]
+              request_buffering: false
+              response_buffering: false
+              strip_path: true
+          - name: dapp
+            url: http://{{ v "dapp" }}
+            routes:
+            - name: web_root_route
+              protocols: ["https", "http"]
+              paths: ["/"]
+              request_buffering: false
+              response_buffering: false
+              strip_path: true
+          - name: acme-dummy
+            url: http://127.0.0.1:65535
+            routes:
+            - name: acme-dummy
+              protocols: ["http"]
+              paths: ["/.well-known/acme-challenge"]
+        plugins:
+          - name: acme
+            config:
+              account_email: miguel@polygon.technology
+              domains: [ {{ v "web_domain" }}]
+              tos_accepted: true
+              storage: "redis"
+              storage_config:
+                redis:
+                  host: {{ v "redis" }}
+
+da-explorer-1:
+  defines: runnable
+  inherits: ./da-explorer
+  containers:
+    defines: containers
+    da-node:
+      ports:
+        - <- `0.0.0.0:${ws_port}:${ws_port}`
+        - <- `0.0.0.0:${rpc_port}:${rpc_port}`
+
+  variables:
+    self_id: "da-explorer-1" 
+    name: EXPLORER_1
+    node_key: <- act("/polygon/da-vault/get", "key", "keynode", "path", "secret/da/testnet/da-explorer-1")
+    full_node: <- get-hostname("/polygon/da-explorer-1", "da-node")
+    redis: <- get-hostname("/polygon/da-explorer-1", "redis")
+    dapp: <- get-hostname("/polygon/da-explorer-1", "dapp")
+    volume-data: /mnt/volume/da/explorer/1
+
+
+
