@@ -11,7 +11,7 @@ da-common-node:
   containers:
     defines: containers
     da-node: 
-      image: da:ava-33
+      image: 0xpolygon/avail:ava-33
       user: root
       entrypoint: /da/bin/da.sh
       paths:
@@ -81,7 +81,22 @@ da-validator:
     da-node: 
       hooks:
         container-started: load-keys
-  #      container-stopping: clean-keys
+    datadog-agent:
+      image: gcr.io/datadoghq/agent:latest
+      environment:
+        - DD_LOGS_ENABLED=true
+        - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+        - DD_CONTAINER_EXCLUDE="image:gcr.io/datadoghq/agent"
+        - DD_TAGS="da-devnet da-monk da"
+        - DD_DOCKER_LABELS_AS_TAGS=true
+        - <- "DD_API_KEY=" act("/polygon/da-vault/get", "key", "api_key", "path", "secret/da/testnet/datadog") concat-all
+      paths:
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        - /proc/:/host/proc/:ro
+        - /opt/datadog-agent/run:/opt/datadog-agent/run:rw
+        - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro 
+
   actions:
     defines: actions
     insert-key:
@@ -147,6 +162,5 @@ da-validator:
           --out-peers {{ v "out_peers" }} \
           --port {{ v "p2p_port" }} \
           --ws-port {{ v "ws_port" }} \
-          --rpc-port {{ v "rpc_port" }} {{ v "cmds" }}
-
+          --rpc-port {{ v "rpc_port" }} {{ v "cmds" }} 2>&1
 
