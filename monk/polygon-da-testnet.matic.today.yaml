@@ -71,7 +71,7 @@ da-aws-validator-3:
   inherits: ./da-validator-3
   variables:
     self_id: "da-aws-validator-3"
-    cmds: <- "--bootnodes /dns4/" get-hostname("/polygon/da-aws-validator-1", "da-node") "/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv --reserved-nodes /dns4/" get-hostname("/polygon/da-aws-validator-2", "da-node") "/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL " concat-all 
+    cmds: <- "--bootnodes /dns4/" get-hostname("/polygon/da-aws-validator-1", "da-node") "/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv --reserved-nodes /dns4/" get-hostname("/polygon/da-aws-validator-2", "da-node") "/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL -lruntime::election-provider=trace" concat-all 
   affinity:
     defines: affinity
     name: da-val-3
@@ -239,7 +239,7 @@ da-explorer:
           --bootnodes /dns4/{{ v "m_da_val_1_node" }}/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv \
           --reserved-nodes /dns4/{{ v "m_da_val_2_node" }}/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL \
           --reserved-nodes /dns4/{{ v "m_da_val_3_node" }}/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz \
-          {{ v "cmds" }}
+          {{ v "cmds" }} 2>&1
     kong_yml:
       container: proxy
       path: /proxy/kong.yml
@@ -256,6 +256,15 @@ da-explorer:
               request_buffering: false
               response_buffering: false
               strip_path: true
+          - name: full_node_rpc
+            url: http://{{ v "full_node" }}:{{ v "rpc_port" }}
+            routes:
+            - name: rpc_route
+              protocols: ["https", "http"]
+              paths: ["/rpc"]
+              request_buffering: false
+              response_buffering: false
+              strip_path: true
           - name: dapp
             url: http://{{ v "dapp" }}
             routes:
@@ -266,7 +275,7 @@ da-explorer:
               response_buffering: false
               strip_path: true
           - name: light_client 
-            url: http://{{ v "light_client" }}:7000/v1/
+            url: http://{{ v "light_client" }}:7000/
             routes:
             - name: light_client_route
               protocols: ["https", "http"]
@@ -326,9 +335,27 @@ da-light-client:
     light_client:
       image: 0xpolygon/avail-light:data-discovery
       environment:
-        - <- "FULL_NODE_RPC=\"" get-hostname("/polygon/da-explorer-1", "da-node") ":9933\"" concat-all 
-        - <- "FULL_NODE_WS=\"ws://" get-hostname("/polygon/da-explorer-1", "da-node") ":9944\"" concat-all
+        - HTTP_SERVER_HOST=0.0.0.0
+        - <- "FULL_NODE_RPC=\"http://" get-hostname("/polygon/da-explorer-1", "da-node") ":9933\"" concat-all
+        - FULL_NODE_WS="wss://devnet-avail.polygon.technology/ws"
         - RUST_BACKTRACE=full
+        - IPFS_PATH=/avail-light/state/ipfs
+        - AVAIL_PATH=/avail-light/state/avail
+    datadog-agent:
+      image: gcr.io/datadoghq/agent:latest
+      environment:
+        - DD_LOGS_ENABLED=true
+        - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+        - DD_CONTAINER_EXCLUDE="image:gcr.io/datadoghq/agent image:kong image:0xpolygon/avail-apps"
+        - DD_TAGS="da-devnet da-monk da light-client"
+        - DD_DOCKER_LABELS_AS_TAGS=true
+        - <- "DD_API_KEY=" act("/polygon/da-vault/get", "key", "api_key", "path", "secret/da/testnet/datadog") concat-all
+      paths:
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        - /proc/:/host/proc/:ro
+        - /opt/datadog-agent/run:/opt/datadog-agent/run:rw
+        - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro 
   affinity:
     defines: affinity
     tag: service
@@ -337,5 +364,5 @@ da-light-client:
     da_light_client:
       size: 16 
       kind: SSD
-      path: /avail/state
+      path: /avail-light/state
 
