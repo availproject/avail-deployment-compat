@@ -46,6 +46,9 @@ da-common-node:
     rpc_port:
       type: int
       value: 9933
+    prometheus_port:
+      type: int
+      value: 9615
     bootnode:
       type: string
       value: "" 
@@ -64,7 +67,6 @@ da-common-node:
     m_da_val_3_node:
       type: string
       value: <- get-hostname("/polygon/da-validator-3", "da-node")
- 
     volume-data:
       type: string
       value: <- `${moncc-volume-path}/da`
@@ -81,6 +83,10 @@ da-validator:
     da-node: 
       hooks:
         container-started: load-keys
+      labels:
+        - com.datadoghq.ad.check_names=["openmetrics"]
+        - com.datadoghq.ad.init_configs=[{}]
+        - 'com.datadoghq.ad.instances=[{"openmetrics_endpoint": "http://%%host%%:9615", "namespace": "avail", "metrics":["substrate*"]}]'
     datadog-agent:
       image: gcr.io/datadoghq/agent:latest
       environment:
@@ -160,6 +166,8 @@ da-validator:
           --offchain-worker Always \
           --in-peers  {{ v "in_peers" }} \
           --out-peers {{ v "out_peers" }} \
+          --prometheus-port {{ v "prometheus_port" }} \
+          --prometheus-external \
           --port {{ v "p2p_port" }} \
           --ws-port {{ v "ws_port" }} \
           --rpc-port {{ v "rpc_port" }} {{ v "cmds" }} 2>&1

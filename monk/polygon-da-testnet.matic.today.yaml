@@ -231,6 +231,8 @@ da-explorer:
           --in-peers  {{ v "in_peers" }} \
           --out-peers {{ v "out_peers" }} \
           --port {{ v "p2p_port" }} \
+          --prometheus-port {{ v "prometheus_port" }} \
+          --prometheus-external \
           --ws-port {{ v "ws_port" }} \
           --ws-external \
           --rpc-port {{ v "rpc_port" }} \
@@ -306,6 +308,10 @@ da-explorer-1:
   containers:
     defines: containers
     da-node:
+      labels:
+        - com.datadoghq.ad.check_names=["openmetrics"]
+        - com.datadoghq.ad.init_configs=[{}]
+        - 'com.datadoghq.ad.instances=[{"openmetrics_endpoint": "http://%%host%%:9615", "namespace": "avail-explorer", "metrics":["substrate*"]}]'
       ports:
         - <- `0.0.0.0:${ws_port}:${ws_port}`
         - <- `0.0.0.0:${rpc_port}:${rpc_port}`
