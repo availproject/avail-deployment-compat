@@ -1,0 +1,57 @@
+namespace: /polygon
+
+# # DataDog Agents
+# 
+# Each validator instance MUST have one DD-agent associated.
+datadog-agent:
+  defines: runnable
+  containers:
+    defines: containers
+    datadog-agent:
+      image: datadog/agent:latest
+      environment:
+        - DD_LOGS_ENABLED=true
+        - DD_APM_ENABLED=true
+        - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+        - DD_CONTAINER_EXCLUDE=image:datadog/agent
+        - DD_TAGS=da-devnet da-monk da
+        - <- "DD_API_KEY=" act("/polygon/da-vault/get", "key", "api_key", "path", "secret/da/testnet/datadog") concat-all
+      paths:
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        - /proc/:/host/proc/:ro
+        - /opt/datadog-agent/run:/opt/datadog-agent/run:rw
+        - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro 
+  actions:
+    defines: actions
+    status:
+      description: Gets the DataDog Agent status
+      code: exec( "datadog-agent", "agent", "status")
+
+datadog-agent-val-1:
+  defines: runnable
+  inherits: ./datadog-agent
+  affinity:
+    defines: affinity
+    name: da-val-1
+
+datadog-agent-val-2:
+  defines: runnable
+  inherits: ./datadog-agent
+  affinity:
+    defines: affinity
+    name: da-val-2
+
+datadog-agent-val-3:
+  defines: runnable
+  inherits: ./datadog-agent
+  affinity:
+    defines: affinity
+    name: da-val-3
+
+datadog-agent-services:
+  defines: runnable
+  inherits: ./datadog-agent
+  affinity:
+    defines: affinity
+    name: da-services

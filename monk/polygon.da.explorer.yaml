@@ -1,0 +1,205 @@
+namespace: /polygon
+
+# Explorer Node
+# ======================================
+
+da-explorer:
+  defines: runnable
+  inherits: ./da-common-node
+  containers:
+    defines: containers
+    dapp:
+      image: 0xpolygon/avail-apps:ava-107
+      environment:
+        - <- `WS_URL=ws://${full_node}:${ws_port}`
+    redis:
+      image:  redis:6-alpine
+      entrypoint: "redis-server --save 60 1"
+      paths:
+        - <- `${volume-data}/redis/data:/data`
+    proxy:
+      image: kong:2.6.0-alpine
+      environment:
+        # General
+        - KONG_PROXY_ACCESS_LOG=/dev/stdout
+        - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+        - KONG_PROXY_ERROR_LOG=/dev/stderr
+        - KONG_ADMIN_ERROR_LOG=/dev/stderr
+        - KONG_ADMIN_LISTEN=0.0.0.0:8001
+        # Proxy DB-less & Declarative
+        - KONG_DATABASE=off
+        - KONG_DECLARATIVE_CONFIG=/proxy/kong.yml
+        # Acme Plugin
+        - KONG_LUA_SSL_TRUSTED_CERTIFICATE=system
+      ports:
+        - 0.0.0.0:80:8000
+        - 0.0.0.0:443:8443
+
+  variables:
+    defines: variables
+    web_domain:
+      type: string
+      value: "devnet-avail.polygon.technology"
+    full_node:
+      type: string
+      value: ""
+    dapp:
+      type: string
+      value: ""
+    redis:
+      type: string
+      value: ""
+    light_client:
+      type: string
+      value: ""
+    ws_max_connections:
+      type: int
+      value: 10000
+    m_da_val_1_node: <- get-hostname("/polygon/da-validator-1", "da-node")
+    m_da_val_2_node: <- get-hostname("/polygon/da-validator-2", "da-node")
+    m_da_val_3_node: <- get-hostname("/polygon/da-validator-3", "da-node")
+  files:
+    defines: files
+    da-exp-def:
+      container: da-node 
+      path: /da/bin/da.sh
+      mode: 755 
+      contents: |
+        #!/bin/bash
+        cat /da/bin/da.sh ;
+        /da/bin/data-avail \
+          --chain {{ v "chain_spec" }} \
+          --base-path /da/state \
+          --name {{ v "name" }} \
+          --node-key {{ v "node_key" }} \
+          --execution Native \
+          --sync Fast \
+          --ws-max-connections {{ v "ws_max_connections" }} \
+          --in-peers  {{ v "in_peers" }} \
+          --out-peers {{ v "out_peers" }} \
+          --port {{ v "p2p_port" }} \
+          --prometheus-port {{ v "prometheus_port" }} \
+          --prometheus-external \
+          --ws-port {{ v "ws_port" }} \
+          --ws-external \
+          --rpc-port {{ v "rpc_port" }} \
+          --rpc-cors all \
+          --rpc-external \
+          --bootnodes /dns4/{{ v "m_da_val_1_node" }}/tcp/30333/p2p/12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv \
+          --reserved-nodes /dns4/{{ v "m_da_val_2_node" }}/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL \
+          --reserved-nodes /dns4/{{ v "m_da_val_3_node" }}/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz \
+          {{ v "cmds" }} 2>&1
+    kong_yml:
+      container: proxy
+      path: /proxy/kong.yml
+      mode: 444
+      contents: |
+        _format_version: "2.1"
+        services:
+          - name: full_node_ws 
+            url: http://{{ v "full_node" }}:{{ v "ws_port" }}
+            routes:
+            - name: ws_route
+              protocols: ["https", "http"]
+              paths: ["/ws"]
+              request_buffering: false
+              response_buffering: false
+              strip_path: true
+          - name: full_node_rpc
+            url: http://{{ v "full_node" }}:{{ v "rpc_port" }}
+            routes:
+            - name: rpc_route
+              protocols: ["https", "http"]
+              paths: ["/rpc"]
+              request_buffering: false
+              response_buffering: false
+              strip_path: true
+          - name: dapp
+            url: http://{{ v "dapp" }}
+            routes:
+            - name: web_root_route
+              protocols: ["https", "http"]
+              paths: ["/"]
+              request_buffering: false
+              response_buffering: false
+              strip_path: true
+          - name: light_client 
+            url: http://{{ v "light_client" }}:7000/
+            routes:
+            - name: light_client_route
+              protocols: ["https", "http"]
+              paths: ["/light"]
+              request_buffering: false
+              response_buffering: false
+              strip_path: true
+          - name: acme-dummy
+            url: http://127.0.0.1:65535
+            routes:
+            - name: acme-dummy
+              protocols: ["http"]
+              paths: ["/.well-known/acme-challenge"]
+        plugins:
+          - name: acme
+            config:
+              account_email: miguel@polygon.technology
+              domains: [ {{ v "web_domain" }}]
+              tos_accepted: true
+              storage: "redis"
+              storage_config:
+                redis:
+                  host: {{ v "redis" }}
+
+da-explorer-1:
+  defines: runnable
+  inherits: ./da-explorer
+  containers:
+    defines: containers
+    da-node:
+      ports:
+        - <- `0.0.0.0:${ws_port}:${ws_port}`
+        - <- `0.0.0.0:${rpc_port}:${rpc_port}`
+  affinity:
+    defines: affinity
+    tag: service
+  variables:
+    self_id: "da-explorer-1" 
+    name: EXPLORER_1
+    node_key: <- act("/polygon/da-vault/get", "key", "keynode", "path", "secret/da/testnet/da-explorer-1")
+    full_node: <- get-hostname("/polygon/da-explorer-1", "da-node")
+    redis: <- get-hostname("/polygon/da-explorer-1", "redis")
+    dapp: <- get-hostname("/polygon/da-explorer-1", "dapp")
+    light_client: <- get-hostname("/polygon/da-light-client", "light_client")
+    volume-data: /mnt/volume/da/explorer/1
+  volumes:
+    defines: volumes
+    da_expo_3:
+      size: 64
+      kind: SSD
+      path: <- $volume-data
+
+# Light-Client
+# ===================================================
+
+da-light-client:
+  defines: runnable
+  containers:
+    defines: containers
+    light_client:
+      image: 0xpolygon/avail-light:data-discovery
+      environment:
+        - HTTP_SERVER_HOST=0.0.0.0
+        - <- "FULL_NODE_RPC=\"http://" get-hostname("/polygon/da-explorer-1", "da-node") ":9933\"" concat-all
+        - FULL_NODE_WS="wss://devnet-avail.polygon.technology/ws"
+        - RUST_BACKTRACE=full
+        - IPFS_PATH=/avail-light/state/ipfs
+        - AVAIL_PATH=/avail-light/state/avail
+  affinity:
+    defines: affinity
+    tag: service
+  volumes:
+    defines: volumes
+    da_light_client:
+      size: 16 
+      kind: SSD
+      path: /avail-light/state
+

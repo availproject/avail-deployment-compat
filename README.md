@@ -148,6 +148,7 @@ The DevNet only need to load 2 monk templates:
 ```
 ```
 
+
 ### Step 3. Run templates
 
 Once templates are loaded, we only need to run 3 nodes.
@@ -189,64 +190,93 @@ you can remove these folders or just use `monk purge`:
     ❯ monk purge polygon/da-dev-validator-1 polygon/da-dev-validator-2 polygon/da-dev-validator-3
 
 
-## TestNet 
+# TestNet: Run A Validator
 
-The TestNet is composed by the following services:
- - One `Hashicorp Vault` to manage controller and session keys. 
- - Three validators.
- - One full node synchronized with validators.
- - One HTTPS proxy with Explorer and WS access to the full node. 
+## Initial Set-up
 
-## Step 1. Load TestNet Template
+If you want to run a validator, you will need the following requirements:
 
-    ❯ monk load monk/polygon-da-testnet.matic.today.yaml 
+a. A Standard Hareward, which is:
+  - CPU - Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz
+  - Storage - A NVMe solid state drive. Should be reasonably sized to deal with blockchain growth. Starting around 80GB - 160GB will be okay for the first six months.
+  - Memory - 64GB ECC
 
-## Step 2. Deploy Vault And Register Validators Keys
+b. At least, 1000 AVL to bound your validator.
 
-*NOTE:* The current `Vault` configuration is for `development` environment. 
+## Build or Download the Data-Avail binary
 
-    ❯ monk run polygon/da-vault
+See previous sections to know how to build or just use `0xpolygon/avail:latest` docker image.
 
-Open an interactive shell in the `Vault` container, and add the private keys for each validator:
+## Synchronize Chain Data
 
-    ❯ monk shell polygon/da-vault
+You can begin syncing your node by running the following command:a
 
-    #> echo '{"name": "da-validator-1", "keynode": {"pk": "12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv", "sk": "<key node private key>" }, "sk": "<controller private key>" }' | vault kv put -address=http://127.0.0.1:8200 -format=json secret/da/testnet/da-validator-1 -
-    
-    #> echo '{"name": "da-validator-2", "keynode": {"pk": "12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL", "sk": "<key node private key>" }, "sk": "<controller private key>" }' | vault kv put -address=http://127.0.0.1:8200 -format=json secret/da/testnet/da-validator-2 -
+    $> data-avail --chain=misc/genesis/testnet.chain.spec.raw.json --pruning=archive
 
-    #> echo '{"name": "da-validator-3", "keynode": {"pk": "12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz", "sk": "<key node private key>" }, "sk": "<controller private key>" }' | vault kv put -address=http://127.0.0.1:8200 -format=json secret/da/testnet/da-validator-3 -
+The `--pruning=archive` flag is implied by the `--validator` flag, so it is only required explicitly if you start your node without one of these two options. If you do not set your pruning to archive node, even when not running in validator mode, you will need to re-sync your database when you switch.
 
-    #> exit
 
-**Note:** The Json format is the following:
+## Bond AVL
 
-```Json
-{
-  "name": "da-validator-1",
-  "keynode": {
-    "pk": "12D3KooWK1NcYjwpyRUYVG9tjp7X2iGbrQxNVafC5hJU9mggYTgv",
-    "sk": "...<key node private key>.."
-  },
-  "sk": "...<controller private key>..."
-}
-```
+It is highly recommended that you make your controller and stash accounts be two separate accounts. For this, you will create two accounts and make sure each of them have at least enough funds to pay the fees for making transactions. Keep most of your funds in the stash account since it is meant to be the custodian of your staking funds.
 
-### Step 3. Run Validators
+Make sure not to bond all your AVL balance since you will be unable to pay transaction fees from your bonded balance.
 
-    ❯ monk run polygon/da-validator-1 polygon/da-validator-2 polygon/da-validator-3
-    
-### Step 4. Add Private Keys to Running Validators
+It is now time to set up our validator. We will do the following:
 
-Load private keys into validator nodes, using the `monk` action `load-keys`. 
+ - Bond the AVL of the Stash account. These AVL will be put at stake for the security of the network and can be slashed.
+ - Select the Controller. This is the account that will decide when to start or stop validating.
 
-    ❯ monk do polygon/da-validator-1/load-keys
-    ❯ monk do polygon/da-validator-2/load-keys
-    ❯ monk do polygon/da-validator-3/load-keys
+First, go to the `Developer` top menu, and click on `Extrinsics`. Select the `staking` pallet, and 
+the `bond` extrinsic. Create a transaction where your `stash` account bounds `1001 AVLs` at least to
+your `controller` account, as you can see in the picture:
 
-### Step 5 (BUG) Restart Validator Nodes
+![Add Validator: Bound funds](.web_resources/add_validator_bound_step.png?raw=true "Bound funds")
 
-**NOTE:**  Due to a current bug on *Substrate* version `polkadot-v0.9.13`, we need to restart all
-nodes after insert the private keys.
 
-    ❯ monk restart polygon/da-validator-1 polygon/da-validator-2 polygon/da-validator-3
+- **Stash** account - Select your Stash account. In this example, we will bond 1001 `AVL`s, where the minimum bonding amount is 1000. Make sure that your Stash account contains at least this much. You can, of course, stake more than this.
+- **Controller** account - Select the Controller account created earlier. This account will also need a _small amount of AVL_ in order to start and stop validating.
+- **Value** bonded - How much `AVL` from the Stash account you want to bond/stake. Note that you do not need to bond all of the `AVL` in that account. Also note that you can always bond more `AVL` later. However, withdrawing any bonded amount requires the duration of the unbonding period.
+- **Payment** destination - The account where the rewards from validating are sent. More info [here](https://wiki.polkadot.network/docs/learn-staking#reward-distribution).
+
+## Set Session Keys
+
+Once your node is fully synced, stop the process by pressing `Ctrl-C`. At your terminal prompt, you will now start running the node.
+
+### Generating the Session Keys
+
+You need to tell the chain your Session keys by signing and submitting an extrinsic. This is what associates your validator node with your Controller account on Data-Avail.
+
+#### Option 1: PolkadotJS-APPS
+
+You can generate your [Session keys](https://wiki.polkadot.network/docs/learn-keys#session-keys) in the client via the apps RPC. If you are doing this, make sure that you have the PolkadotJS-Apps explorer attached to your validator node. You can configure the apps dashboard to connect to the endpoint of your validator in the Settings tab. If you are connected to a default endpoint hosted by Polygon, you will *not be able* to use this method since making RPC requests to this node would effect the local keystore hosted on a public node and you want to make sure you are interacting with the keystore for your node.
+
+Once ensuring that you have connected to your node, the easiest way to set session keys for your node is by calling the `author_rotateKeys` RPC request to create new keys in your validator's keystore. Navigate to Toolbox tab and select RPC Calls then select the `author` > `rotateKeys()` option and remember to save the output that you get back for a later step.
+
+#### Option 2: CLI
+
+If you are on a **remote server**, it is easier to run this command on the same machine (while the node is running with the default HTTP RPC port configured):
+
+    curl -H "Content-Type: application/json" -d '{"id":1, "jsonrpc":"2.0", "method": "author_rotateKeys", "params":[]}' http://localhost:9933
+
+The output will have a hex-encoded "result" field. The result is the concatenation of the four public keys. Save this result for a later step.
+
+You can restart your node at this point.
+
+### Submitting the setKeys Transaction
+
+You need to tell the chain your Session keys by signing and submitting an extrinsic. This is what associates your validator with your Controller account.
+
+Go to `Staking` > `Account Actions`, and click "Set Session Key" on the bonding account you generated earlier. Enter the output `from author_rotateKeys` in the field and click "Set Session Key".
+
+
+![Set Session Keys](.web_resources/add_validator_set_session_key.png?raw=true "Bound funds")
+
+
+Submit this extrinsic, and you are now ready to start validating.
+
+## Validate
+
+To verify that your node is live and synchronized, head to `Network > Staking`, and section
+`Waiting`. Your account should be shown there. A new validator set is selected every `Era`, based on
+the staking amount.
