@@ -146,7 +146,6 @@ The DevNet only need to load 2 monk templates:
     monk load monk/polygon-da-base.matic.today.yaml
     monk load monk/polygon-da-devnet.matic.today.yaml
 ```
-```
 
 
 ### Step 3. Run templates
