@@ -4,10 +4,6 @@ namespace: /polygon
 da-validator-1:
   defines: runnable
   inherits: ./da-validator-genesis
-  containers:
-    defines: containers
-    da-node:
-      image: 0xpolygon/avail:ava-122
   variables:
     self_id: "da-validator-1"
     node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-1") parse-json get-member("keynode") get-member("sk")
@@ -18,10 +14,6 @@ da-validator-1:
 da-validator-2:
   defines: runnable
   inherits: ./da-validator-genesis
-  containers:
-    defines: containers
-    da-node:
-      image: 0xpolygon/avail:ava-122
   variables:
     self_id: "da-validator-2" 
     node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-2") parse-json get-member("keynode") get-member("sk")
@@ -32,10 +24,6 @@ da-validator-2:
 da-validator-3:
   defines: runnable
   inherits: ./da-validator-genesis
-  containers:
-    defines: containers
-    da-node:
-      image: 0xpolygon/avail:ava-122
   variables:
     self_id: "da-validator-3"
     node_key: <- act("/polygon/da-vault/get_as_json", "path", "secret/da/testnet/da-validator-3") parse-json get-member("keynode") get-member("sk")

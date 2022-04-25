@@ -72,7 +72,7 @@ da-explorer:
           --base-path /da/state \
           --name {{ v "name" }} \
           --node-key {{ v "node_key" }} \
-          --execution Native \
+          --execution NativeElseWasm \
           --sync Fast \
           --ws-max-connections {{ v "ws_max_connections" }} \
           --in-peers  {{ v "in_peers" }} \

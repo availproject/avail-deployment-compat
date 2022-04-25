@@ -15,7 +15,7 @@ RUN \
 	git clone --branch ${BRANCH} https://github.com/maticnetwork/avail.git && \
 	cp -r avail/misc/genesis /da && \
 	cd avail && \
-	cargo build --release && \
+	cargo build --release -p data-avail && \
 	# Install binaries \ 
 	mv target/release/data-avail /da/bin && \
 	# and clean \

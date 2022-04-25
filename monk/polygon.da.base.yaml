@@ -79,7 +79,7 @@ da-common-node:
   containers:
     defines: containers
     da-node: 
-      image: 0xpolygon/avail:ava-122
+      image: 0xpolygon/avail:ava-152
       user: root
       entrypoint: /da/bin/da.sh
       paths:
@@ -172,13 +172,13 @@ da-validator:
   inherits: ./da-common-node
   containers:
     defines: containers
-    da-node: 
-      labels:
-        - com.datadoghq.ad.check_names=["openmetrics"]
-        - com.datadoghq.ad.init_configs=[{}]
-        - 'com.datadoghq.ad.instances=[{"openmetrics_endpoint": "http://%%host%%:9615", "namespace": "avail", "metrics":["substrate*"]}]'
   actions:
     defines: actions
+
+    rotate-keys:
+      description: "Generate new session keys and returns the corresponding public keys"
+      code: |
+        exec( "da-node", "curl", "-H", "Content-Type: application/json", "-d", "{\"id\":1, \"jsonrpc\":\"2.0\", \"method\": \"author_rotateKeys\", \"params\":[]}",  "http://localhost:9933")
 
     insert-key:
       description: "Insert key into keystore"
@@ -258,7 +258,7 @@ da-validator:
           --name {{ v "name" }} \
           --node-key {{ v "node_key" }} \
           --keystore-path /da/keystore \
-          --execution Native \
+          --execution NativeElseWasm \
           --offchain-worker Always \
           --enable-offchain-indexing=true \
           --in-peers  {{ v "in_peers" }} \
