@@ -32,7 +32,15 @@ RUN apt-get update && \
 	rm -rf /var/lib/apt/lists 
  
 COPY --from=builder /da/ /da
+COPY entrypoint.sh / 
 WORKDIR /da
 
+ENV \
+	DA_CHAIN="/da/genesis/testnet.chain.spec.raw.json" \
+	DA_NAME="AvailNode" \
+	DA_MAX_IN_PEERS=50 \
+	DA_MAX_OUT_PEERS=50 \
+	DA_P2P_PORT="30333"
+
 VOLUME ["/tmp", "/da/state", "/da/keystore"]
-ENTRYPOINT ["/da/bin/data-avail"]
+ENTRYPOINT ["/entrypoint.sh"]
