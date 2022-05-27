@@ -54,4 +54,4 @@ datadog-agent-services:
   inherits: ./datadog-agent
   affinity:
     defines: affinity
-    name: da-services
+    name: da-service

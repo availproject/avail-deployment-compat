@@ -1,0 +1,100 @@
+- name: Create folder for templates
+  ansible.builtin.file: 
+    path: "{{ node_base_path }}"
+    state: directory 
+    mode: '0750'
+
+- name: Create folder for chainspecs
+  ansible.builtin.file:
+    path: "{{ node_base_path }}/genesis"
+    state: directory
+    mode: 0755
+
+- name: create kong proxy configuration
+  ansible.builtin.template:
+    src: "./templates/kong.yml"
+    dest: "{{ node_base_path }}/kong.yml"
+    mode: '0644'
+- name: send kong proxy enviroment file
+  ansible.builtin.copy:
+    src: kong.env
+    dest: "{{ node_base_path }}/kong.env"
+
+- name: create internal kong network
+  community.docker.docker_network:
+    name: kong_internal_net 
+
+- name: create kong general upstream network
+  community.docker.docker_network:
+    name: kong_upstream_net
+
+- name: create kong db
+  community.docker.docker_container:
+    name: redis
+    image:  redis:6-alpine
+    command: "redis-server --save 60 1"
+    volumes:
+      - /data
+    network_mode: kong_internal_net
+
+- name: create kong proxy
+  community.docker.docker_container:
+    name: proxy 
+    image: kong:2.6.0-alpine
+    state: started
+    restart: yes
+    env_file: "{{ node_base_path }}/kong.env"
+    volumes:
+      - "{{ node_base_path }}/kong.yml:/proxy/kong.yml:ro"
+    ports:
+      - 443:8443
+      - 80:8000
+    networks:
+      - name: kong_internal_net
+        links:
+          - redis:redis
+      - name: kong_upstream_net
+        aliases:
+          - proxy
+
+- name: create full-node entrypoint
+  ansible.builtin.template:
+    src: "./templates/da.sh"
+    dest: "{{ node_base_path }}/da.sh"
+    mode: '0755'
+  notify: restart node
+
+- name: create v2 testnet chainspec
+  ansible.builtin.template:
+    src: "../../templates/genesis/testnet-v2.chain.spec.raw.json"
+    dest: "{{ node_base_path }}/genesis/testnet-v2.chain.spec.raw.json"
+    mode: 755
+  notify: restart node
+
+- name: start full-node 
+  community.docker.docker_container:
+    name: da-client
+    image: 0xpolygon/avail:1.0.0
+    tmpfs: /tmp
+    volumes:
+      - "{{ node_base_path  }}/full_node_state:/da/state"
+      - "{{ node_base_path  }}/da.sh:/da/bin/da.sh"
+      - "{{ node_base_path }}/genesis:/da/genesis"
+    labels:
+      com.datadoghq.ad.check_names: '["openmetrics"]'
+      com.datadoghq.ad.init_configs: "[{}]"
+      com.datadoghq.ad.instances: '[{"openmetrics_endpoint":"http://%%host%%:9615/metrics", "namespace": "avail", "metrics": ["substrate*"]}]'
+    ports:
+      - 9933:9933
+      - 9944:9944
+      - 30333:30333
+    entrypoint: /da/bin/da.sh
+    network_mode: kong_upstream_net
+
+- name: create explorer dapp
+  community.docker.docker_container:
+    name: dapp 
+    image: 0xpolygon/avail-apps:ava-107
+    env:
+      WS_URL: ws://{{ node.web_domain }}/ws
+    network_mode: kong_upstream_net

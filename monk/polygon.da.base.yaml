@@ -79,7 +79,7 @@ da-common-node:
   containers:
     defines: containers
     da-node: 
-      image: 0xpolygon/avail:ava-152
+      image: 0xpolygon/avail:ava-154
       user: root
       entrypoint: /da/bin/da.sh
       paths:
@@ -116,7 +116,7 @@ da-common-node:
       value: "" 
     chain_spec:
       type: string
-      value: '/da/genesis/testnet.chain.spec.raw.json'
+      value: ''
     name:
       type: string
       value: DA_VALIDATOR

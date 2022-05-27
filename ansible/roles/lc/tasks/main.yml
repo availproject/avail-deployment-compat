@@ -1,0 +1,29 @@
+---
+- name: Create folder for light-client 
+  file: 
+    path: "{{ node_base_path }}/{{ node_name }}/" 
+    state: directory 
+    mode: '0750'
+
+- name: setup container for light-client 
+  community.docker.docker_container:
+    name: "{{ node_name }}"
+    image: 0xpolygon/avail-light:ava-154
+    entrypoint: "/avail-light/start.sh"
+    env:
+      HTTP_SERVER_HOST: "0.0.0.0"
+      FULL_NODE_RPC: '["http://3.213.146.89:9933"]'
+      FULL_NODE_WS: '["ws://testnet.polygonavail.net/ws"]'
+      RUST_BACKTRACE: full
+      IPFS_PATH: /avail-light/state/ipfs
+      AVAIL_PATH: /avail-light/state/avail
+      LOG_LEVEL: "'INFO'"
+    ports:
+      - 7000:7000
+    labels:
+      com.datadoghq.ad.check_names: '["openmetrics"]'
+      com.datadoghq.ad.init_configs: "[{}]"
+      com.datadoghq.ad.instances: '[{"openmetrics_endpoint":"http://%%host%%:9615/metrics", "namespace": "avail", "metrics": ["substrate*"]}]'
+    volumes:
+      - "{{ node_base_path }}/{{ node_name }}/state:/avail-light/state"
+    network_mode: kong_upstream_net

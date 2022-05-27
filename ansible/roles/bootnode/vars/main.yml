@@ -1,0 +1,4 @@
+---
+sk: "{{ lookup('onepassword', node_name, field='keynode_sk', vault='Avail Testnet') }}"
+p_node_key: "{{ lookup('onepassword', node_name, field='p-node-key', vault='Avail Testnet') }}"
+node_key: "{{ lookup('onepassword', node_name, field='node-key', vault='Avail Testnet') }}"

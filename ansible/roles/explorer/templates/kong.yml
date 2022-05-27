@@ -1,0 +1,54 @@
+_format_version: "2.1"
+services:
+  - name: full_node_ws 
+    url: http://da-client:{{ node_ws_port }}
+    routes:
+    - name: ws_route
+      protocols: ["https", "http"]
+      paths: ["/ws"]
+      request_buffering: false
+      response_buffering: false
+      strip_path: true
+  - name: full_node_rpc
+    url: http://da-client:{{ node_rpc_port }}
+    routes:
+    - name: rpc_route
+      protocols: ["https", "http"]
+      paths: ["/rpc"]
+      request_buffering: false
+      response_buffering: false
+      strip_path: true
+  - name: dapp
+    url: http://dapp
+    routes:
+    - name: web_root_route
+      protocols: ["https", "http"]
+      paths: ["/"]
+      request_buffering: false
+      response_buffering: false
+      strip_path: true
+  - name: light_client 
+    url: http://light-client-1:7000/
+    routes:
+    - name: light_client_route
+      protocols: ["https", "http"]
+      paths: ["/light"]
+      request_buffering: false
+      response_buffering: false
+      strip_path: true
+  - name: acme-dummy
+    url: http://127.0.0.1:65535
+    routes:
+      - name: acme-dummy
+        protocols: ["http"]
+        paths: ["/.well-known/acme-challenge"]
+plugins:
+  - name: acme
+    config:
+      account_email: devops@polygon.technology
+      domains: ["{{node.web_domain}}"]
+      tos_accepted: true
+      storage: "redis"
+      storage_config:
+        redis:
+          host: redis

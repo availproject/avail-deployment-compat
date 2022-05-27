@@ -66,12 +66,14 @@ da-explorer:
       mode: 755 
       contents: |
         #!/bin/bash
+        # --validator \
         cat /da/bin/da.sh ;
         /da/bin/data-avail \
           --chain {{ v "chain_spec" }} \
           --base-path /da/state \
           --name {{ v "name" }} \
           --node-key {{ v "node_key" }} \
+          --pruning 'archive' \
           --execution NativeElseWasm \
           --sync Fast \
           --ws-max-connections {{ v "ws_max_connections" }} \
@@ -185,14 +187,15 @@ da-light-client:
   containers:
     defines: containers
     light_client:
-      image: 0xpolygon/avail-light:data-discovery
+      image: 0xpolygon/avail-light:ava-154
       environment:
         - HTTP_SERVER_HOST=0.0.0.0
-        - <- "FULL_NODE_RPC=\"http://" get-hostname("/polygon/da-explorer-1", "da-node") ":9933\"" concat-all
-        - FULL_NODE_WS="wss://devnet-avail.polygon.technology/ws"
+        - <- "FULL_NODE_RPC=[\"http://" get-hostname("/polygon/da-explorer-1", "da-node") ":9933\"]" concat-all
+        - FULL_NODE_WS=["wss://devnet-avail.polygon.technology/ws"]
         - RUST_BACKTRACE=full
         - IPFS_PATH=/avail-light/state/ipfs
         - AVAIL_PATH=/avail-light/state/avail
+        - LOG_LEVEL="INFO"
   affinity:
     defines: affinity
     tag: service

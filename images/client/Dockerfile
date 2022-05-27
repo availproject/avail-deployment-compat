@@ -47,7 +47,8 @@ ENV \
 	APP_ID=0 \
 	CONFIDENCE=92.0 \
 	AVAIL_PATH="avail_path" \
-	BOOTSTRAPS=[]
+	BOOTSTRAPS=[] \
+	LOG_LEVEL="INFO"
 
 WORKDIR avail-light
 VOLUME ["/tmp", "/avail/state"]
