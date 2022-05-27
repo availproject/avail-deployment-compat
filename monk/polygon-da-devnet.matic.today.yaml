@@ -55,16 +55,4 @@ da-dev-validator-3:
     volume-data: <- `${moncc-volume-path}/dev/validator/3`
     cmds: <- "--charlie --bootnodes /dns4/" get-hostname("/polygon/da-dev-validator-1", "da-node") "/tcp/30333/p2p/12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp --reserved-nodes /dns4/" get-hostname("/polygon/da-dev-validator-2", "da-node") "/tcp/30333/p2p/12D3KooWHdiAxVd8uMQR1hGWXccidmfCwLqcMpGwR6QcTP6QRMuD " concat-all
 
-# Explorer
-
-da-dev-explorer:
-  defines: runnable
-  containers:
-    defines: containers
-    dapp:
-      image: 0xpolygon/avail-apps:ava-107
-      environment:
-        - <- "WS_URL=\"ws://" get-hostname("/polygon/da-dev-validator-1","da-node") ":9944\"" concat-all 
-      ports:
-        - 0.0.0.0:80:80
 
