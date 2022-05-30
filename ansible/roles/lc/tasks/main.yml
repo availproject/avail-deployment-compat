@@ -27,3 +27,4 @@
     volumes:
       - "{{ node_base_path }}/{{ node_name }}/state:/avail-light/state"
     network_mode: kong_upstream_net
+    restart_policy: "on-failure"
