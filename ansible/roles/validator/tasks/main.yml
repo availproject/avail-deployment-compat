@@ -16,13 +16,6 @@
     state: directory
     mode: 0755
 
-# - name: fetch key node from vault
-#   uri:
-#     url: "http://{{ vault.ip }}:8200/v1/secret/data/{{ node.vault_secret_path }}"
-#     headers:
-#       X-Vault-Token: "{{ vault.token }}"
-#   register: secret
-
 - name: create entrypoint
   ansible.builtin.template:
     src: "./templates/da.sh"
