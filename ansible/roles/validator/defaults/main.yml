@@ -3,6 +3,8 @@ node_port: 30333
 node_ws_port: 9944
 node_rpc_port: 9933
 node_base_path: /volumes/{{ node_name }}
+node_name: "{{ hostvars[inventory_hostname]['tags']['Name'] }}"
+node_reserved_nodes: []
 
 prometheus:
   port: 9615
