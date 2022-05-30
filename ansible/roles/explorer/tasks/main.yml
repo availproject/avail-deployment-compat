@@ -94,7 +94,7 @@
 - name: create explorer dapp
   community.docker.docker_container:
     name: dapp 
-    image: 0xpolygon/avail-apps:ava-107
+    image: 0xpolygon/avail-apps:{{ dapp_docker_tag }}
     env:
       WS_URL: ws://{{ node.web_domain }}/ws
     network_mode: kong_upstream_net
