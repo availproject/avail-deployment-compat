@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@polkadot/api": "^8.6.2"
+    "@polkadot/api": "^8.6.2",
+    "bn.js": "^5.2.1"
   }
 }

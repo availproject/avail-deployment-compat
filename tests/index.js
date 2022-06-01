@@ -1,5 +1,6 @@
-const { ApiPromise, WsProvider } = require('@polkadot/api');
+const { ApiPromise, WsProvider, HttpProvider } = require('@polkadot/api');
 const { Keyring } = require('@polkadot/keyring');
+const BN = require('bn.js');
 
 const testnetLocal = {
   "bootnode-1": {
@@ -149,48 +150,97 @@ const testnetNames = [
   "alyssa",
 ];
 
-async function main () {
+const apiOptions  = {
+  // provider: new WsProvider('ws://127.0.0.1:49944'), // sudo ngrep -d any -x -O dump.pcap port 9944
+  // HTTP might be useful for debugging and seeing the rpc calls. Can't do subscriptions though
+  provider: new HttpProvider('http://127.0.0.1:39933'), // sudo ngrep -d any -x -O dump.pcap port 9933
+  types: {
+    // UncheckedExtrinsic: { // garbage
+    //   size: "u32",
+    //   index: "Vec<(u32,u32)>",
+    // },
+    Address:'MultiAddress', // Is this right?
+    LookupSource:'MultiAddress',
+    DataLookup: {
+      size: "u32",
+      index: "Vec<(u32,u32)>",
+    },
+    KateExtrinsicRoot: {
+      hash: "Hash",
+      commitment: "Vec<u8>",
+      rows: "u16",
+      cols: "u16",
+    },
+    KateHeader: {
+      parentHash: "Hash",
+      number: "Compact<BlockNumber>",
+      stateRoot: "Hash",
+      extrinsicsRoot: "KateExtrinsicRoot",
+      digest: "Digest",
+      appDataLookup: "DataLookup",
+    },
+    Header: "KateHeader",
+    AppId: "u32",
+    CheckAppIdExtra: {
+      appId: "u32",
+    },
+    CheckAppId: {
+      extra: "CheckAppIdExtra",
+      types: "{}",
+    },
+  },
+  rpc: {
+    kate: {
+      blockLength: {
+        description: 'This is a placeholder. TODO - provide the correct types',
+        params: [
+          {
+            name: 'self',
+            type: 'u64'
+          },
+          {
+            name: 'at',
+            type: 'Hash',
+            isOptional: true
+          }
+        ],
+        type: 'Balance'
+      },
 
-  const apiOptions  = {
-    provider: new WsProvider('ws://127.0.0.1:9944'),
-    types: {
-      DataLookup: {
-        size: "u32",
-        index: "Vec<(u32,u32)>",
-      },
-      KateExtrinsicRoot: {
-        hash: "Hash",
-        commitment: "Vec<u8>",
-        rows: "u16",
-        cols: "u16",
-      },
-      KateHeader: {
-        parentHash: "Hash",
-        number: "Compact<BlockNumber>",
-        stateRoot: "Hash",
-        extrinsicsRoot: "KateExtrinsicRoot",
-        digest: "Digest",
-        appDataLookup: "DataLookup",
-      },
-      Header: "KateHeader",
-      AppId: "u32",
-      CheckAppIdExtra: {
+      queryProof: {
+        description: 'This is a placeholder. TODO - provide the correct types',
+        params: [
+          {
+            name: 'self',
+            type: 'u64'
+          },
+          {
+            name: 'at',
+            type: 'Hash',
+            isOptional: true
+          }
+        ],
+        type: 'Balance'
+      }
+    }
+  },
+  signedExtensions: {
+    CheckAppId: {
+      extrinsic: {
         appId: "u32",
       },
-      CheckAppId: {
-        extra: "CheckAppIdExtra",
-        types: "{}",
-      },
+      payload: {},
     },
-    signedExtensions: {
-      CheckAppId: {
-        extrinsic: {
-          appId: "u32",
-        },
-        payload: {},
-      },
-    },
-  };
+  },
+};
+
+const AVLUnit = new BN(1000000000000000000n);
+
+
+async function main () {
+
+
+
   const api = await ApiPromise.create(apiOptions);
   const [chain, nodeName, nodeVersion] = await Promise.all([
     api.rpc.system.chain(),
@@ -199,54 +249,43 @@ async function main () {
   ]);
   console.log(`Connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
 
-  const keyring = new Keyring({ type: 'sr25519', ss58Format: 2 });
-
-  for (const [key, value] of Object.entries(testnetLocal)) {
-    testnetLocal[key].pair = keyring.addFromUri(value.secretPhrase,  { name: 'key' }, 'sr25519');
-    console.log(`Added ${key} key to keyring`);
-  }
+  await initKeys(api);
+  // await seedFunds(api);
+  // await bondAvl(api);
 
 
-  console.log(keyring.pairs.length, 'pairs available');
+  // const finalizedBlockHash = await api.rpc.chain.getFinalizedHead();
+  // const finalizedBlockHash = await api.rpc.chain.getBlockHash(807);
+  // debugger;
+  // const finalizedBlock = await api.rpc.chain.getBlock(finalizedBlockHash);
+  // console.log(finalizedBlock.block.header.number.toString());
 
-  console.log(testnetLocal.louis.pair.address);
-  console.log(testnetLocal["bootnode-1"].pair);
+  const newSessionKeys = await api.rpc.author.rotateKeys();
+  const setkey = await api.tx.session.setKeys(newSessionKeys, Array(33).fill(0)).signAndSend(
+    testnetLocal["alyssa"].pair,
+    resultLog
+  );
+  // await bondAvl(api);
+  return;
 
-  // const transfer = api.tx.balances.transfer(testnetLocal.louis.pair.address, 12345);
-  // const hash = await transfer.signAndSend(testnetLocal["bootnode-1"].pair);
-  // console.log('Transfer sent with hash', hash.toHex());
+
 
 
   const methods = await api.rpc.rpc.methods();
   console.log(methods);
-  const now = await api.query.timestamp.now();
-  console.log(now);
-  const b = await api.query.dataAvailability.lastBlockLenId();
 
-  // const { nonce, balance } = await api.query.system.account(testnetLocal.louis.pair.address);
-  const foo = await api.query.system.account(testnetLocal["bootnode-1"].pair.address)
 
-  console.log(foo);
-  console.log(foo.data.free.toString());
+  // const now = await api.query.timestamp.now();
 
-  // Bootnode balance
-  // 1000000000000000000000000
-  // This is 1,000,000 AVL
-
-  const seedFund = 10000000000000000000n;
-
-  // for(let i = 0; i < testnetNames.length; i = i + 1) {
-  //   await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal[testnetNames[i]].pair.address, seedFund, api);
-  // }
-
-  const bondAmount = 1010000000000000000n;
-  for(let i = 0; i < testnetNames.length; i = i + 1) {
-    let meep = await api.tx.staking.bond(testnetLocal[testnetNames[i]].pair.address, bondAmount, "controller").signAndSend(
-      testnetLocal[testnetNames[i]].pair
-    );
-    console.log(meep);
+  for (const [key, value] of Object.entries(testnetLocal)) {
+    let balance = await api.query.system.account(value.pair.address)
+    console.log("Account", key,"Balance", balance.data.free.toString(), "Rounded", balance.data.free.div(AVLUnit).toString());
   }
-  
+  // const { nonce, balance } = await api.query.system.account(testnetLocal.louis.pair.address);
+
+
+
+
   return;
 
   await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal.louis.pair.address, seedFund, api);
@@ -258,9 +297,33 @@ async function main () {
 
 }
 
-main().catch(console.error).finally(() => process.exit());
+async function bondAvl(api) {
+  const bondAmount = 1010000000000000000n;
+  for(let i = 0; i < testnetNames.length; i = i + 1) {
+    let meep = await api.tx.staking.bond(testnetLocal[testnetNames[i]].pair.address, bondAmount, "controller").signAndSend(
+      testnetLocal[testnetNames[i]].pair
+    );
+    console.log(meep);
+  }
+}
 
+async function initKeys(api) {
+  const keyring = new Keyring({ type: 'sr25519', ss58Format: 2 });
+  for (const [key, value] of Object.entries(testnetLocal)) {
+    testnetLocal[key].pair = keyring.addFromUri(value.secretPhrase,  { name: 'key' }, 'sr25519');
+    console.log(`Added ${key} key to keyring`);
+  }
+}
 
+async function seedFunds(api) {
+  // Bootnode balance
+  // 1000000000000000000000000
+  // This is 1,000,000 AVL
+  const seedFund = 10000000000000000000n;
+  for(let i = 0; i < testnetNames.length; i = i + 1) {
+    await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal[testnetNames[i]].pair.address, seedFund, api);
+  }
+}
 async function testTransfer(from, to, amount, api) {
   const p = new Promise(async (resolve, reject) => {
 
@@ -280,3 +343,10 @@ async function testTransfer(from, to, amount, api) {
   });
   return p;
 }
+
+function resultLog(result) {
+  console.log(result);
+}
+
+
+main().catch(console.error).finally(() => process.exit());
