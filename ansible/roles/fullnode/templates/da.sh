@@ -9,8 +9,8 @@ cat /da/bin/da.sh ;
 	--node-key {{ node_key }} \
 	--execution NativeElseWasm \
 	--ws-max-connections {{ node.ws_max_connections }} \
-	--in-peers  {{ node.in_peers }} \
-	--out-peers {{ node.out_peers }} \
+	--in-peers  {{ node_in_peers }} \
+	--out-peers {{ node_out_peers }} \
 	--port {{ node_port }} \
 	--prometheus-port {{ prometheus.port }} \
 	--prometheus-external \
@@ -19,7 +19,7 @@ cat /da/bin/da.sh ;
 	--rpc-port {{ node_rpc_port }} \
 	--rpc-cors all \
 	--rpc-external \
-{% for bn in node.boot_nodes %}
+{% for bn in node_boot_nodes %}
 	--bootnodes {{ bn }} \
 {% endfor %}
 2>&1
