@@ -24,6 +24,10 @@
     mode: 755
   notify: restart node
 
+- name: create internal network
+  community.docker.docker_network:
+    name: "{{ node_network_mode }}"
+
 - name: start full-node 
   community.docker.docker_container:
     name: da-client
@@ -43,3 +47,4 @@
       - 30333:30333
     entrypoint: /da/bin/da.sh
     network_mode: "{{ node_network_mode }}"
+    restart_policy: always

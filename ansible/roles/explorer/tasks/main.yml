@@ -17,7 +17,7 @@
 
 - name: create internal kong network
   community.docker.docker_network:
-    name: kong_internal_net 
+    name: "{{ node_network_mode }}" 
 
 - name: create kong general upstream network
   community.docker.docker_network:
@@ -30,7 +30,7 @@
     command: "redis-server --save 60 1"
     volumes:
       - /data
-    network_mode: kong_internal_net
+    network_mode: "{{ node_network_mode }}"
 
 - name: create kong proxy
   community.docker.docker_container:
@@ -45,12 +45,13 @@
       - 443:8443
       - 80:8000
     networks:
-      - name: kong_internal_net
+      - name: "{{ node_network_mode }}"
         links:
           - redis:redis
       - name: kong_upstream_net
         aliases:
           - proxy
+    restart_policy: always
 
 - name: create explorer dapp
   community.docker.docker_container:
@@ -59,3 +60,4 @@
     env:
       WS_URL: ws://{{ node.web_domain }}/ws
     network_mode: kong_upstream_net
+    restart_policy: always

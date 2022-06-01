@@ -50,6 +50,7 @@
     env:
       DA_CHAIN: "/da/genesis/testnet-v2.chain.spec.raw.json"
       DA_NAME: "{{ node_name }}"
+    restart_policy: always
 
 - name: load private keys
   community.docker.docker_container_exec:
