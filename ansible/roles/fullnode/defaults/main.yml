@@ -3,7 +3,7 @@ node_port: 30333
 node_ws_port: 9944
 node_rpc_port: 9933
 node_base_path: /volumes/{{node_name}}
-dapp_docker_tag: v1.0.0
+node_docker_tag: 1.0.0
 node_network_mode: default
 
 prometheus:
