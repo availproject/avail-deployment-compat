@@ -27,6 +27,7 @@
 - name: create internal network
   community.docker.docker_network:
     name: "{{ node_network_mode }}"
+  when: node_network_mode != "default"
 
 - name: start full-node 
   community.docker.docker_container:
