@@ -8,6 +8,7 @@ node_network_mode: default
 node_name: "{{ hostvars[inventory_hostname]['tags']['Name'] }}"
 node_in_peers: 50
 node_out_peers: 50
+node_ws_max_connections: 1000
 
 prometheus:
   port: 9615

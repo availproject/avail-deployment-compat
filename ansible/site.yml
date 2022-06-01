@@ -50,9 +50,6 @@
       vars:
         node_name: explorer-1
         node:
-          ws_max_connections: 1000
-          in_peers: 50
-          out_peers: 50
           web_domain: "testnet.polygonavail.net"
           boot_nodes:
             - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC

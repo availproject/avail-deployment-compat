@@ -8,7 +8,7 @@ cat /da/bin/da.sh ;
 	--name {{ node_name }} \
 	--node-key {{ node_key }} \
 	--execution NativeElseWasm \
-	--ws-max-connections {{ node.ws_max_connections }} \
+	--ws-max-connections {{ node_ws_max_connections }} \
 	--in-peers  {{ node_in_peers }} \
 	--out-peers {{ node_out_peers }} \
 	--port {{ node_port }} \
