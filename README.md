@@ -23,15 +23,15 @@
 
 | Bootnode   | Node IP  | P2P Discovery Address | 
 | ---------- | -------- | ------------------------------------------------------------------------------------------------ |
-| Bootnode 1 | `13.38.227.125`  | `/ip4/52.47.205.129/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz`  |
-| Bootnode 2 | `15.237.127.118` | `/ip4/15.237.127.118/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL` |
-| Bootnode 3 | `52.47.205.129`  | `/ip4/52.47.205.129/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz`  |
-| Full Node  | `35.180.61.81`   | [Explorer dApp](https://devnet-avail.polygon.technology/) | 
+| Bootnode 1 | `23.20.114.84` | `/ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC`  |
+| Bootnode 2 | `52.3.23.97`   | `/ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead` |
+| Bootnode 3 | `44.205.165.4` | `/ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh`  |
+| Full Node  | | [Explorer dApp](https://testnet.polygonavail.net/) | 
 
 ## TestNet Chain Specification 
 <a name="deployments_chain_spec"/>
 
-TestNet uses the following chain spec file: [testnet.chain.spec.raw.json](./misc/genesis/testnet.chain.spec.raw.json)
+TestNet uses the following chain spec file: [testnet.chain.spec.raw.json](./ansible/templates/genesis/testnet-v2.chain.spec.raw.json)
 
 
 # Run a Validator Node
@@ -266,6 +266,22 @@ the output would be something like:
 2. Run the services using `docker-compose.light-client.yml`:
 
     $ docker-compose -f docker-compose.light-client.yml up 
+
+# Deploy Testnet with Ansible
+
+## Requirements
+
+  * Ansible ~> 5
+  * 1password CLI tool https://1password.com/downloads/command-line/
+  * AWS SSO access to Avail testnet account
+
+## Provision instances
+
+Ansible deployment use Docker containers to run the network, the instances are provisioned by Terraform and are ready to run the playbooks. Currently IPs are EIPs currently existing in the testnet account.
+
+  1. Copy and paste AWS SSO environment variables for Programmatic access to your terminal
+  2. Sign in to 1password `eval $(op signin)`
+  3. Provision the cluster with `ansible-playbook site.yml --diff -v` from the ansible directory
 
 # TestNet: Run A Validator
 
