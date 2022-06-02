@@ -151,9 +151,10 @@ const testnetNames = [
 ];
 
 const apiOptions  = {
-  // provider: new WsProvider('ws://127.0.0.1:49944'), // sudo ngrep -d any -x -O dump.pcap port 9944
+  provider: new WsProvider('ws://127.0.0.1:9944'), // sudo ngrep -d any -x -O dump.pcap port 9944
+  // provider: new WsProvider('ws://127.0.0.1:80/ws'), // sudo ngrep -d any -x -O dump.pcap port 9944
   // HTTP might be useful for debugging and seeing the rpc calls. Can't do subscriptions though
-  provider: new HttpProvider('http://127.0.0.1:39933'), // sudo ngrep -d any -x -O dump.pcap port 9933
+  // provider: new HttpProvider('http://127.0.0.1:9933'), // sudo ngrep -d any -x -O dump.pcap port 9933
   types: {
     // UncheckedExtrinsic: { // garbage
     //   size: "u32",
@@ -171,6 +172,7 @@ const apiOptions  = {
       rows: "u16",
       cols: "u16",
     },
+    AccountInfo: 'AccountInfoWithRefCount',
     KateHeader: {
       parentHash: "Hash",
       number: "Compact<BlockNumber>",
@@ -238,9 +240,6 @@ const AVLUnit = new BN(1000000000000000000n);
 
 
 async function main () {
-
-
-
   const api = await ApiPromise.create(apiOptions);
   const [chain, nodeName, nodeVersion] = await Promise.all([
     api.rpc.system.chain(),
@@ -252,48 +251,49 @@ async function main () {
   await initKeys(api);
   // await seedFunds(api);
   // await bondAvl(api);
+  // await checkAllBlocks(api);
+  await seizeChain(api);
 
 
-  // const finalizedBlockHash = await api.rpc.chain.getFinalizedHead();
-  // const finalizedBlockHash = await api.rpc.chain.getBlockHash(807);
-  // debugger;
-  // const finalizedBlock = await api.rpc.chain.getBlock(finalizedBlockHash);
-  // console.log(finalizedBlock.block.header.number.toString());
 
-  const newSessionKeys = await api.rpc.author.rotateKeys();
-  const setkey = await api.tx.session.setKeys(newSessionKeys, Array(33).fill(0)).signAndSend(
-    testnetLocal["alyssa"].pair,
-    resultLog
-  );
-  // await bondAvl(api);
   return;
 
+}
 
-
-
-  const methods = await api.rpc.rpc.methods();
-  console.log(methods);
-
-
-  // const now = await api.query.timestamp.now();
-
+async function getAllBalances(api) {
   for (const [key, value] of Object.entries(testnetLocal)) {
     let balance = await api.query.system.account(value.pair.address)
     console.log("Account", key,"Balance", balance.data.free.toString(), "Rounded", balance.data.free.div(AVLUnit).toString());
   }
-  // const { nonce, balance } = await api.query.system.account(testnetLocal.louis.pair.address);
+}
+async function getAllMethods(api) {
+  const methods = await api.rpc.rpc.methods();
+  console.log(methods);
+}
 
+async function checkAllBlocks(api) {
+  const finalizedBlockHash = await api.rpc.chain.getFinalizedHead();
+  let finalizedBlock;
 
+  try {
+    finalizedBlock = await api.rpc.chain.getBlock(finalizedBlockHash);
+  } catch (e) {
+    console.warn(`The current finalized block can't be read`, e);
+    return;
+  }
 
+  const maxBlockNumber = finalizedBlock.block.header.number.toNumber();
 
-  return;
+  for (let i = 0; i <= maxBlockNumber; i = i + 1) {
+    let bh = await api.rpc.chain.getBlockHash(i);
+    try {
+      await api.rpc.chain.getBlock(bh);
+    } catch (e) {
+      console.warn(`There is an issue with block number ${i}`);
+    }
 
-  await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal.louis.pair.address, seedFund, api);
-  await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal.lem.pair.address, seedFund, api);
-  await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal.eva.pair.address, seedFund, api);
-  await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal.cy.pair.address, seedFund, api);
-  await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal.ben.pair.address, seedFund, api);
-  await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal.alyssa.pair.address, seedFund, api);
+  }
+  return finalizedBlock;
 
 }
 
@@ -321,10 +321,10 @@ async function seedFunds(api) {
   // This is 1,000,000 AVL
   const seedFund = 10000000000000000000n;
   for(let i = 0; i < testnetNames.length; i = i + 1) {
-    await testTransfer(testnetLocal["bootnode-1"].pair, testnetLocal[testnetNames[i]].pair.address, seedFund, api);
+    await testTransfer(api, testnetLocal["bootnode-1"].pair, testnetLocal[testnetNames[i]].pair.address, seedFund);
   }
 }
-async function testTransfer(from, to, amount, api) {
+async function testTransfer(api, from, to, amount) {
   const p = new Promise(async (resolve, reject) => {
 
     const transfer = api.tx.balances.transfer(to, amount);
@@ -343,6 +343,39 @@ async function testTransfer(from, to, amount, api) {
   });
   return p;
 }
+async function setData(api, appId, data, from) {
+  const p = new Promise(async (resolve, reject) => {
+    const dataSubmission = api.tx.dataAvailability.submitData(data);
+    const unsub = await dataSubmission.signAndSend(from, {app_id: appId}, async (result) => {
+      if (result.status.isInBlock) {
+        console.log(`Transaction included at blockHash ${result.status.asInBlock}`);
+        unsub();
+        resolve(result);
+      } else if (result.status.isFinalized) {
+        console.log(`Transaction finalized at blockHash ${result.status.asFinalized}`);
+        unsub();
+        resolve(result);
+      }
+    });
+  });
+  return p;
+}
+
+async function seizeChain(api) {
+  console.log("Attemping to seize chain");
+  console.log("Setting data from ben");
+  const p = setData(api, 1, "Test test", testnetLocal["ben"].pair);
+  const newSessionKeys = await api.rpc.author.rotateKeys();
+  console.log("Setting session keys");
+  const setkey = await api.tx.session.setKeys(newSessionKeys, Array(33).fill(0)).signAndSend(
+    testnetLocal["alyssa"].pair,
+    resultLog
+  );
+  console.log("Waiting for data to be saved");
+  await p;
+  console.log("Data saved successfully");
+}
+
 
 function resultLog(result) {
   console.log(result);
@@ -350,3 +383,10 @@ function resultLog(result) {
 
 
 main().catch(console.error).finally(() => process.exit());
+
+
+// Create application
+// create duplicate application
+// DA AppKeys
+// Submit data
+// Read Data
