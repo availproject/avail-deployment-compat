@@ -1,5 +1,16 @@
-# Data Availability Deployments
+<div align="Center">
+<h1>avail-deployment</h1>
+<h3>Deployment Configuration for the Polygon Avail blockchain</h3>
+</div>
+
+<br>
+
+# Introduction
 <a name="deployments"/>
+
+`avail-deployment` contains scripts and configs for deploying Polygon Avail.
+
+Learn more about Avail at the Avail [product page](https://polygon.technology/solutions/polygon-avail/) and [documentation](https://docs.polygon.technology/docs/avail/introduction/what-is-avail/) websites.
 
 #### Table of Contents
 - [Data Availability Deployment](#deployments)
