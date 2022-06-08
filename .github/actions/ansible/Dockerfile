@@ -23,4 +23,5 @@ COPY . /ansible
 
 WORKDIR /ansible
 
-CMD [ "ansible-playbook", "--version" ]
+ENTRYPOINT [ "ansible-playbook", "site.yml" ]
+CMD [ "--version" ]
