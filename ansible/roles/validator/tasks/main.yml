@@ -33,7 +33,7 @@
 - name: Start avail docker image
   community.docker.docker_container:
     name: da-client
-    image: 0xpolygon/avail:1.0.0
+    image: 0xpolygon/avail:{{ node_docker_tag }}
     entrypoint: "/da/bin/da.sh"
     ports:
       - "{{ node_port }}:{{ node_port }}"

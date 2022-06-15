@@ -7,17 +7,38 @@
     file:
       state: absent
       path: "/volumes/{{ item }}/state"
-    with_items: 
+    with_items:
       - bootnode-1
       - bootnode-2
       - bootnode-3
       - explorer-1
-  - name: Removing state folder
+      - validator_1
+      - validator_2
+      - validator_3
+  - name: Removing keystore folder
     file:
       state: absent
       path: "/volumes/{{ item }}/keystore"
-    with_items: 
+    with_items:
       - bootnode-1
       - bootnode-2
       - bootnode-3
+      - explorer-1
+      - validator_1
+      - validator_2
+      - validator_3
+  - name: Removing keystore folder
+    file:
+      state: absent
+      path: "/volumes/{{ item }}"
+    with_items:
+      - light-client-1
+  - name: Removing keystore folder
+    file:
+      state: absent
+      path: "/volumes/{{ item }}/full_node_state"
+    with_items:
+      - fullnode_1
+      - fullnode_2
+      - fullnode_3
       - explorer-1
