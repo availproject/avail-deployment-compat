@@ -7,8 +7,14 @@
 version: "3.3"
 services:
   validator1:
+    environment:
+      - RUST_LOG=info
     container_name: validator1
-    image: 0xpolygon/avail:1.0.0
+    build:
+      context: ./images/da
+      args:
+        - BRANCH=main
+    image: 0xpolygon/avail:1.0.0-dev
     tmpfs: /tmp
     entrypoint: /da/exec/da.sh
     volumes:
@@ -38,11 +44,16 @@ services:
       --port 30331
       --ws-port 9944
       --rpc-port 9933
+      --rpc-methods unsafe
+      --unsafe-rpc-external
+      --unsafe-ws-external
   validator2:
+    environment:
+      - RUST_LOG=info
     container_name: validator2
     depends_on:
       - validator1
-    image: 0xpolygon/avail:1.0.0
+    image: 0xpolygon/avail:1.0.0-dev
     tmpfs: /tmp
     entrypoint: /da/exec/da.sh
     volumes:
@@ -54,6 +65,7 @@ services:
       - ./volume/testnet/validator2/keystore:/da/keystore
     ports:
       - 30332:30332
+      - 9955:9944
     deploy:
       restart_policy:
         condition: on-failure
@@ -73,12 +85,17 @@ services:
       --rpc-cors all
       --ws-port 9944
       --rpc-port 9933
+      --rpc-methods unsafe
+      --unsafe-rpc-external
+      --unsafe-ws-external
   validator3:
+    environment:
+      - RUST_LOG=info
     container_name: validator3
     depends_on:
       - validator2
       - validator1
-    image: 0xpolygon/avail:1.0.0
+    image: 0xpolygon/avail:1.0.0-dev
     tmpfs: /tmp
     entrypoint: /da/exec/da.sh
     volumes:
@@ -92,6 +109,7 @@ services:
       - 30333:30333
       - 49944:9944
       - 39933:9933
+      - 9966:9944
     deploy:
       restart_policy:
         condition: on-failure
@@ -116,12 +134,14 @@ services:
       --unsafe-ws-external
       --rpc-methods unsafe
   full_node:
+    environment:
+      - RUST_LOG=info
     container_name: full_node
     depends_on:
       - validator3
       - validator2
       - validator1
-    image: 0xpolygon/avail:1.0.0
+    image: 0xpolygon/avail:1.0.0-dev
     entrypoint: /da/exec/da.sh
     volumes:
       - ./volume/testnet/exec/:/da/exec:ro
@@ -158,12 +178,14 @@ services:
       --unsafe-ws-external
       --rpc-methods unsafe
   validator_alyssa:
+    environment:
+      - RUST_LOG=info
     container_name: validator_alyssa
     depends_on:
       - validator3
       - validator2
       - validator1
-    image: 0xpolygon/avail:1.0.0
+    image: 0xpolygon/avail:1.0.0-dev
     entrypoint: /da/exec/da.sh
     volumes:
       - ./volume/testnet/exec/:/da/exec:ro
@@ -200,7 +222,11 @@ services:
     environment:
       - WS_URL=wss://localhost/ws
   lightclient:
-    image: 0xpolygon/avail-light:1.0.1-beta
+    build:  
+        context: ./images/client
+        args:
+          - BRANCH=main
+    image: 0xpolygon/avail-light:1.0.2-beta
     depends_on:
       - full_node
     entrypoint: [
@@ -215,8 +241,8 @@ services:
       - 11000:11000
     environment:
       - HTTP_SERVER_HOST=0.0.0.0
-      - FULL_NODE_RPC=["http://host.docker.internal:9933"]
-      - FULL_NODE_WS=["ws://host.docker.internal:9944"]
+      - FULL_NODE_RPC=["http://full_node:9933"]
+      - FULL_NODE_WS=["ws://full_node:9944"]
       - LOG_LEVEL="INFO"
   redis:
     container_name: redis

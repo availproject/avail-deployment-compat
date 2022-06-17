@@ -1,5 +1,6 @@
 http_server_host = "${HTTP_SERVER_HOST}"
 http_server_port = ${HTTP_SERVER_PORT}
+ipfs_seed_randomize = ${IPFS_SEED_RANDOM}
 ipfs_seed = ${IPFS_SEED}
 ipfs_port = ${IPFS_PORT}
 ipfs_path = "${IPFS_PATH}"
@@ -10,3 +11,6 @@ confidence = ${CONFIDENCE}
 avail_path = "${AVAIL_PATH}"
 bootstraps = ${BOOTSTRAPS}
 log_level = ${LOG_LEVEL} 
+max_parallel_fetch_tasks = ${PARALLEL_TASKS}
+disable_rpc = ${DISABLE_RPC}
+block_processing_delay = ${BLOCK_PROCESSING_DELAY}

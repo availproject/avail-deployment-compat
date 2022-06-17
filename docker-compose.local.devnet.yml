@@ -1,0 +1,74 @@
+## Setting up something that replicates the testnet environment
+# docker-compose -f docker-compose.local.testnet.yml up --abort-on-container-exit
+## reset full local state
+# find volume/testnet -type d -name 'state' -or -name 'keystore' | awk '{print "rm -rf ./" $0 "/*"}' | sh
+## remove stopped containers
+# docker-compose -f docker-compose.local.testnet.yml rm
+version: "3.3"
+services:
+  bootstrap_lc:
+    build:  
+        context: ./images/client
+        dockerfile: Dockerfile-dev
+        args:
+          - BRANCH=develop
+    # depends_on:
+    #   - full_node
+    entrypoint: [
+      "wait-for-it",
+      "-t", "30",
+      "host.docker.internal:9944",
+      "--",
+      "/app/avail-light/start.sh"
+    ]
+    ports:
+      - 9000:7000
+      - 37000:37000
+    environment:
+      - HTTP_SERVER_HOST=0.0.0.0
+      - FULL_NODE_RPC=["http://host.docker.internal:9933"]
+      - FULL_NODE_WS=["ws://host.docker.internal:9944"]
+      - LOG_LEVEL="INFO"
+      - PARALLEL_TASKS=8
+      - IPFS_SEED=1
+      - DISABLE_RPC=true
+      - BLOCK_PROCESSING_DELAY=10
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+     - bootstrap_network
+  lc:
+    build:  
+        context: ./images/client
+        dockerfile: Dockerfile-dev
+        args:
+          - BRANCH=luka/randomize-seed
+    depends_on:
+      - bootstrap_lc
+    entrypoint: [
+      "wait-for-it",
+      "-t", "30",
+      "host.docker.internal:9944",
+      "--",
+      "/app/avail-light/start.sh"
+    ]
+    deploy:
+      mode: replicated
+      replicas: 20
+    environment:
+      - HTTP_SERVER_HOST=0.0.0.0
+      - FULL_NODE_RPC=["http://host.docker.internal:9933"]
+      - FULL_NODE_WS=["ws://host.docker.internal:9944"]
+      - LOG_LEVEL="INFO"
+      - PARALLEL_TASKS=8
+      - IPFS_SEED_RANDOM=true
+      - BOOTSTRAPS=[["12D3KooWMm1c4pzeLPGkkCJMAgFbsfQ8xmVDusg272icWsaNHWzN", "/dns4/host.docker.internal/tcp/37000"]]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+     - lc_network
+networks:
+  bootstrap_network:
+    name: bootstrap_network
+  lc_network:
+    name: lc_network

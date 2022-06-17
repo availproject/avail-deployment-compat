@@ -17,7 +17,7 @@ RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 # Clone private repository
 RUN --mount=type=ssh \
 	mkdir -p /src && \
-	git clone -b ${BRANCH} git@github.com:maticnetwork/avail-light.git /src/avail-light && \
+	git clone -b ${BRANCH} https://github.com/maticnetwork/avail-light.git /src/avail-light && \
 	cd /src/avail-light && \
 	cargo b --release && \
 	mkdir -p /avail-light && \
