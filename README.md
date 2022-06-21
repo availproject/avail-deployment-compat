@@ -1,5 +1,16 @@
-# Data Availability Deployments
+<div align="Center">
+<h1>avail-deployment</h1>
+<h3>Deployment Configuration for the Polygon Avail blockchain</h3>
+</div>
+
+<br>
+
+# Introduction
 <a name="deployments"/>
+
+`avail-deployment` contains scripts and configs for deploying Polygon Avail.
+
+Learn more about Avail at the Avail [product page](https://polygon.technology/solutions/polygon-avail/) and [documentation](https://docs.polygon.technology/docs/avail/introduction/what-is-avail/) websites.
 
 #### Table of Contents
 - [Data Availability Deployment](#deployments)
@@ -16,7 +27,6 @@
   - [Optional: How to Generate Deterministic WASM](#build_srtool)
 - [Development Environment](#dev_env)
   -  [Build and Run Light Client and Data-Avail in Dev](#dev_env_build)
-- [Using Monk Templates](#use_monk)
 
 
 ## Current Testnet Deployment
@@ -24,15 +34,15 @@
 
 | Bootnode   | Node IP  | P2P Discovery Address | 
 | ---------- | -------- | ------------------------------------------------------------------------------------------------ |
-| Bootnode 1 | `13.38.227.125`  | `/ip4/52.47.205.129/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz`  |
-| Bootnode 2 | `15.237.127.118` | `/ip4/15.237.127.118/tcp/30333/p2p/12D3KooWQtxig5HukFDwQzshGWgQEZAqGqdCN7AQBW7cQRJWCyxL` |
-| Bootnode 3 | `52.47.205.129`  | `/ip4/52.47.205.129/tcp/30333/p2p/12D3KooW9tVuCzq3eknsevL5uyqQ3LpVcuqtkTqropjNccbhsWBz`  |
-| Full Node  | `35.180.61.81`   | [Explorer dApp](https://devnet-avail.polygon.technology/) | 
+| Bootnode 1 | `23.20.114.84` | `/ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC`  |
+| Bootnode 2 | `52.3.23.97`   | `/ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead` |
+| Bootnode 3 | `44.205.165.4` | `/ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh`  |
+| Full Node  | | [Explorer dApp](https://testnet.polygonavail.net/) | 
 
 ## TestNet Chain Specification 
 <a name="deployments_chain_spec"/>
 
-TestNet uses the following chain spec file: [testnet.chain.spec.raw.json](./misc/genesis/testnet.chain.spec.raw.json)
+TestNet uses the following chain spec file: [testnet.chain.spec.raw.json](./ansible/templates/genesis/testnet-v2.chain.spec.raw.json)
 
 
 # Run a Validator Node
@@ -268,70 +278,21 @@ the output would be something like:
 
     $ docker-compose -f docker-compose.light-client.yml up 
 
-# Using Monk Templates
+# Deploy Testnet with Ansible
 
-## DevNet using 3 validators
-In the `DevNet`, validators use the development accounts: `Alice`, `Bob`, and `Charlie`. 
+## Requirements
 
-### Step 1: Build Images
+  * Ansible ~> 5
+  * 1password CLI tool https://1password.com/downloads/command-line/
+  * AWS SSO access to Avail testnet account
 
-    export DOCKER_BUILDKIT=1
-    docker build -t da:ava-33  --build-arg BRANCH=miguel/ava-33-create-monk-template-for-da-testnet -f images/da/Dockerfile images/da/    
+## Provision instances
 
-### Step 2. Load Monk Templates
+Ansible deployment use Docker containers to run the network, the instances are provisioned by Terraform and are ready to run the playbooks. Currently IPs are EIPs currently existing in the testnet account.
 
-The DevNet only need to load 2 monk templates:
-
-- `monk/polygon-da-base.matic.today.yaml`, which contains common definition for DevNet & TestNet.
-- `monk/polygon-da-devnet.matic.today.yaml`, where validators are defined.
-
-```
-    monk s ns-delete /templates/local/polygon
-    monk load monk/polygon-da-base.matic.today.yaml
-    monk load monk/polygon-da-devnet.matic.today.yaml
-```
-
-
-### Step 3. Run templates
-
-Once templates are loaded, we only need to run 3 nodes.
-
-    ❯ monk run polygon/da-dev-validator-1 polygon/da-dev-validator-2 polygon/da-dev-validator-3
-
-
-Now you can check logs using `monk logs`, i.e.:
-
-    ❯ monk logs -f -l 100 polygon/da-dev-validator-1
-    
-    2022-03-22 10:52:20 ✨ Imported #9 (0x911b…bdf5)    
-    2022-03-22 10:52:23 💤 Idle (2 peers), best: #9 (0x911b…bdf5), finalized #7 (0x6309…0366), ⬇ 1.5kiB/s ⬆ 1.8kiB/s    
-    2022-03-22 10:52:28 💤 Idle (2 peers), best: #9 (0x911b…bdf5), finalized #7 (0x6309…0366), ⬇ 1.2kiB/s ⬆ 1.2kiB/s    
-    2022-03-22 10:52:33 💤 Idle (2 peers), best: #9 (0x911b…bdf5), finalized #7 (0x6309…0366), ⬇ 1.2kiB/s ⬆ 1.2kiB/s    
-    2022-03-22 10:52:38 💤 Idle (2 peers), best: #9 (0x911b…bdf5), finalized #7 (0x6309…0366), ⬇ 1.1kiB/s ⬆ 1.1kiB/s    
-    2022-03-22 10:52:40 Rows: 1 Cols: 4 Size: 128    
-    2022-03-22 10:52:40 Time to extend block 150.509µs    
-    2022-03-22 10:52:40 Time to prepare 181.938µs    
-    2022-03-22 10:52:40 Number of CPU cores: 16    
-    2022-03-22 10:52:40 Time to build a commitment 1.766672ms    
-    2022-03-22 10:52:40 ✨ Imported #10 (0x64f4…84b5)    
-    2022-03-22 10:52:43 💤 Idle (2 peers), best: #10 (0x64f4…84b5), finalized #8 (0x3c88…cfe1), ⬇ 1.6kiB/s ⬆ 1.6kiB/s    
-    2022-03-22 10:52:48 💤 Idle (2 peers), best: #10 (0x64f4…84b5), finalized #8 (0x3c88…cfe1), ⬇ 1.1kiB/s ⬆ 1.1kiB/s    
-    2022-03-22 10:52:53 💤 Idle (2 peers), best: #10 (0x64f4…84b5), finalized #8 (0x3c88…cfe1), ⬇ 1.2kiB/s ⬆ 1.2kiB/s    
-    2022-03-22 10:52:58 💤 Idle (2 peers), best: #10 (0x64f4…84b5), finalized #8 (0x3c88…cfe1), ⬇ 1.2kiB/s ⬆ 1.2kiB/s    
-    2022-03-22 10:53:00 Rows: 1 Cols: 4 Size: 128    
-    2022-03-22 10:53:00 Time to extend block 146.593µs    
-    2022-03-22 10:53:00 Time to prepare 175.756µs    
-    2022-03-22 10:53:00 Number of CPU cores: 16    
-    2022-03-22 10:53:00 Time to build a commitment 1.891133ms    
-    2022-03-22 10:53:00 ✨ Imported #11 (0x0a5e…43d6)
-
-### Purge Node State
-
-In this configuration, the state of the node is stored at `/var/lib/monkd/volumes/dev/validator`, so
-you can remove these folders or just use `monk purge`:
-
-    ❯ monk purge polygon/da-dev-validator-1 polygon/da-dev-validator-2 polygon/da-dev-validator-3
-
+  1. Copy and paste AWS SSO environment variables for Programmatic access to your terminal
+  2. Sign in to 1password `eval $(op signin)`
+  3. Provision the cluster with `ansible-playbook site.yml --diff -v` from the ansible directory
 
 # TestNet: Run A Validator
 

@@ -48,17 +48,15 @@
     - role: explorer
       tags: explorers
       vars:
+        node_boot_nodes: &bnlist
+          - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC
+          - /ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead
+          - /ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh
         node_name: explorer-1
         node:
-          vault_secret_path: "da/testnet/da-explorer-1"
-          ws_max_connections: 1000
-          in_peers: 50
-          out_peers: 50
           web_domain: "testnet.polygonavail.net"
-          boot_nodes:
-            - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC
-            - /ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead
-            - /ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh
+          boot_nodes: *bnlist
+
     - role: lc
       tags: lc
       vars:
@@ -76,6 +74,20 @@
     - common
     - datadog
     - role: validator
+      vars:
+        node_boot_nodes:
+            - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC
+            - /ip4/52.3.23.97/tcp/30333/p2p/12D3KooWCYeahoNTXSJzPGxwVzvLbYNQBjUhn8SFXrwi66o78ead
+            - /ip4/44.205.165.4/tcp/30333/p2p/12D3KooWAq5mHuHx8p6Lyi9eXTQcsUHWdKUAL2u3t8aJbsDBucVh
+
+# More fullnodes
+- hosts: avail_fullnode_testnet
+  become: true
+  tags: fullnodes
+  roles:
+    - common
+    - datadog
+    - role: fullnode
       vars:
         node_boot_nodes:
             - /ip4/23.20.114.84/tcp/30333/p2p/12D3KooWJfr2gxQ9pMfxDUm8wK3tVy4SwkbTGaP8t91882S95YZC

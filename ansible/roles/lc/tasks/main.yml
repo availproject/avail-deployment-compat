@@ -12,8 +12,8 @@
     entrypoint: "/avail-light/start.sh"
     env:
       HTTP_SERVER_HOST: "0.0.0.0"
-      FULL_NODE_RPC: '["http://3.213.146.89:9933"]'
-      FULL_NODE_WS: '["wss://testnet.polygonavail.net/ws"]'
+      FULL_NODE_RPC: "{{ ('[\"' + target.node_rpc + '\"]') | string }}"
+      FULL_NODE_WS: "{{ ('[\"' + target.node_ws + '\"]') | string }}"
       RUST_BACKTRACE: full
       IPFS_PATH: /avail-light/state/ipfs
       AVAIL_PATH: /avail-light/state/avail
@@ -27,4 +27,4 @@
     volumes:
       - "{{ node_base_path }}/{{ node_name }}/state:/avail-light/state"
     network_mode: kong_upstream_net
-    restart_policy: "always"
+    restart_policy: always

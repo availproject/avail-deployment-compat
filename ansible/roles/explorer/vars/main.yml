@@ -1,1 +1,2 @@
 node_key: "{{ lookup('onepassword', node_name, field='node-key', vault='Avail Testnet') }}"
+node_network_mode: "kong_internal_net"

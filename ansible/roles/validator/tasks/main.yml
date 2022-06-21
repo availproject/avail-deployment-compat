@@ -33,7 +33,7 @@
 - name: Start avail docker image
   community.docker.docker_container:
     name: da-client
-    image: 0xpolygon/avail:1.0.0
+    image: 0xpolygon/avail:{{ node_docker_tag }}
     entrypoint: "/da/bin/da.sh"
     ports:
       - "{{ node_port }}:{{ node_port }}"
@@ -50,6 +50,7 @@
     env:
       DA_CHAIN: "/da/genesis/testnet-v2.chain.spec.raw.json"
       DA_NAME: "{{ node_name }}"
+    restart_policy: always
 
 - name: load private keys
   community.docker.docker_container_exec:
