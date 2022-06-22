@@ -1,0 +1,5 @@
+- name: create volumes directory
+  ansible.builtin.file:
+    path: /volumes
+    state: directory
+

@@ -308,6 +308,7 @@ resource "aws_instance" "full_node" {
 
   tags = {
     Name = format("full_node_%02d", count.index + 1)
+    Role = "full_node"
   }
 }
 
@@ -318,7 +319,7 @@ resource "aws_instance" "validator" {
   key_name      = var.devnet_key_name
   subnet_id     = aws_subnet.devnet_private.id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-  
+
   root_block_device {
     delete_on_termination = true
     volume_size           = 30
@@ -327,5 +328,6 @@ resource "aws_instance" "validator" {
 
   tags = {
     Name = format("validator_%02d", count.index + 1)
+    Role = "validator"
   }
 }
