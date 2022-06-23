@@ -4,14 +4,15 @@ import json
 
 work_dir = sys.argv[1]
 
-with open(work_dir + "/nodes.json", 'r') as node_list:
-    node_data  = json.load(node_list)
+with open(work_dir + "/names.txt", 'r') as node_list:
+    node_data  = node_list.read().splitlines()
 
 
 master_list = {}
 
 for node in node_data:
-    node_info = node.copy()
+    node_info = {}
+    node_info["tag_name"] = node
     tpl = {
         "title": "",
         "category": "SERVER",
@@ -83,3 +84,6 @@ for node in node_data:
 
 with open(work_dir + "/master.json", 'w') as f:
     json.dump(master_list, f)
+
+
+# TODO - Modify the chainspec so that it can loop over certain parameters?
