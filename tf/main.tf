@@ -45,12 +45,14 @@ resource "aws_internet_gateway" "igw" {
 # Elastic-IP (eip) for NAT
 resource "aws_eip" "nat_eip" {
   vpc        = true
+  count         = length(var.zones)
   depends_on = [aws_internet_gateway.igw]
 }
 
 resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.devnet_public.id
+  count         = length(var.zones)
+  subnet_id     = element(aws_subnet.devnet_public, count.index).id
+  allocation_id = element(aws_eip.nat_eip, count.index).id
 
   tags = {
     Name = "nat"
@@ -60,23 +62,25 @@ resource "aws_nat_gateway" "nat" {
 
 resource "aws_subnet" "devnet_private" {
   vpc_id            = aws_vpc.devnet.id
-  cidr_block        = var.devnet_private_subnet
-  availability_zone = element(var.zones, 0)
+  count             = length(var.zones)
+  availability_zone = element(var.zones, count.index)
+  cidr_block        = element(var.devnet_private_subnet, count.index)
   tags = {
-    Name = "validator"
+    Name = "private-subnet"
   }
 }
 
 resource "aws_subnet" "devnet_public" {
   vpc_id                  = aws_vpc.devnet.id
-  cidr_block              = var.devnet_public_subnet
-  availability_zone       = element(var.zones, 0)
+  count                   = length(var.zones)
+  availability_zone       = element(var.zones, count.index)
+  cidr_block              = element(var.devnet_public_subnet, count.index)
   map_public_ip_on_launch = true
 
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
-    Name = "fullnode"
+    Name = "public-subnet"
   }
 }
 
@@ -86,7 +90,7 @@ resource "aws_subnet" "devnet_public" {
 
 resource "aws_route_table" "devnet_private" {
   vpc_id = aws_vpc.devnet.id
-
+  count = length(var.zones)
   tags = {
     Name = "devnet_private_route_table"
   }
@@ -109,22 +113,25 @@ resource "aws_route" "public_internet_gateway" {
   gateway_id             = aws_internet_gateway.igw.id
 }
 
-# Route for NAT
+# # Route for NAT
 resource "aws_route" "private_nat_gateway" {
-  route_table_id         = aws_route_table.devnet_private.id
+  route_table_id         = element(aws_route_table.devnet_private, count.index).id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.nat.id
+  count                  = length(var.zones)
+  nat_gateway_id         = element(aws_nat_gateway.nat, count.index).id
 }
 
 # Route table associations for both Public & Private Subnets
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.devnet_public.id
+  count          = length(var.zones)
+  subnet_id      = element(aws_subnet.devnet_public, count.index).id
   route_table_id = aws_route_table.devnet_public.id
 }
 
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.devnet_private.id
-  route_table_id = aws_route_table.devnet_private.id
+  count          = length(var.zones)
+  subnet_id      = element(aws_subnet.devnet_private, count.index).id
+  route_table_id = element(aws_route_table.devnet_private, count.index).id
 }
 
 
@@ -159,8 +166,6 @@ resource "aws_security_group" "default" {
 resource "aws_iam_role" "ec2_role" {
   name = "ec2_role"
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
   assume_role_policy = <<POLYGON
 {
     "Version": "2012-10-17",
@@ -185,10 +190,10 @@ POLYGON
 }
 
 resource "aws_iam_policy" "ec2_policy" {
-  name = "ec2_policy"
-  path = "/"
+  name        = "ec2_policy"
+  path        = "/"
   description = "Policy to provide permissin to EC2"
-  policy = <<POLYGON
+  policy      = <<POLYGON
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -287,8 +292,8 @@ POLYGON
 }
 
 resource "aws_iam_policy_attachment" "ec2_policy_role" {
-  name = "ec2_attachment"
-  roles = [aws_iam_role.ec2_role.name]
+  name       = "ec2_attachment"
+  roles      = [aws_iam_role.ec2_role.name]
   policy_arn = aws_iam_policy.ec2_policy.arn
 }
 
@@ -299,25 +304,26 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 
 resource "aws_instance" "full_node" {
-  ami           = var.base_ami
-  instance_type = var.base_instance_type
-  count         = var.full_node_count
-  key_name      = var.devnet_key_name
-  subnet_id     = aws_subnet.devnet_public.id
+  ami                  = var.base_ami
+  instance_type        = var.base_instance_type
+  count                = var.full_node_count
+  key_name             = var.devnet_key_name
+  subnet_id            = element(aws_subnet.devnet_public, count.index).id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
   tags = {
-    Name = format("full_node_%02d", count.index + 1)
-    Role = "full_node"
+    Name     = format("full-node-%02d", count.index + 1)
+    Hostname = format("full-node-%02d", count.index + 1)
+    Role     = "full-node"
   }
 }
 
 resource "aws_instance" "validator" {
-  ami           = var.base_ami
-  instance_type = var.base_instance_type
-  count         = var.validator_count
-  key_name      = var.devnet_key_name
-  subnet_id     = aws_subnet.devnet_private.id
+  ami                  = var.base_ami
+  instance_type        = var.base_instance_type
+  count                = var.validator_count
+  key_name             = var.devnet_key_name
+  subnet_id            = element(aws_subnet.devnet_private, count.index).id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
   root_block_device {
@@ -327,7 +333,8 @@ resource "aws_instance" "validator" {
   }
 
   tags = {
-    Name = format("validator_%02d", count.index + 1)
-    Role = "validator"
+    Name     = format("validator-%02d", count.index + 1)
+    Hostname = format("validator-%02d", count.index + 1)
+    Role     = "validator"
   }
 }

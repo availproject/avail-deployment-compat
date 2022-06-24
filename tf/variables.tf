@@ -5,7 +5,7 @@ variable "region" {
 }
 variable "zones" {
   description = "The zones for deployment"
-  type        = list(any)
+  type        = list(string)
   default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
 }
 variable "base_ami" {
@@ -29,7 +29,7 @@ variable "validator_count" {
   default     = 3
 }
 variable "devnet_key_name" {
-  description = "The name that we want to use for the ssh key boar"
+  description = "The name that we want to use for the ssh key pair"
   type        = string
   default     = "2022-06-21-avail-devnet"
 }
@@ -40,13 +40,13 @@ variable "devnet_key_value" {
 }
 variable "devnet_public_subnet" {
   description = "The cidr block for the public subnet in our VPC"
-  type        = string
-  default     = "10.0.2.0/23"
+  type        = list(string)
+  default     = ["10.0.2.0/23", "10.0.4.0/23", "10.0.6.0/23"]
 }
 variable "devnet_private_subnet" {
   description = "The cidr block for the private subnet in our VPC"
-  type        = string
-  default     = "10.0.4.0/23"
+  type        = list(string)
+  default     = ["10.0.128.0/23", "10.0.130.0/23", "10.0.132.0/23"]
 }
 variable "devnet_vpc_block" {
   description = "The cidr block for our VPC"
