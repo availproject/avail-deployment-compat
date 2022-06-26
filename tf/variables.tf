@@ -53,3 +53,8 @@ variable "devnet_vpc_block" {
   type        = string
   default     = "10.0.0.0/16"
 }
+variable "additional_tags" {
+  default     = {}
+  description = "Additional resource tags"
+  type        = map(string)
+}

@@ -11,8 +11,18 @@ terraform {
 
 provider "aws" {
   region = "us-west-2"
+  default_tags {
+    tags = {
+      Environment = "devnet"
+      Network = "avail"
+      Owner       = "jhilliard@polygon.technology"
+      # this won't work in all cases, but for arbitrary devnets that are being created it should befine
+      Lineage = jsondecode(file("terraform.tfstate")).lineage
+    }
+  }
 }
 
+data "aws_caller_identity" "provisioner" {}
 
 resource "aws_key_pair" "devnet" {
   key_name   = var.devnet_key_name
@@ -21,15 +31,13 @@ resource "aws_key_pair" "devnet" {
 
 
 
-# https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html
-
-
 resource "aws_vpc" "devnet" {
   cidr_block       = var.devnet_vpc_block
   instance_tenancy = "default"
 
   tags = {
     Name = "devnet"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -37,7 +45,8 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.devnet.id
 
   tags = {
-    Name = "devnet_igw"
+    Name = "igw"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -56,6 +65,7 @@ resource "aws_nat_gateway" "nat" {
 
   tags = {
     Name = "nat"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -67,6 +77,7 @@ resource "aws_subnet" "devnet_private" {
   cidr_block        = element(var.devnet_private_subnet, count.index)
   tags = {
     Name = "private-subnet"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -81,6 +92,7 @@ resource "aws_subnet" "devnet_public" {
 
   tags = {
     Name = "public-subnet"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -92,7 +104,8 @@ resource "aws_route_table" "devnet_private" {
   vpc_id = aws_vpc.devnet.id
   count = length(var.zones)
   tags = {
-    Name = "devnet_private_route_table"
+    Name = "private_route_table"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -100,7 +113,8 @@ resource "aws_route_table" "devnet_public" {
   vpc_id = aws_vpc.devnet.id
 
   tags = {
-    Name = "devnet_public_route_table"
+    Name = "public_route_table"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -185,7 +199,8 @@ resource "aws_iam_role" "ec2_role" {
 }
 POLYGON
   tags = {
-    tag-key = "devnet_role"
+    Name = "devnet_role"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -289,6 +304,11 @@ resource "aws_iam_policy" "ec2_policy" {
     ]
 }
 POLYGON
+  tags = {
+    Name = "devnet_role"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
+  }
+
 }
 
 resource "aws_iam_policy_attachment" "ec2_policy_role" {
@@ -315,6 +335,7 @@ resource "aws_instance" "full_node" {
     Name     = format("full-node-%02d", count.index + 1)
     Hostname = format("full-node-%02d", count.index + 1)
     Role     = "full-node"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
 
@@ -336,5 +357,6 @@ resource "aws_instance" "validator" {
     Name     = format("validator-%02d", count.index + 1)
     Hostname = format("validator-%02d", count.index + 1)
     Role     = "validator"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
