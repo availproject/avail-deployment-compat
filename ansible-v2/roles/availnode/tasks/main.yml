@@ -31,34 +31,56 @@
     mode: 755
   notify: restart node
 
-- name: create v2 testnet chainspec
+- name: create secret.txt
   ansible.builtin.template:
-    src: "../../build/populated.devnet.chainspec.raw.json"
+    src: "./templates/secret.txt"
+    dest: "{{ node_base_path }}/secret.txt"
+    mode: 755
+  notify: restart node
+  # TODO if this changes we need to rotate keys
+
+- name: Dropping new lines from secret
+  ansible.builtin.replace:
+    path: "{{ node_base_path }}/secret.txt"
+    regexp: '[\n\r]'
+    replace: ''
+
+- name: create nodeprivkey.txt
+  ansible.builtin.template:
+    src: "./templates/nodeprivkey.txt"
+    dest: "{{ node_base_path }}/nodeprivkey.txt"
+    mode: 755
+  notify: restart node
+
+- name: Dropping new lines from node key
+  ansible.builtin.replace:
+    path: "{{ node_base_path }}/nodeprivkey.txt"
+    regexp: '[\n\r]'
+    replace: ''
+
+
+- name: create chainspec
+  ansible.builtin.template:
+    src: "../../build/{{ lineage }}/populated.devnet.chainspec.raw.json"
     dest: "{{ node_base_path }}/genesis/devnet.chain.spec.raw.json"
     mode: 755
   notify: restart node
 
-# - name: Start avail docker image
-#   community.docker.docker_container:
-#     name: da-client
-#     image: 0xpolygon/avail:{{ node_docker_tag }}
-#     entrypoint: "/da/bin/da.sh"
-#     ports:
-#       - "{{ node_port }}:{{ node_port }}"
-#     labels:
-#       com.datadoghq.ad.check_names: '["openmetrics"]'
-#       com.datadoghq.ad.init_configs: "[{}]"
-#       com.datadoghq.ad.instances: '[{"openmetrics_endpoint":"http://%%host%%:9615/metrics", "namespace": "avail", "metrics": ["substrate*"]}]'
-#     volumes:
-#       - "{{ node_base_path }}/da.sh:/da/bin/da.sh"
-#       - "{{ node_base_path }}/state:/da/state"
-#       - "{{ node_base_path }}/keystore:/da/keystore"
-#       - "{{ node_base_path }}/genesis:/da/genesis"
-#     state: started
-#     env:
-#       DA_CHAIN: "/da/genesis/testnet-v2.chain.spec.raw.json"
-#       DA_NAME: "{{ node_name }}"
-#     restart_policy: always
+- name: Start avail docker image
+  community.docker.docker_container:
+    name: da-client
+    image: 0xpolygon/avail:{{ node_docker_tag }}
+    entrypoint: "/var/avail/da.sh"
+    ports:
+      - "{{ node_port }}:{{ node_port }}"
+    labels:
+      com.datadoghq.ad.check_names: '["openmetrics"]'
+      com.datadoghq.ad.init_configs: "[{}]"
+      com.datadoghq.ad.instances: '[{"openmetrics_endpoint":"http://%%host%%:9615/metrics", "namespace": "avail", "metrics": ["substrate*"]}]'
+    volumes:
+      - "{{ node_base_path }}:/var/avail"
+    state: started
+    restart_policy: always
 
 # - name: load private keys
 #   community.docker.docker_container_exec:

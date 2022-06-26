@@ -1,11 +1,6 @@
 - name: Set a hostname
   ansible.builtin.hostname:
-    name: "{{ hostvars[inventory_hostname].tags.Name }}.dev.avail.polygon"
-
-- name: create volumes directory
-  ansible.builtin.file:
-    path: /volumes
-    state: directory
+    name: "{{ node_hostname }}"
 
 - name: Install aptitude
   apt:
@@ -23,6 +18,7 @@
       - python3-pip
       - virtualenv
       - python3-setuptools
+      - zile
     state: latest
     update_cache: true
 
