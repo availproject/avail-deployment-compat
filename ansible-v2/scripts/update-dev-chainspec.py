@@ -6,9 +6,9 @@ import re
 
 
 def get_balance_for_node(node_name):
-    if re.match("validator_", node_name):
+    if re.match("validator-", node_name):
         return 1000000000000000000000000
-    if re.match("election_", node_name):
+    if re.match("election-", node_name):
         return 1000000000000000000000000
     return 1000000000000000000000
 
@@ -40,7 +40,7 @@ for node in nodes:
         nodes[node]["wallet"]["sr25519"]["ss58PublicKey"],
         get_balance_for_node(node)
     ])
-    if re.match("validator_", node):
+    if re.match("validator-", node):
         rt["staking"]["stakers"].append([
             nodes[node]["wallet"]["sr25519"]["ss58PublicKey"],
             nodes[node]["wallet"]["sr25519"]["ss58PublicKey"],
@@ -57,9 +57,9 @@ for node in nodes:
                 "authority_discovery": nodes[node]["wallet"]["sr25519"]["ss58PublicKey"]
             }
         ])
-    if re.match("tech_committee_", node):
+    if re.match("tech-committee-", node):
         rt["technicalCommittee"]["members"].append(nodes[node]["wallet"]["sr25519"]["ss58PublicKey"])
-    if re.match("election_", node):
+    if re.match("election-", node):
         rt["elections"]["members"].append([
             nodes[node]["wallet"]["sr25519"]["ss58PublicKey"],
             1000000000000000000
@@ -67,11 +67,11 @@ for node in nodes:
 
 new_app_keys = []
 for key in rt["dataAvailability"]["appKeys"]:
-    key[1]["owner"] = nodes["sudo_01"]["wallet"]["sr25519"]["ss58PublicKey"]
+    key[1]["owner"] = nodes["sudo-01"]["wallet"]["sr25519"]["ss58PublicKey"]
     new_app_keys.append(key)
 rt["dataAvailability"]["appKeys"] = new_app_keys
 
-rt["sudo"]["key"] = nodes["sudo_01"]["wallet"]["sr25519"]["ss58PublicKey"]
+rt["sudo"]["key"] = nodes["sudo-01"]["wallet"]["sr25519"]["ss58PublicKey"]
 
 with open(work_dir + "/populated.devnet.chainspec.json", 'w') as f:
     json.dump(chainspec, f, indent = 4)

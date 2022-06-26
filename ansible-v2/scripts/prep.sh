@@ -20,9 +20,6 @@ then
     exit
 fi
 
-
-
-
 echo "Creating temp directory to house files"
 tmp_dir=$(mktemp -d)
 
@@ -54,15 +51,15 @@ mkdir build/$lineage_id
 
 echo "Generating list of nodes based on the current ansible inventory"
 ansible-inventory --list | jq '._meta.hostvars[] | {tag_name: .tags.Name, tag_role: .tags.Role, instance_id: .instance_id}'  | jq -s '.' > $tmp_dir/nodes.json
-cat nodes.json | jq -r '.[].tag_name' > $tmp_dir/names.txt
+cat $tmp_dir/nodes.json | jq -r '.[].tag_name' > $tmp_dir/names.txt
 
 echo "Adding wallets that aren't tied to physical hosts"
 
-echo "election_01" >> $tmp_dir/names.txt
-echo "sudo_01" >> $tmp_dir/names.txt
-echo "tech_committee_01" >> $tmp_dir/names.txt
-echo "tech_committee_02" >> $tmp_dir/names.txt
-echo "tech_committee_03" >> $tmp_dir/names.txt
+echo "election-01" >> $tmp_dir/names.txt
+echo "sudo-01" >> $tmp_dir/names.txt
+echo "tech-committee-01" >> $tmp_dir/names.txt
+echo "tech-committee-02" >> $tmp_dir/names.txt
+echo "tech-committee-03" >> $tmp_dir/names.txt
 
 
 echo "Generating p2p keys and wallets for all nodes"
