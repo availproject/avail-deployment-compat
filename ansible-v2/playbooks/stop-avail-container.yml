@@ -1,0 +1,16 @@
+---
+- name: Stop the avail container
+  hosts: all
+  tasks:
+    - name: Stop avail docker image
+      community.docker.docker_container:
+        name: da-client
+        state: stopped
+
+- name: stop the light client container
+  hosts: avail_explorer_testnet
+  tasks:
+    - name: Stop avail-light docker image
+      community.docker.docker_container:
+        name: light-client-1 # comes from the `node_name` var in site.yml which is used to name the container
+        state: stopped

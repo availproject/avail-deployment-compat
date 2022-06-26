@@ -22,6 +22,12 @@ provider "aws" {
   }
 }
 
+resource "aws_ssm_parameter" "lineage" {
+  name  = "terraform-lineage"
+  type  = "String"
+  value = jsondecode(file("terraform.tfstate")).lineage
+}
+
 data "aws_caller_identity" "provisioner" {}
 
 resource "aws_key_pair" "devnet" {

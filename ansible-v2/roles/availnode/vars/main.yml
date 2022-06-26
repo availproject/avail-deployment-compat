@@ -1,0 +1,3 @@
+sk: "{{ lookup('onepassword', hostvars[inventory_hostname].tags.Name, field='keynode_sk', vault='Avail Devnet') }}"
+p_node_key: "{{ lookup('onepassword', node_name, field='p-node-key', vault='Avail Devnet') }}"
+node_key: "{{ lookup('onepassword', node_name, field='node-key', vault='Avail Devnet') }}"

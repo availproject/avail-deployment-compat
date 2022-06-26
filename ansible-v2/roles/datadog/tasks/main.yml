@@ -16,14 +16,11 @@
     volumes: "{{ datadog_volumes }}"
     env:
       DD_API_KEY: "{{ datadog_api_key|default('FAKE_KEY') }}"
-      DD_TAGS: "network:avail-testnet"
+      DD_TAGS: "network:avail-devnet"
       DD_PROCESS_AGENT_ENABLED: "true"
       DD_LOGS_STDOUT: "true"
       DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
-      DD_ENV: "testnet"
+      DD_ENV: "devnet"
       DD_LOGS_ENABLED: "true"
       DD_CONTAINER_EXCLUDE: "image:datadog/agent"
-    published_ports:
-      - "8125:8125/udp"
-      - "8126:8126"
   tags: datadog_agent

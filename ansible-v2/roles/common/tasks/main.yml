@@ -1,3 +1,7 @@
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{ hostvars[inventory_hostname].tags.Name }}.dev.avail.polygon"
+
 - name: create volumes directory
   ansible.builtin.file:
     path: /volumes

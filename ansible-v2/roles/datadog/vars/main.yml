@@ -6,4 +6,4 @@ datadog_volumes:
   - /etc/passwd:/etc/passwd:ro
   - /sys/fs/cgroup:/host/sys/fs/cgroup
 
-datadog_api_key: "{{ lookup('onepassword', 'Datadog API Key', field='credential', vault='Avail Testnet') }}"
+datadog_api_key: "{{ lookup('onepassword', 'Datadog API Key', field='credential', vault='Avail Devnet') }}"

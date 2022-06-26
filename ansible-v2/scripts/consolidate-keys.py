@@ -86,4 +86,3 @@ with open(work_dir + "/master.json", 'w') as f:
     json.dump(master_list, f)
 
 
-# TODO - Modify the chainspec so that it can loop over certain parameters?

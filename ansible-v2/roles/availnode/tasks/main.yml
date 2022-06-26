@@ -1,0 +1,83 @@
+---
+
+- name: Creating base path
+  ansible.builtin.file:
+    path: "{{ node_base_path }}"
+    state: directory
+    mode: 0755
+
+- name: Create folder for chainspecs
+  ansible.builtin.file:
+    path: "{{ node_base_path }}/genesis"
+    state: directory
+    mode: 0755
+
+- name: Create folder for keystore
+  ansible.builtin.file:
+    path: "{{ node_base_path }}/keystore"
+    state: directory
+    mode: 0755
+
+- name: Create folder for state
+  ansible.builtin.file:
+    path: "{{ node_base_path }}/state"
+    state: directory
+    mode: 0755
+
+- name: create entrypoint
+  ansible.builtin.template:
+    src: "./templates/da.sh"
+    dest: "{{ node_base_path }}/da.sh"
+    mode: 755
+  notify: restart node
+
+- name: create v2 testnet chainspec
+  ansible.builtin.template:
+    src: "../../build/populated.devnet.chainspec.raw.json"
+    dest: "{{ node_base_path }}/genesis/devnet.chain.spec.raw.json"
+    mode: 755
+  notify: restart node
+
+# - name: Start avail docker image
+#   community.docker.docker_container:
+#     name: da-client
+#     image: 0xpolygon/avail:{{ node_docker_tag }}
+#     entrypoint: "/da/bin/da.sh"
+#     ports:
+#       - "{{ node_port }}:{{ node_port }}"
+#     labels:
+#       com.datadoghq.ad.check_names: '["openmetrics"]'
+#       com.datadoghq.ad.init_configs: "[{}]"
+#       com.datadoghq.ad.instances: '[{"openmetrics_endpoint":"http://%%host%%:9615/metrics", "namespace": "avail", "metrics": ["substrate*"]}]'
+#     volumes:
+#       - "{{ node_base_path }}/da.sh:/da/bin/da.sh"
+#       - "{{ node_base_path }}/state:/da/state"
+#       - "{{ node_base_path }}/keystore:/da/keystore"
+#       - "{{ node_base_path }}/genesis:/da/genesis"
+#     state: started
+#     env:
+#       DA_CHAIN: "/da/genesis/testnet-v2.chain.spec.raw.json"
+#       DA_NAME: "{{ node_name }}"
+#     restart_policy: always
+
+# - name: load private keys
+#   community.docker.docker_container_exec:
+#     container: da-client
+#     debug: yes
+#     argv:
+#       - /da/bin/data-avail
+#       - key
+#       - insert
+#       - "--chain=/da/genesis/testnet-v2.chain.spec.raw.json"
+#       - "--base-path=/da/state"
+#       - "--keystore-path=/da/keystore"
+#       - "--suri={{ sk }}"
+#       - "--key-type={{ item.key_type }}"
+#       - "--scheme={{ item.scheme }}"
+#   with_items:
+#     - { key_type: "babe", scheme: "Sr25519" }
+#     - { key_type: "gran", scheme: "Ed25519" }
+#     - { key_type: "imon", scheme: "Sr25519" }
+#     - { key_type: "audi", scheme: "Sr25519" }
+#     - { key_type: "auth", scheme: "Sr25519" }
+#   notify: restart node
