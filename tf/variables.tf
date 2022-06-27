@@ -73,3 +73,8 @@ variable "route53_zone_id" {
   description = "The ID of the hosted zone to contain the CNAME record to our LB"
   type        = string
 }
+variable "route53_domain_name" {
+  default     = "dev.avail.h3.vc"
+  description = "Our base domain"
+  type        = string
+}
