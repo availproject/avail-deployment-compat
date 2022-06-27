@@ -28,6 +28,11 @@ variable "validator_count" {
   type        = number
   default     = 3
 }
+variable "explorer_count" {
+  description = "The number of explorers that we're going to deploy"
+  type        = number
+  default     = 3
+}
 variable "devnet_key_name" {
   description = "The name that we want to use for the ssh key pair"
   type        = string
