@@ -64,6 +64,13 @@ resource "aws_eip" "nat_eip" {
   depends_on = [aws_internet_gateway.igw]
 }
 
+resource "aws_eip" "lb_eip" {
+  vpc        = true
+  count      = length(var.zones)
+  depends_on = [aws_internet_gateway.igw]
+}
+
+
 resource "aws_nat_gateway" "nat" {
   count         = length(var.zones)
   subnet_id     = element(aws_subnet.devnet_public, count.index).id
@@ -101,8 +108,6 @@ resource "aws_subnet" "devnet_public" {
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
-
-
 
 
 
@@ -177,7 +182,7 @@ resource "aws_security_group" "default" {
     from_port = "0"
     to_port   = "0"
     protocol  = "-1"
-    self      = "true"
+    self      = true
   }
 }
 
@@ -368,4 +373,105 @@ resource "aws_instance" "validator" {
     Role        = "validator"
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
+}
+
+
+resource "aws_lb" "avail_nodes" {
+  name               = "avail-lb"
+  load_balancer_type = "network"
+  internal           = false
+  subnets            = [for subnet in aws_subnet.devnet_public : subnet.id]
+}
+
+resource "aws_lb_target_group" "avail_full_node" {
+  count       = length(aws_instance.full_node)
+  name        = format("full-node-%02d", count.index + 1)
+  protocol    = "TCP"
+  target_type = "instance"
+  vpc_id      = aws_vpc.devnet.id
+  port        = element(aws_instance.full_node, count.index).tags.AvailPort
+}
+resource "aws_lb_target_group" "avail_validator" {
+  count       = length(aws_instance.validator)
+  name        = format("validator-%02d", count.index + 1)
+  protocol    = "TCP"
+  target_type = "instance"
+  vpc_id      = aws_vpc.devnet.id
+  port        = element(aws_instance.validator, count.index).tags.AvailPort
+}
+
+resource "aws_lb_target_group_attachment" "avail_full_node" {
+  count            = length(aws_instance.full_node)
+  target_group_arn = element(aws_lb_target_group.avail_full_node, count.index).arn
+  target_id        = element(aws_instance.full_node, count.index).id
+  port             = element(aws_instance.full_node, count.index).tags.AvailPort
+}
+
+resource "aws_lb_target_group_attachment" "avail_validator" {
+  count            = length(aws_instance.validator)
+  target_group_arn = element(aws_lb_target_group.avail_validator, count.index).arn
+  target_id        = element(aws_instance.validator, count.index).id
+  port             = element(aws_instance.validator, count.index).tags.AvailPort
+}
+
+
+resource "aws_lb_listener" "avail_full_node" {
+  count             = length(aws_instance.full_node)
+  load_balancer_arn = aws_lb.avail_nodes.arn
+  port              = element(aws_instance.full_node, count.index).tags.AvailPort
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = element(aws_lb_target_group.avail_full_node, count.index).arn
+  }
+}
+resource "aws_lb_listener" "avail_validator" {
+  count             = length(aws_instance.validator)
+  load_balancer_arn = aws_lb.avail_nodes.arn
+  port              = element(aws_instance.validator, count.index).tags.AvailPort
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = element(aws_lb_target_group.avail_validator, count.index).arn
+  }
+}
+
+resource "aws_security_group" "allow_internal" {
+  name        = "avail-all-nodes"
+  description = "Allow all internal traffic"
+  vpc_id      = aws_vpc.devnet.id
+}
+
+resource "aws_security_group_rule" "allow_internal" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = [aws_vpc.devnet.cidr_block]
+  security_group_id = aws_security_group.allow_internal.id
+}
+
+resource "aws_network_interface_sg_attachment" "sg_validator_attachment" {
+  count                = length(aws_instance.validator)
+  security_group_id    = aws_security_group.allow_internal.id
+  network_interface_id = element(aws_instance.validator, count.index).primary_network_interface_id
+}
+
+resource "aws_network_interface_sg_attachment" "sg_full_node_attachment" {
+  count                = length(aws_instance.full_node)
+  security_group_id    = aws_security_group.allow_internal.id
+  network_interface_id = element(aws_instance.full_node, count.index).primary_network_interface_id
+}
+
+output "ec2_full_node_ips" {
+  value = ["${aws_instance.full_node.*.private_ip}"]
+}
+output "ec2_validator_ips" {
+  value = ["${aws_instance.validator.*.private_ip}"]
+}
+
+output "alb_domain_name" {
+  value = aws_lb.avail_nodes.dns_name
 }
