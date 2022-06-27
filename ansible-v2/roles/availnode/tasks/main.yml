@@ -83,25 +83,3 @@
       - "{{ node_base_path }}:/var/avail"
     state: started
     restart_policy: always
-
-# - name: load private keys
-#   community.docker.docker_container_exec:
-#     container: da-client
-#     debug: yes
-#     argv:
-#       - /da/bin/data-avail
-#       - key
-#       - insert
-#       - "--chain=/da/genesis/testnet-v2.chain.spec.raw.json"
-#       - "--base-path=/da/state"
-#       - "--keystore-path=/da/keystore"
-#       - "--suri={{ sk }}"
-#       - "--key-type={{ item.key_type }}"
-#       - "--scheme={{ item.scheme }}"
-#   with_items:
-#     - { key_type: "babe", scheme: "Sr25519" }
-#     - { key_type: "gran", scheme: "Ed25519" }
-#     - { key_type: "imon", scheme: "Sr25519" }
-#     - { key_type: "audi", scheme: "Sr25519" }
-#     - { key_type: "auth", scheme: "Sr25519" }
-#   notify: restart node

@@ -68,3 +68,8 @@ variable "avail_ws_port" {
   description = "The WS Port that Avail is listening on"
   type        = number
 }
+variable "route53_zone_id" {
+  default     = "Z062326020PSB9CU671ZF"
+  description = "The ID of the hosted zone to contain the CNAME record to our LB"
+  type        = string
+}

@@ -568,6 +568,15 @@ resource "aws_network_interface_sg_attachment" "sg_full_node_attachment_p2p" {
   network_interface_id = element(aws_instance.full_node, count.index).primary_network_interface_id
 }
 
+
+resource "aws_route53_record" "avail" {
+  zone_id = var.route53_zone_id
+  name    = "dev.avail.h3.vc"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [aws_lb.avail_nodes.dns_name]
+}
+
 output "ec2_full_node_ips" {
   value = ["${aws_instance.full_node.*.private_ip}"]
 }
