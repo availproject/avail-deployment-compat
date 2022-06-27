@@ -73,6 +73,8 @@
     entrypoint: "/var/avail/da.sh"
     ports:
       - "{{ node_port }}:{{ node_port }}"
+      - "{{ node_rpc_port }}:{{ node_rpc_port }}"
+      - "{{ node_ws_port }}:{{ node_ws_port }}"
     labels:
       com.datadoghq.ad.check_names: '["openmetrics"]'
       com.datadoghq.ad.init_configs: "[{}]"

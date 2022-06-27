@@ -58,3 +58,13 @@ variable "additional_tags" {
   description = "Additional resource tags"
   type        = map(string)
 }
+variable "avail_rpc_port" {
+  default     = 9933
+  description = "The RPC Port that Avail is listening on"
+  type        = number
+}
+variable "avail_ws_port" {
+  default     = 9944
+  description = "The WS Port that Avail is listening on"
+  type        = number
+}

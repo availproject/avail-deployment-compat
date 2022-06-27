@@ -57,5 +57,12 @@ fi
     --port {{ node_port }} \
     --ws-port {{ node_ws_port }} \
     --rpc-port {{ node_rpc_port }} \
+    {%  if not is_validator %}
+    --rpc-methods Safe \
+    --rpc-cors all \
+    --unsafe-rpc-external \
+    --unsafe-ws-external \
+    {% endif %}
+
     2>&1
 
