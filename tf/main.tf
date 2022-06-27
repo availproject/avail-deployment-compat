@@ -437,22 +437,6 @@ resource "aws_lb_listener" "avail_validator" {
 }
 
 
-
-# resource "aws_lb_target_group" "avail_full_node_rpc" {
-#   name        = "full-node-rpc"
-#   protocol    = "HTTP"
-#   target_type = "instance"
-#   vpc_id      = aws_vpc.devnet.id
-#   port        = var.avail_rpc_port
-# }
-
-# resource "aws_lb_target_group_attachment" "avail_full_node_rpc" {
-#   count            = length(aws_instance.full_node)
-#   target_group_arn = aws_lb_target_group.avail_full_node_rpc.arn
-#   target_id        = element(aws_instance.full_node, count.index).id
-#   port             = var.avail_rpc_port
-# }
-
 resource "aws_lb_target_group" "avail_full_node_ws" {
   name        = "full-node-ws"
   protocol    = "HTTP"
@@ -482,30 +466,6 @@ resource "aws_lb_target_group_attachment" "avail_full_node_rpc" {
   port             = var.avail_rpc_port
 }
 
-
-# resource "aws_lb_listener" "avail_full_node_rpc" {
-#   count             = length(aws_instance.full_node)
-#   load_balancer_arn = aws_lb.avail_nodes.arn
-#   port              = var.avail_rpc_port
-#   protocol          = "TCP"
-
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.avail_full_node_rpc.arn
-#   }
-# }
-
-# resource "aws_lb_listener" "avail_full_node_ws" {
-#   count             = length(aws_instance.full_node)
-#   load_balancer_arn = aws_lb.avail_nodes.arn
-#   port              = var.avail_ws_port
-#   protocol          = "TCP"
-
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.avail_full_node_ws.arn
-#   }
-# }
 
 
 resource "aws_security_group" "allow_internal" {
