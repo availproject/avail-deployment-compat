@@ -465,6 +465,51 @@ resource "aws_network_interface_sg_attachment" "sg_full_node_attachment" {
   network_interface_id = element(aws_instance.full_node, count.index).primary_network_interface_id
 }
 
+
+
+
+resource "aws_security_group" "allow_p2p_validator" {
+  count       = length(aws_instance.validator)
+  name        = format("allow-p2p-validator-%02d", count.index + 1)
+  description = "Allow all p2p traffic"
+  vpc_id      = aws_vpc.devnet.id
+}
+resource "aws_security_group" "allow_p2p_full_node" {
+  count       = length(aws_instance.full_node)
+  name        = format("allow-p2p-full-node-%02d", count.index + 1)
+  description = "Allow all p2p traffic"
+  vpc_id      = aws_vpc.devnet.id
+}
+resource "aws_security_group_rule" "allow_internal_validator" {
+  count             = length(aws_instance.validator)
+  type              = "ingress"
+  from_port         = element(aws_instance.validator, count.index).tags.AvailPort
+  to_port           = element(aws_instance.validator, count.index).tags.AvailPort
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = element(aws_security_group.allow_p2p_validator, count.index).id
+}
+resource "aws_security_group_rule" "allow_internal_full_node" {
+  count             = length(aws_instance.full_node)
+  type              = "ingress"
+  from_port         = element(aws_instance.full_node, count.index).tags.AvailPort
+  to_port           = element(aws_instance.full_node, count.index).tags.AvailPort
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = element(aws_security_group.allow_p2p_full_node, count.index).id
+}
+resource "aws_network_interface_sg_attachment" "sg_validator_attachment_p2p" {
+  count                = length(aws_instance.validator)
+  security_group_id    = element(aws_security_group.allow_p2p_validator, count.index).id
+  network_interface_id = element(aws_instance.validator, count.index).primary_network_interface_id
+}
+
+resource "aws_network_interface_sg_attachment" "sg_full_node_attachment_p2p" {
+  count                = length(aws_instance.full_node)
+  security_group_id    = element(aws_security_group.allow_p2p_full_node, count.index).id
+  network_interface_id = element(aws_instance.full_node, count.index).primary_network_interface_id
+}
+
 output "ec2_full_node_ips" {
   value = ["${aws_instance.full_node.*.private_ip}"]
 }

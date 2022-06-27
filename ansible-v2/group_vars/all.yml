@@ -1,5 +1,6 @@
 ---
 lineage: 63f6606d-329f-273a-64a1-8bfc06a1b56c
+lb_dns: avail-lb-de4268be15138de8.elb.us-west-2.amazonaws.com
 node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
 avail_domain: "avail.john.dev"
 node_hostname: "{{ node_name }}.{{ avail_domain}}"

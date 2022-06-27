@@ -38,6 +38,10 @@ fi
     {%  if is_validator %}
     --validator \
     {% endif %}
+    {%  for hostvar in hostvars %}
+    --reserved-nodes /dns/{{ lb_dns }}/tcp/{{ hostvars[hostvar].tags.AvailPort }}/p2p/{{ lookup('op', 'Wallet Credentials for ' + hostvars[hostvar].tags.Name, vault='Avail Devnet: ' + lineage, field='libP2PPub') | trim }} \
+    {% endfor %}
+    --public-addr /dns/{{ lb_dns }}/tcp/{{ node_port }}/p2p/{{ p2p_pub_key }} \
     --chain /var/avail/genesis/devnet.chain.spec.raw.json \
     --base-path /var/avail/state \
     --name {{ node_name }} \

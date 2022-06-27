@@ -1,3 +1,5 @@
-sk: "{{ lookup('onepassword', hostvars[inventory_hostname].tags.Name, field='keynode_sk', vault='Avail Devnet') }}"
-p_node_key: "{{ lookup('onepassword', node_name, field='p-node-key', vault='Avail Devnet') }}"
-node_key: "{{ lookup('onepassword', node_name, field='node-key', vault='Avail Devnet') }}"
+---
+secret_phrase: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + lineage, field='recoveryPhrase') | trim }}"
+p2p_priv_key: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + lineage, field='libP2PPriv') | trim }}"
+p2p_pub_key: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + lineage, field='libP2PPub') | trim }}"
+node_port: "{{ hostvars[inventory_hostname].tags.AvailPort }}"

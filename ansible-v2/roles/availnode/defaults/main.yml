@@ -1,3 +1,0 @@
----
-secret_phrase: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + lineage, field='recoveryPhrase') | trim }}"
-p2p_priv_key: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + lineage, field='libP2PPriv') | trim }}"
