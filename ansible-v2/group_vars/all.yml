@@ -2,7 +2,7 @@
 lineage: 63f6606d-329f-273a-64a1-8bfc06a1b56c
 lb_dns: dev.avail.h3.vc
 node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
-avail_domain: "avail.h3.vc"
+avail_domain: "dev.avail.h3.vc"
 node_hostname: "{{ node_name }}.{{ avail_domain}}"
 
 # depending on how we load blance this might need to be moved to the host level
@@ -15,6 +15,8 @@ node_network_mode: default
 node_in_peers: 50
 node_out_peers: 50
 node_ws_max_connections: 1000
+explorer_docker_tag: v1.0.0
+explorer_http_port: 8080
 
 prometheus:
   port: 9615

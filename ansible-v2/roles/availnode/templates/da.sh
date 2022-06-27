@@ -31,17 +31,14 @@ then
     touch /var/avail/auth.created
 fi
 
-#TODO add the bootnodes / peers
-#TODO --reserved-only for validators
-
 /da/bin/data-avail \
     {%  if is_validator %}
     --validator \
     {% endif %}
-    {%  for hostvar in hostvars %}
-    --reserved-nodes /dns/{{ lb_dns }}/tcp/{{ hostvars[hostvar].tags.AvailPort }}/p2p/{{ lookup('op', 'Wallet Credentials for ' + hostvars[hostvar].tags.Name, vault='Avail Devnet: ' + lineage, field='libP2PPub') | trim }} \
-    {% endfor %}
     --public-addr /dns/{{ lb_dns }}/tcp/{{ node_port }}/p2p/{{ p2p_pub_key }} \
+    {%  for item in hostvars %}{% if (hostvars[item].tags.Role == "validator" or hostvars[item].tags.Role == "full-node" and item != inventory_hostname) %}
+    --reserved-nodes /dns/{{ lb_dns }}/tcp/{{ hostvars[item].tags.AvailPort }}/p2p/{{ lookup('op', 'Wallet Credentials for ' + hostvars[item].tags.Name, vault='Avail Devnet: ' + lineage, field='libP2PPub') | trim }}\
+    {% endif %}{% endfor %}
     --chain /var/avail/genesis/devnet.chain.spec.raw.json \
     --base-path /var/avail/state \
     --name {{ node_name }} \

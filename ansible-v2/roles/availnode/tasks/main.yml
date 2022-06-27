@@ -25,6 +25,8 @@
     mode: 0755
 
 - name: create entrypoint
+  tags:
+    - templates
   ansible.builtin.template:
     src: "./templates/da.sh"
     dest: "{{ node_base_path }}/da.sh"

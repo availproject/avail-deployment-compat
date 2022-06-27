@@ -1,7 +1,5 @@
 # Default Security Group of VPC
-resource "aws_security_group" "default" {
-  name        = "default-sg"
-  description = "Default SG to alllow traffic from the VPC"
+resource "aws_default_security_group" "default" {
   vpc_id      = aws_vpc.devnet.id
   depends_on = [
     aws_vpc.devnet
@@ -119,3 +117,46 @@ resource "aws_network_interface_sg_attachment" "sg_full_node_attachment_rpc" {
   network_interface_id = element(aws_instance.full_node, count.index).primary_network_interface_id
 }
 
+
+resource "aws_security_group" "allow_http_https_explorer" {
+  name        = "allow-http-https-explorer"
+  description = "Allow all http and https traffic"
+  vpc_id      = aws_vpc.devnet.id
+}
+resource "aws_security_group_rule" "allow_http_explorer" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.allow_http_https_explorer.id
+}
+resource "aws_security_group_rule" "allow_https_explorer" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.allow_http_https_explorer.id
+}
+
+
+
+resource "aws_security_group" "allow_outbound_everywhere" {
+  name        = "allow-everything-out"
+  description = "Allow all outgoing traffic"
+  vpc_id      = aws_vpc.devnet.id
+}
+resource "aws_security_group_rule" "allow_outbound_everywhere" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = -1
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.allow_outbound_everywhere.id
+}
+resource "aws_network_interface_sg_attachment" "allow_outbound_everywhere" {
+  count                = length(concat(aws_instance.full_node, aws_instance.validator, aws_instance.explorer))
+  security_group_id    = aws_security_group.allow_outbound_everywhere.id
+  network_interface_id = element(concat(aws_instance.full_node, aws_instance.validator, aws_instance.explorer), count.index).primary_network_interface_id
+}

@@ -1,4 +1,3 @@
-
 resource "aws_lb_target_group" "avail_full_node_ws" {
   name        = "full-node-ws"
   protocol    = "HTTP"
@@ -6,7 +5,6 @@ resource "aws_lb_target_group" "avail_full_node_ws" {
   vpc_id      = aws_vpc.devnet.id
   port        = var.avail_ws_port
 }
-
 resource "aws_lb_target_group_attachment" "avail_full_node_ws" {
   count            = length(aws_instance.full_node)
   target_group_arn = aws_lb_target_group.avail_full_node_ws.arn
@@ -20,12 +18,24 @@ resource "aws_lb_target_group" "avail_full_node_rpc" {
   vpc_id      = aws_vpc.devnet.id
   port        = var.avail_rpc_port
 }
-
 resource "aws_lb_target_group_attachment" "avail_full_node_rpc" {
   count            = length(aws_instance.full_node)
   target_group_arn = aws_lb_target_group.avail_full_node_rpc.arn
   target_id        = element(aws_instance.full_node, count.index).id
   port             = var.avail_rpc_port
+}
+resource "aws_lb_target_group" "avail_explorer_http" {
+  name        = "explorer-http"
+  protocol    = "HTTP"
+  target_type = "instance"
+  vpc_id      = aws_vpc.devnet.id
+  port        = var.avail_explorer_port
+}
+resource "aws_lb_target_group_attachment" "avail_explorer_http" {
+  count            = length(aws_instance.explorer)
+  target_group_arn = aws_lb_target_group.avail_explorer_http.arn
+  target_id        = element(aws_instance.explorer, count.index).id
+  port        = var.avail_explorer_port
 }
 
 
@@ -39,7 +49,7 @@ resource "aws_lb_target_group_attachment" "avail_full_node_rpc" {
 resource "aws_lb" "explorer_rpc" {
   name               = "avail-alb-explorer"
   load_balancer_type = "application"
-  # security_groups    = [aws_security_group.lb_sg.id]
+  security_groups    = [aws_security_group.allow_http_https_explorer.id, aws_default_security_group.default.id]
   internal = true
   subnets  = [for subnet in aws_subnet.devnet_private : subnet.id]
 }
@@ -68,7 +78,7 @@ resource "aws_lb_listener" "avail_explorer_443" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.avail_full_node_ws.arn
+    target_group_arn = aws_lb_target_group.avail_explorer_http.arn
   }
 }
 

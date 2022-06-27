@@ -3,4 +3,11 @@
   roles:
     - common
     - datadog
+- hosts: validator:full_node
+  become: true
+  roles:
     - availnode
+- hosts: explorer
+  become: true
+  roles:
+    - explorer

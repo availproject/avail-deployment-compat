@@ -19,6 +19,7 @@
       - virtualenv
       - python3-setuptools
       - zile
+      - net-tools
     state: latest
     update_cache: true
 

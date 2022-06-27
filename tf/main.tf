@@ -53,3 +53,4 @@ output "ec2_explorer_ips" {
 output "alb_domain_name" {
   value = aws_lb.avail_nodes.dns_name
 }
+
