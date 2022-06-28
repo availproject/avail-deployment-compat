@@ -20,6 +20,14 @@ resource "aws_lb_target_group" "avail_validator" {
   vpc_id      = aws_vpc.devnet.id
   port        = element(aws_instance.validator, count.index).tags.AvailPort
 }
+resource "aws_lb_target_group" "avail_light_client" {
+  count       = length(aws_instance.light_client)
+  name        = format("light-client-%02d", count.index + 1)
+  protocol    = "TCP"
+  target_type = "instance"
+  vpc_id      = aws_vpc.devnet.id
+  port        = element(aws_instance.light_client, count.index).tags.LightPort
+}
 
 resource "aws_lb_target_group_attachment" "avail_full_node" {
   count            = length(aws_instance.full_node)
@@ -33,6 +41,12 @@ resource "aws_lb_target_group_attachment" "avail_validator" {
   target_group_arn = element(aws_lb_target_group.avail_validator, count.index).arn
   target_id        = element(aws_instance.validator, count.index).id
   port             = element(aws_instance.validator, count.index).tags.AvailPort
+}
+resource "aws_lb_target_group_attachment" "avail_light_client" {
+  count            = length(aws_instance.light_client)
+  target_group_arn = element(aws_lb_target_group.avail_light_client, count.index).arn
+  target_id        = element(aws_instance.light_client, count.index).id
+  port             = element(aws_instance.light_client, count.index).tags.LightPort
 }
 
 
@@ -56,6 +70,17 @@ resource "aws_lb_listener" "avail_validator" {
   default_action {
     type             = "forward"
     target_group_arn = element(aws_lb_target_group.avail_validator, count.index).arn
+  }
+}
+resource "aws_lb_listener" "avail_light_client" {
+  count             = length(aws_instance.light_client)
+  load_balancer_arn = aws_lb.avail_nodes.arn
+  port              = element(aws_instance.light_client, count.index).tags.LightPort
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = element(aws_lb_target_group.avail_light_client, count.index).arn
   }
 }
 

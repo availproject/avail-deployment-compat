@@ -40,6 +40,11 @@ variable "full_node_count" {
   type        = number
   default     = 6
 }
+variable "light_client_count" {
+  description = "The number of light clients that we're going to deploy"
+  type        = number
+  default     = 3
+}
 variable "validator_count" {
   description = "The number of validators that we're going to deploy"
   type        = number

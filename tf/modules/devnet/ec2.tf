@@ -43,6 +43,7 @@ resource "aws_instance" "validator" {
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
+
 resource "aws_instance" "explorer" {
   ami                  = var.base_ami
   instance_type        = var.base_instance_type
@@ -61,6 +62,29 @@ resource "aws_instance" "explorer" {
     Name        = format("explorer-%02d", count.index + 1)
     Hostname    = format("explorer-%02d", count.index + 1)
     Role        = "explorer"
+    Provisioner = data.aws_caller_identity.provisioner.account_id
+  }
+}
+
+resource "aws_instance" "light_client" {
+  ami                  = var.base_ami
+  instance_type        = var.base_instance_type
+  count                = var.light_client_count
+  key_name             = var.devnet_key_name
+  subnet_id            = element(aws_subnet.devnet_public, count.index).id
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
+  root_block_device {
+    delete_on_termination = true
+    volume_size           = 30
+    volume_type           = "gp2"
+  }
+
+  tags = {
+    Name        = format("light-client-%02d", count.index + 1)
+    Hostname    = format("light-client-%02d", count.index + 1)
+    Role        = "light-client"
+    LightPort   = format("32%03d", count.index + 1)
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
