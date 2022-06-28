@@ -1,6 +1,6 @@
 # Default Security Group of VPC
 resource "aws_default_security_group" "default" {
-  vpc_id      = aws_vpc.devnet.id
+  vpc_id = aws_vpc.devnet.id
   depends_on = [
     aws_vpc.devnet
   ]

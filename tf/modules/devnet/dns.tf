@@ -1,6 +1,3 @@
-
-
-
 resource "aws_route53_record" "avail" {
   zone_id = var.route53_zone_id
   name    = var.route53_domain_name
@@ -17,8 +14,6 @@ resource "aws_acm_certificate" "avail_cert" {
     create_before_destroy = true
   }
 }
-
-
 
 resource "aws_route53_record" "avail_validation" {
   for_each = {

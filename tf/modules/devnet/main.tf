@@ -13,9 +13,9 @@ provider "aws" {
   region = "us-west-2"
   default_tags {
     tags = {
-      Environment = "devnet"
-      Network     = "avail"
-      Owner       = var.owner
+      Environment    = "devnet"
+      Network        = "avail"
+      Owner          = var.owner
       DeploymentName = var.deployment_name
     }
   }
