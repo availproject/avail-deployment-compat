@@ -15,7 +15,7 @@ node_network_mode: default
 node_in_peers: 50
 node_out_peers: 50
 node_ws_max_connections: 1000
-explorer_docker_tag: v1.0.0
+explorer_docker_tag: v1.0.1
 explorer_http_port: 8080
 
 prometheus:
