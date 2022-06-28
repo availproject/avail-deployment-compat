@@ -9,6 +9,8 @@
     update_cache: true
 
 - name: Install required system packages
+  tags:
+    - packages
   apt:
     pkg:
       - apt-transport-https
@@ -20,6 +22,7 @@
       - python3-setuptools
       - zile
       - net-tools
+      - inxi
     state: latest
     update_cache: true
 
@@ -38,4 +41,42 @@
     name: docker-ce
     state: latest
     update_cache: true
+
+- name: Delete motd
+  tags:
+    - motd
+  file:
+    state: absent
+    path: /etc/update-motd.d/
+
+- name: Create MOTD
+  tags:
+    - motd
+  file:
+    state: directory
+    path: /etc/update-motd.d/
+
+- name: create motd logo
+  tags:
+    - motd
+  ansible.builtin.template:
+    src: "./templates/motd.sh"
+    dest: "/etc/update-motd.d/00-avl-logo"
+    mode: 755
+
+- name: create sysinfo
+  tags:
+    - motd
+  ansible.builtin.template:
+    src: "./templates/info.sh"
+    dest: "/etc/update-motd.d/10-sys-info"
+    mode: 755
+
+- name: create network info
+  tags:
+    - motd
+  ansible.builtin.template:
+    src: "./templates/network.sh"
+    dest: "/etc/update-motd.d/20-network-info"
+    mode: 755
 

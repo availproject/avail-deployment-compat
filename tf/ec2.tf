@@ -3,9 +3,14 @@ resource "aws_instance" "full_node" {
   instance_type = var.base_instance_type
   count         = var.full_node_count
   key_name      = var.devnet_key_name
-  # subnet_id            = element(aws_subnet.devnet_public, count.index).id
   subnet_id            = element(aws_subnet.devnet_private, count.index).id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
+  root_block_device {
+    delete_on_termination = true
+    volume_size           = 30
+    volume_type           = "gp2"
+  }
 
   tags = {
     Name        = format("full-node-%02d", count.index + 1)
