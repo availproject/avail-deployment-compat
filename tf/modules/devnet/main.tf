@@ -15,17 +15,10 @@ provider "aws" {
     tags = {
       Environment = "devnet"
       Network     = "avail"
-      Owner       = "jhilliard@polygon.technology"
-      # this won't work in all cases, but for arbitrary devnets that are being created it should be fine
-      Lineage = jsondecode(file("terraform.tfstate")).lineage
+      Owner       = var.owner
+      DeploymentName = var.deployment_name
     }
   }
-}
-
-resource "aws_ssm_parameter" "lineage" {
-  name  = "terraform-lineage"
-  type  = "String"
-  value = jsondecode(file("terraform.tfstate")).lineage
 }
 
 data "aws_caller_identity" "provisioner" {}

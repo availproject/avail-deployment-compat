@@ -26,13 +26,6 @@ resource "aws_eip" "nat_eip" {
   depends_on = [aws_internet_gateway.igw]
 }
 
-resource "aws_eip" "lb_eip" {
-  vpc        = true
-  count      = length(var.zones)
-  depends_on = [aws_internet_gateway.igw]
-}
-
-
 resource "aws_nat_gateway" "nat" {
   count         = length(var.zones)
   subnet_id     = element(aws_subnet.devnet_public, count.index).id

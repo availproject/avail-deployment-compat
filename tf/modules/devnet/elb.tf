@@ -72,6 +72,9 @@ resource "aws_lb_target_group_attachment" "explorer_rpc" {
   target_group_arn = aws_lb_target_group.explorer_rpc.arn
   target_id        = aws_lb.explorer_rpc.id
   port             = 443
+  depends_on = [
+    aws_lb_listener.avail_explorer_443
+  ]
 }
 
 resource "aws_lb_target_group" "explorer_rpc_insecure" {
@@ -86,6 +89,9 @@ resource "aws_lb_target_group_attachment" "explorer_rpc_insecure" {
   target_group_arn = aws_lb_target_group.explorer_rpc_insecure.arn
   target_id        = aws_lb.explorer_rpc.id
   port             = 80
+  depends_on = [
+    aws_lb_listener.avail_explorer_80
+  ]
 }
 
 resource "aws_lb_listener" "alb_443_pass" {

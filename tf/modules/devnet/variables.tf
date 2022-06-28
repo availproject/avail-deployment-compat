@@ -1,7 +1,24 @@
+variable "deployment_name" {
+  description = "The unique name for this particular deployment"
+  type        = string
+}
+variable "route53_zone_id" {
+  description = "The ID of the hosted zone to contain the CNAME record to our LB"
+  type        = string
+}
+variable "route53_domain_name" {
+  description = "Our base domain"
+  type        = string
+}
+variable "owner" {
+  description = "The main point of contact for this particular deployment"
+  type        = string
+}
+
 variable "region" {
   description = "The region where we want to deploy"
   type        = string
-  default     = ""
+  default     = "us-west-2"
 }
 variable "zones" {
   description = "The zones for deployment"
@@ -77,14 +94,4 @@ variable "avail_explorer_port" {
   default     = 8080
   description = "The HTTP port that the explorer is listening on"
   type        = number
-}
-variable "route53_zone_id" {
-  default     = "Z062326020PSB9CU671ZF"
-  description = "The ID of the hosted zone to contain the CNAME record to our LB"
-  type        = string
-}
-variable "route53_domain_name" {
-  default     = "dev.avail.h3.vc"
-  description = "Our base domain"
-  type        = string
 }
