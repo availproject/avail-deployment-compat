@@ -1,8 +1,9 @@
 ---
-lineage: 63f6606d-329f-273a-64a1-8bfc06a1b56c
-lb_dns: dev.avail.h3.vc
+deployment_name: devnet01
+# once we have the deployment_name, it should possible to retrive this lb_dns value dynamically from the tf provisioning
+lb_dns: devnet01.dataavailability.link
 node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
-avail_domain: "dev.avail.h3.vc"
+avail_domain: "{{ lb_dns }}"
 node_hostname: "{{ node_name }}.{{ avail_domain}}"
 
 # depending on how we load blance this might need to be moved to the host level
