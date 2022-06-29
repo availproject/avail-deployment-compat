@@ -20,36 +20,6 @@ resource "aws_default_security_group" "default" {
   }
 }
 
-resource "aws_security_group" "allow_internal" {
-  name        = "avail-all-nodes"
-  description = "Allow all internal traffic"
-  vpc_id      = aws_vpc.devnet.id
-}
-
-resource "aws_security_group_rule" "allow_internal" {
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "tcp"
-  cidr_blocks       = [aws_vpc.devnet.cidr_block]
-  security_group_id = aws_security_group.allow_internal.id
-}
-resource "aws_network_interface_sg_attachment" "sg_validator_attachment" {
-  count                = length(aws_instance.validator)
-  security_group_id    = aws_security_group.allow_internal.id
-  network_interface_id = element(aws_instance.validator, count.index).primary_network_interface_id
-}
-resource "aws_network_interface_sg_attachment" "sg_full_node_attachment" {
-  count                = length(aws_instance.full_node)
-  security_group_id    = aws_security_group.allow_internal.id
-  network_interface_id = element(aws_instance.full_node, count.index).primary_network_interface_id
-}
-resource "aws_network_interface_sg_attachment" "sg_light_client_attachment" {
-  count                = length(aws_instance.light_client)
-  security_group_id    = aws_security_group.allow_internal.id
-  network_interface_id = element(aws_instance.light_client, count.index).primary_network_interface_id
-}
-
 resource "aws_security_group" "allow_p2p_validator" {
   count       = length(aws_instance.validator)
   name        = format("allow-p2p-validator-%02d", count.index + 1)

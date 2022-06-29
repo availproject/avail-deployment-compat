@@ -80,11 +80,6 @@ variable "devnet_vpc_block" {
   type        = string
   default     = "10.0.0.0/16"
 }
-variable "additional_tags" {
-  default     = {}
-  description = "Additional resource tags"
-  type        = map(string)
-}
 variable "avail_rpc_port" {
   default     = 9933
   description = "The RPC Port that Avail is listening on"

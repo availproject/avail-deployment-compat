@@ -24,7 +24,7 @@ resource "aws_subnet" "devnet_public" {
   count                   = length(var.zones)
   availability_zone       = element(var.zones, count.index)
   cidr_block              = element(var.devnet_public_subnet, count.index)
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   depends_on = [aws_internet_gateway.igw]
 
