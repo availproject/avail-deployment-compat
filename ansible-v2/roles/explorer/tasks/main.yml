@@ -5,5 +5,5 @@
     ports:
       - "{{ explorer_http_port }}:80"
     env:
-      WS_URL: wss://{{ avail_domain }}/ws
+      WS_URL: "{{ global_ws }}"
     restart_policy: always

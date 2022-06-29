@@ -1,3 +1,21 @@
+- name: Create deployment_name file
+  ansible.builtin.template:
+    force: no
+    src: "./templates/avail-deployment"
+    dest: "/etc/avail-deployment"
+    mode: 755
+
+- name: Check whether /etc/avail-deployment contains "{{ deployment_name }}"
+  command: grep -Fxq "{{ deployment_name }}" /etc/avail-deployment
+  register: checkdeployment
+  check_mode: no
+  ignore_errors: yes
+  changed_when: no
+
+- ansible.builtin.assert:
+    that:
+      - checkdeployment.rc == 0
+
 - name: Set a hostname
   ansible.builtin.hostname:
     name: "{{ node_hostname }}"
@@ -79,4 +97,3 @@
     src: "./templates/network.sh"
     dest: "/etc/update-motd.d/20-network-info"
     mode: 755
-

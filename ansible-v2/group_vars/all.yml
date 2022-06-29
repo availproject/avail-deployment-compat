@@ -6,6 +6,9 @@ node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
 avail_domain: "{{ lb_dns }}"
 node_hostname: "{{ node_name }}.{{ avail_domain}}"
 
+global_rpc: "https://{{ avail_domain}}/rpc"
+global_ws: "wss://{{ avail_domain}}/ws"
+
 # depending on how we load blance this might need to be moved to the host level
 node_port: 30333
 node_ws_port: 9944
@@ -18,6 +21,7 @@ node_out_peers: 50
 node_ws_max_connections: 1000
 explorer_docker_tag: v1.0.1
 explorer_http_port: 8080
+lightclient_docker_tag: 1.0.1
 
 prometheus:
   port: 9615
