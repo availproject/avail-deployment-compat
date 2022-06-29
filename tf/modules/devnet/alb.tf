@@ -38,14 +38,6 @@ resource "aws_lb_target_group_attachment" "avail_explorer_http" {
   port             = var.avail_explorer_port
 }
 
-
-
-
-
-
-
-
-
 resource "aws_lb" "explorer_rpc" {
   name               = "avail-alb-explorer"
   load_balancer_type = "application"
