@@ -19,10 +19,7 @@
       # BOOTSTRAPS = ${BOOTSTRAPS}
     ports:
       - "{{ node_port }}:7000"
-    labels:
-      com.datadoghq.ad.check_names: '["openmetrics"]'
-      com.datadoghq.ad.init_configs: "[{}]"
-      com.datadoghq.ad.instances: '[{"openmetrics_endpoint":"http://%%host%%:9615/metrics", "namespace": "avail", "metrics": ["substrate*"]}]'
     volumes:
       - "{{ node_base_path }}/lightclient:/state"
     restart_policy: always
+  notify: restart light client
