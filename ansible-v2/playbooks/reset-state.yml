@@ -1,0 +1,17 @@
+---
+- name: Stop the avail container
+  hosts: all
+  become: true
+  tasks:
+    - name: Delete avail directory
+      file:
+        state: absent
+        path: /var/avail
+    - name: remove container
+      ignore_errors: true
+      docker_container:
+        name:
+           - da-client
+           - dapp
+        state: absent
+

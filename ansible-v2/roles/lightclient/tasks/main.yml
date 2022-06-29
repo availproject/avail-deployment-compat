@@ -1,0 +1,25 @@
+- name: Start light client
+  community.docker.docker_container:
+    name: light-client
+    image: 0xpolygon/avail-light:{{ lightclient_docker_tag }}
+    entrypoint: "/avail-light/start.sh"
+    env:
+      APP_ID: "0"
+      AVAIL_PATH: "/state/avail"
+      CONFIDENCE: "92.0"
+      FULL_NODE_RPC: "{{ ('[\"' + global_rpc + '\"]') | string }}"
+      FULL_NODE_WS: "{{ ('[\"' + global_ws + '\"]') | string }}"
+      HTTP_SERVER_HOST: "0.0.0.0"
+      HTTP_SERVER_PORT: "7000"
+      IPFS_PATH: "/state/ipfs"
+      IPFS_PORT: "37000"
+      IPFS_SEED: "1"
+      LOG_LEVEL: "'INFO'"
+      RUST_BACKTRACE: full
+      # BOOTSTRAPS = ${BOOTSTRAPS}
+    ports:
+      - "{{ node_port }}:7000"
+    volumes:
+      - "{{ node_base_path }}/lightclient:/state"
+    restart_policy: always
+  notify: restart light client

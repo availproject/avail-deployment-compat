@@ -1,0 +1,9 @@
+- name: create explorer dapp
+  community.docker.docker_container:
+    name: dapp
+    image: 0xpolygon/avail-apps:{{ explorer_docker_tag }}
+    ports:
+      - "{{ explorer_http_port }}:80"
+    env:
+      WS_URL: "{{ global_ws }}"
+    restart_policy: always

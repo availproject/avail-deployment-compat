@@ -1,0 +1,25 @@
+---
+# stop all of the containers before clearing state / resetting keys and things like that
+- name: Stop all containers
+  hosts: all
+  become: true
+  tasks:
+    - name: Get running containers
+      ignore_errors: yes
+      docker_host_info:
+        containers: yes
+      register: docker_info
+
+    - name: Stop running containers
+      ignore_errors: yes
+      docker_container:
+        name: "{{ item }}"
+        state: stopped
+      loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
+
+    - name: Remove running containers
+      ignore_errors: yes
+      docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ docker_info.containers | map(attribute='Id') | list }}"

@@ -1,0 +1,28 @@
+- hosts: all
+  become: true
+  tags:
+    - init
+  roles:
+    - common
+    - datadog
+
+- hosts: validator:full_node
+  become: true
+  tags:
+    - availnode
+  roles:
+    - availnode
+
+- hosts: explorer
+  become: true
+  tags:
+    - explorer
+  roles:
+    - explorer
+
+- hosts: light_client
+  become: true
+  tags:
+    - light_client
+  roles:
+    - lightclient

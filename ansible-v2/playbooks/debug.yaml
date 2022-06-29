@@ -1,0 +1,39 @@
+---
+- name: Debugging
+  hosts: all
+  tasks:
+  - name: Print the gateway for each host when defined
+    ansible.builtin.debug:
+      msg: System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}
+    when: ansible_default_ipv4.gateway is defined
+
+  - name: Get uptime information
+    ansible.builtin.shell: /usr/bin/uptime
+    register: result
+
+  - name: Print the uptime from the last task
+    ansible.builtin.debug:
+      var: result
+      verbosity: 3
+
+
+  - name: Display all variables/facts known for a host
+    ansible.builtin.debug:
+      var: hostvars
+      verbosity: 4
+
+
+  - name: Print the tag name
+    ansible.builtin.debug:
+      msg: System {{ inventory_hostname }} has ec2 tag name {{ hostvars[inventory_hostname].tags.Name }}
+
+  - name: IP and hostname pairs
+    ansible.builtin.debug:
+      msg: "IP: {{ item }} --- Name: {{ hostvars[item].tags.Name }}"
+    with_items: "{{ groups['all'] }}"
+
+  - name: Onepassword Check
+    ansible.builtin.debug:
+      msg: "{{ lookup('op', 'Wallet Credentials for full-node-03', vault='Avail Devnet: 63f6606d-329f-273a-64a1-8bfc06a1b56c') }}"
+
+
