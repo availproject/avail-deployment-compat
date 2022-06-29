@@ -16,3 +16,10 @@
         name: "{{ item }}"
         state: stopped
       loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
+
+    - name: Remove running containers
+      ignore_errors: yes
+      docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
