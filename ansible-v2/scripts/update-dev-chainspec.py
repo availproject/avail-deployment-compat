@@ -6,9 +6,7 @@ import re
 
 
 def get_balance_for_node(node_name):
-    if re.match("validator-", node_name):
-        return 1000000000000000000000000
-    if re.match("election-", node_name):
+    if re.match("validator-", node_name) or re.match("election-", node_name):
         return 1000000000000000000000000
     return 1000000000000000000000
 
