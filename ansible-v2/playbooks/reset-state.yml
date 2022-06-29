@@ -3,17 +3,15 @@
   hosts: all
   become: true
   tasks:
-    - name: Stop avail docker image
-      community.docker.docker_container:
-        name: da-client
-        state: stopped
     - name: Delete avail directory
       file:
         state: absent
         path: /var/avail
     - name: remove container
+      ignore_errors: true
       docker_container:
-        name: da-client
+        name:
+           - da-client
+           - dapp
         state: absent
-
 
