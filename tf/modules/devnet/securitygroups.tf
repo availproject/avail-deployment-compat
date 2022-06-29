@@ -179,8 +179,11 @@ resource "aws_security_group_rule" "allow_outbound_everywhere" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.allow_outbound_everywhere.id
 }
+locals {
+  all_instances = concat(aws_instance.full_node, aws_instance.validator, aws_instance.explorer, aws_instance.light_client)
+}
 resource "aws_network_interface_sg_attachment" "allow_outbound_everywhere" {
-  count                = length(concat(aws_instance.full_node, aws_instance.validator, aws_instance.explorer))
+  count                = length(local.all_instances)
   security_group_id    = aws_security_group.allow_outbound_everywhere.id
-  network_interface_id = element(concat(aws_instance.full_node, aws_instance.validator, aws_instance.explorer), count.index).primary_network_interface_id
+  network_interface_id = element(local.all_instances, count.index).primary_network_interface_id
 }
