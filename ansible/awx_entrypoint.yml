@@ -66,8 +66,7 @@
     register: new_nodes
 
   - debug:
-      msg: "{{ item|regex_replace('\\u001b.*0m', '')|trim }}"
-    loop: "{{ new_nodes.stdout }}"
+      msg: "{{ new_nodes.stdout|regex_replace('\\u001b.*0m', '')|trim }}"
 
 #
 #   - name: Add new instance to host group
