@@ -66,7 +66,7 @@
     register: new_nodes
 
   - debug:
-      msg: "{{ ''.join(new_nodes.stdout_lines)  | replace('\\e[0m', '')| replace('\\t', '') }}"
+      msg: "{{ ''.join(new_nodes.stdout_lines)  | replace('\\e[0m', '') | replace('\\t', '') | replace(/\u001b[^m]*?m/g, '') }}"
 
 
 #
