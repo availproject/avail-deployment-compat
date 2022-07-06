@@ -67,7 +67,7 @@
 
   - debug:
       msg: "{{ item|regex_replace('\\u001b.*0m', '')|trim }}"
-    loop: "{{ new_nodes.stdout_lines }}"
+    loop: "{{ new_nodes.stdout }}"
 
 #
 #   - name: Add new instance to host group
