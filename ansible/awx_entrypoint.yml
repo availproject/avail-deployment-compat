@@ -14,7 +14,7 @@
        pyenv_python_versions:
          - 3.6.4
   environment:
-    MAX_EVENT_RES: 90000000
+    MAX_EVENT_RES_DATA: 90000000
   tasks:
   - name: setup controller environment
     shell:
