@@ -65,9 +65,11 @@
         terraform plan
     register: new_nodes
 
-  - debug:
-      msg: "{{ ''.join(new_nodes.stdout_lines) | replace('\\e[0m', '') | replace('\\t', '') | replace('\\u001b', '') | replace('\u001b', '') }}"
+  # - debug:
+  #     msg: "{{ ''.join(new_nodes.stdout_lines) | replace('\\e[0m', '') | replace('\\t', '') | replace('\\u001b', '') | replace('\u001b', '') }}"
 
+  - debug:
+      var: new_nodes.stdout | regex_replace('\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]', '')
 
 #
 #   - name: Add new instance to host group
