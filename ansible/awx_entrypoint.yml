@@ -13,6 +13,8 @@
        pyenv_enable_autocompletion: false
        pyenv_python_versions:
          - 3.6.4
+  environment:
+    MAX_EVENT_RES: 90000000
   tasks:
   - name: setup controller environment
     shell:
