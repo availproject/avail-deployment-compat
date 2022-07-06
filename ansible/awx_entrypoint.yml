@@ -65,10 +65,6 @@
         terraform plan
     register: new_nodes
 
-  - name: tf output
-    shell:
-      cmd: |
-        echo {{ new_nodes.stdout_lines }}
 #
 #   - name: Add new instance to host group
 #     add_host:
