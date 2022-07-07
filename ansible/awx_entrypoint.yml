@@ -61,6 +61,7 @@
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
+        echo {{ awx_project_revision }}
         terraform init
         terraform plan -no-color -var 'deploy_name=devnet_{{ awx_project_revision }}'
     register: new_nodes
