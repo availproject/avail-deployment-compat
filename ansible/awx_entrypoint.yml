@@ -1,9 +1,6 @@
 ---
-# isntall controller dependencies, create new instances and teardown at end
-- name: install python and aws dependencies on ansible controller machine
+- name: provision avail resources and configure nodes with ansible
   hosts: localhost
-  collections:
-  - amazon.aws
   roles:
      - role: staticdev.pyenv
        pyenv_path: "/tmp/pyenv"
@@ -13,10 +10,8 @@
        pyenv_enable_autocompletion: false
        pyenv_python_versions:
          - 3.6.4
-  environment:
-    MAX_EVENT_RES_DATA: 90000000
   tasks:
-  - name: setup controller environment
+  - name: setup python3 and terraform on controller machine
     shell:
       cmd: |
         export PATH="/tmp/pyenv/shims:$PATH"
@@ -30,8 +25,7 @@
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
 
-
-  - name: create tf cloud config file with content
+  - name: create tf cloud authentication config
     copy:
       dest: "/var/lib/awx/.terraform.d/credentials.tfrc.json"
       content: |
@@ -39,12 +33,11 @@
           token = "{{ lookup("env", "TF_TOKEN") }}"
         }
 
-  - name: update safe directory
+  - name: update safe directory for avail repo
     command: git config --global --add safe.directory /opt/avail_repo
     check_mode: no
 
-  # Clones the private repository in the private_clone folder inside the *opt* directory.
-  - name: Clone private terraform repo
+  - name: clone specific avail repo branch to localhost
     ansible.builtin.git:
       repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/maticnetwork/avail-deployment.git'
       dest: /opt/avail_repo
@@ -57,17 +50,16 @@
     no_log: false
     register: git_clone
 
-  - name: init terraform run plan and apply
+  - name: init terraform and apply to provision resources
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         COMMIT_SHA="$(git rev-parse --short HEAD)"
         GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-        echo "$GIT_BRANCH"
         CLEAN_GIT_BRANCH=$(tr '/' '_' <<<"$GIT_BRANCH")
-        echo "$CLEAN_GIT_BRANCH"
+        echo {{ awx_job_scm_branch }}
         terraform init
-        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"''
+        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_id }}'
     register: new_nodes
 
 #

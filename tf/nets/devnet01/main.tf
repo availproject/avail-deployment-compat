@@ -4,7 +4,7 @@ provider "aws" {
     tags = {
       Environment    = "devnet"
       Network        = "avail"
-      Owner          = "jhilliard@polygon.technology"
+      Owner          = var.owner
       DeploymentName = var.deploy_name
     }
   }
@@ -14,7 +14,7 @@ terraform {
   cloud {
     organization = "Polygon-Technology"
     workspaces {
-      name = "gh-actions-demo"
+      name = "awx_devnet_avail"
     }
   }
   required_providers {
@@ -30,9 +30,9 @@ terraform {
 module "devnet" {
   source = "../../modules/devnet"
 
-  deployment_name     = "devnet01"
+  deployment_name     = var.deploy_name
   route53_zone_id     = "Z0313018249JD9NBSCJ1O" # dataavailability.link
   route53_domain_name = "devnet01.dataavailability.link"
-  owner               = "jhilliard@polygon.technology"
+  owner               = var.owner
 
 }
