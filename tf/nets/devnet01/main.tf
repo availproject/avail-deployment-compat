@@ -4,8 +4,8 @@ provider "aws" {
     tags = {
       Environment    = "devnet"
       Network        = "avail"
-      Owner          = var.owner
-      DeploymentName = var.deployment_name
+      Owner          = "jhilliard@polygon.technology"
+      DeploymentName = "devnet01"
     }
   }
 }
