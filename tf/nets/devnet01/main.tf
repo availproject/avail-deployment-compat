@@ -5,7 +5,7 @@ provider "aws" {
       Environment    = "devnet"
       Network        = "avail"
       Owner          = "jhilliard@polygon.technology"
-      DeploymentName = "devnet01"
+      DeploymentName = var.deploy_name
     }
   }
 }
