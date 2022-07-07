@@ -62,7 +62,7 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
-        terraform plan -var 'deploy_name=devnet_{{ awx_project_revision }}'
+        terraform plan -no-color -var 'deploy_name=devnet_{{ awx_project_revision }}'
     register: new_nodes
 
 #
