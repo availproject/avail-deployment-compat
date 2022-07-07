@@ -43,7 +43,7 @@
       dest: /opt/avail_repo
       clone: yes
       accept_hostkey: true
-      version: dan/awx_integration
+      version: {{ GIT_BRANCH_NAME }}
       force: yes
       update: yes
     ignore_errors: false
@@ -55,9 +55,7 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         COMMIT_SHA="$(git rev-parse --short HEAD)"
-        GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-        CLEAN_GIT_BRANCH=$(tr '/' '_' <<<"$GIT_BRANCH")
-        echo {{ awx_job_scm_branch }}
+        CLEAN_GIT_BRANCH=$(tr '/' '_' <<<{{ GIT_BRANCH_NAME }})
         terraform init
         terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_id }}'
     register: new_nodes
