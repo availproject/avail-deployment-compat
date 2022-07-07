@@ -62,9 +62,12 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         COMMIT_SHA="$(git rev-parse --short HEAD)"
-        echo "$COMMIT_SHA"
+        GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+        echo "$GIT_BRANCH"
+        CLEAN_GIT_BRANCH=$(tr '/' '_' <<<"$GIT_BRANCH")
+        echo "$CLEAN_GIT_BRANCH"
         terraform init
-        terraform apply -no-color -var 'deploy_name=devnet_'"$COMMIT_SHA"''
+        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"''
     register: new_nodes
 
 #
