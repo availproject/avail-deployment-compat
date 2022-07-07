@@ -57,91 +57,44 @@
         COMMIT_SHA="$(git rev-parse --short HEAD)"
         CLEAN_GIT_BRANCH=$(tr '/' '_' <<<{{ GIT_BRANCH_NAME }})
         terraform init
-        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}'
-    register: new_nodes
+        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -auto-approve
+        echo $(terraform output full_node_ips)
+        echo $(terraform output validator_ips)
+        echo $(terraform output explorer_ips)
+        echo $(terraform output light_client_ips)
+    register: nodes
 
-#
-#   - name: Add new instance to host group
-#     add_host:
-#       hostname: "{{ item }}"
-#       groupname: launched
-#     loop: "{{ new_nodes.stdout_lines[-1] }}"
-#
-# - name: Configure instance(s)
-#   hosts: launched
-#   become: yes
-#   gather_facts: True
-#   vars:
-#     create_containers: 1
-#     default_container_name: bor
-#     default_container_image: 0xpolygon/bor:0.3.0-beta3
-#   tasks:
-#     - name: Wait for sudo
-#       become: yes
-#       shell:  while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
-#     - name: Install aptitude
-#       apt:
-#         name: aptitude
-#         state: latest
-#         update_cache: true
-#     - name: Install required system packages
-#       apt:
-#         pkg:
-#           - apt-transport-https
-#           - ca-certificates
-#           - curl
-#           - software-properties-common
-#           - python3-pip
-#           - virtualenv
-#           - python3-setuptools
-#           - awscli
-#         state: latest
-#         update_cache: true
-#     - name: Add Docker GPG apt Key
-#       apt_key:
-#         url: https://download.docker.com/linux/ubuntu/gpg
-#         state: present
-#     - name: Add Docker Repository
-#       apt_repository:
-#         repo: deb https://download.docker.com/linux/ubuntu focal stable
-#         state: present
-#     - name: Update apt and install docker-ce
-#       apt:
-#         name: docker-ce
-#         state: latest
-#         update_cache: true
-#     - name: Install Docker Module for Python
-#       pip:
-#         name: docker
-#     - name: Login ECR
-#       shell: "{{ item }}"
-#       environment:
-#         AWS_ACCESS_KEY_ID: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
-#         AWS_SECRET_ACCESS_KEY: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
-#         AWS_REGION: us-east-2
-#       with_items:
-#        - $(aws ecr get-login -a-no-include-email --region us-east-2)
-#     - name: Pull default docker image
-#       docker_image:
-#         name: "{{ default_container_image }}"
-#         source: pull
-#     - name: Create and run container
-#       docker_container:
-#         name: "{{ default_container_name }}{{ item }}"
-#         image: "{{ default_container_image }}"
-#         state: started
-#         ports: "8080:80"
-#         detach: yes
-#         command: server
-#       with_sequence: count={{ create_containers }}
-#
-# - name: teardown instances
-#   hosts: localhost
-#   tasks:
-#     - name: teardown resources once done with testing
-#       shell:
-#         cmd: |
-#           sleep 2m
-#           cd /opt/tf_repo/aws/test-applications/us-east-2/ci_deployment_cluster
-#           terraform init
-#           terraform destroy -var 'instance_count={{ instance_count }}' -auto-approve
+  - name: register full node host group
+    add_host:
+      hostname: "{{ item }}"
+      groupname: full_nodes
+    loop: "{{ nodes.stdout_lines[-4] }}"
+
+  - name: register validators host group
+    add_host:
+      hostname: "{{ item }}"
+      groupname: validators
+    loop: "{{ nodes.stdout_lines[-3] }}"
+
+  - name: register explorers host group
+    add_host:
+      hostname: "{{ item }}"
+      groupname: explorers
+    loop: "{{ nodes.stdout_lines[-2] }}"
+
+  - name: register light clients host group
+    add_host:
+      hostname: "{{ item }}"
+      groupname: light_clients
+    loop: "{{ nodes.stdout_lines[-1] }}"
+
+# TODO: key generation phase, can we combine with provisioning step?
+# TODO: configure all nodes via ansible and start containers
+
+  - name: teardown all terraform resources once done
+    shell:
+      cmd: |
+        sleep 3m
+        cd /opt/avail_repo/tf/nets/devnet01
+        terraform init
+        terraform destroy -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -auto-approve
