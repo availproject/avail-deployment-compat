@@ -62,8 +62,9 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         COMMIT_SHA="$(git rev-parse --short HEAD)"
+        echo "$COMMIT_SHA"
         terraform init
-        terraform apply -no-color -var 'deploy_name=devnet_$COMMIT_SHA'
+        terraform apply -no-color -var 'deploy_name=devnet_"$COMMIT_SHA"'
     register: new_nodes
 
 #
