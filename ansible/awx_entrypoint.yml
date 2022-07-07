@@ -43,7 +43,7 @@
       dest: /opt/avail_repo
       clone: yes
       accept_hostkey: true
-      version: {{ GIT_BRANCH_NAME }}
+      version: "{{ GIT_BRANCH_NAME }}"
       force: yes
       update: yes
     ignore_errors: false
