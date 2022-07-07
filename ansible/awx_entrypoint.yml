@@ -61,8 +61,9 @@
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
+        echo $(git rev-parse --short HEAD)
         terraform init
-        terraform apply -no-color -var 'deploy_name=devnet_{{ scm_revision }}'
+        terraform apply -no-color -var 'deploy_name=devnet_{{ awx_project_revision }}'
     register: new_nodes
 
 #
