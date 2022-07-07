@@ -50,14 +50,14 @@
     no_log: false
     register: git_clone
 
-  - name: init terraform and apply to provision resources
+  - name: init terraform and apply to provision avail resources
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         COMMIT_SHA="$(git rev-parse --short HEAD)"
         CLEAN_GIT_BRANCH=$(tr '/' '_' <<<{{ GIT_BRANCH_NAME }})
         terraform init
-        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_id }}'
+        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}'
     register: new_nodes
 
 #
