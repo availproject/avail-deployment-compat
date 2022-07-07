@@ -1,6 +1,8 @@
 ---
 - name: provision avail resources and configure nodes with ansible
   hosts: localhost
+  collections:
+  - amazon.aws
   roles:
      - role: staticdev.pyenv
        pyenv_path: "/tmp/pyenv"
