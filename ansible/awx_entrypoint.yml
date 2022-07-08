@@ -66,7 +66,6 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
-        terraform destroy -target "module.devnet.aws_lb.explorer_rpc" -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
         terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
 
   - name: init terraform and apply to provision avail resources

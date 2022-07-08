@@ -116,9 +116,6 @@ resource "aws_security_group" "allow_http_https_explorer" {
   name        = "allow-http-https-explorer"
   description = "Allow all http and https traffic"
   vpc_id      = aws_vpc.devnet.id
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 resource "aws_security_group_rule" "allow_http_explorer" {
   type              = "ingress"
