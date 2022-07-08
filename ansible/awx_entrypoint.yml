@@ -50,58 +50,74 @@
     no_log: false
     register: git_clone
 
-  - name: delete any orphan terraform devnet resources
+  - name: set reused vars for reference across tasks
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
-        terraform init
-        terraform destroy -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -auto-approve
+        CLEAN_GIT_BRANCH=$(sed -E 's/[^[:alnum:][:space:]]+/-/g' <<<{{ GIT_BRANCH_NAME }})
+        echo "$CLEAN_GIT_BRANCH"
+      register: branch_output
 
-  - name: init terraform and apply to provision avail resources
+  - set_fact:
+      clean_branch_name: "{{ branch_output.stdout_lines[-1] }}"
+
+  - name: test global var
     shell:
       cmd: |
-        cd /opt/avail_repo/tf/nets/devnet01
-        COMMIT_SHA="$(git rev-parse --short HEAD)"
-        CLEAN_GIT_BRANCH=$(tr '/' '_' <<<{{ GIT_BRANCH_NAME }})
-        terraform init
-        terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -auto-approve
-        echo $(terraform output full_node_ips)
-        echo $(terraform output validator_ips)
-        echo $(terraform output explorer_ips)
-        echo $(terraform output light_client_ips)
-    register: nodes
-
-  - name: register full node host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: full_nodes
-    loop: "{{ nodes.stdout_lines[-4] }}"
-
-  - name: register validators host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: validators
-    loop: "{{ nodes.stdout_lines[-3] }}"
-
-  - name: register explorers host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: explorers
-    loop: "{{ nodes.stdout_lines[-2] }}"
-
-  - name: register light clients host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: light_clients
-    loop: "{{ nodes.stdout_lines[-1] }}"
-
-# TODO: key generation phase, can we combine with provisioning step?
-# TODO: configure all nodes via ansible and start containers
-
-  - name: teardown all terraform resources once done
-    shell:
-      cmd: |
-        sleep 3m
-        cd /opt/avail_repo/tf/nets/devnet01
-        terraform init
-        terraform destroy -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -auto-approve
+        echo "{{ clean_branch_name }}"
+#
+#   - name: delete any orphan terraform devnet resources
+#     shell:
+#       cmd: |
+#         cd /opt/avail_repo/tf/nets/devnet01
+#         terraform init
+#         terraform destroy -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -var 'subdomain='"$SUBDOMAIN_FORMATTED"'' -auto-approve
+#
+#   - name: init terraform and apply to provision avail resources
+#     shell:
+#       cmd: |
+#         cd /opt/avail_repo/tf/nets/devnet01
+#         COMMIT_SHA="$(git rev-parse --short HEAD)"
+#         CLEAN_GIT_BRANCH=$(tr '/' '_' <<<{{ GIT_BRANCH_NAME }})
+#         terraform init
+#         terraform apply -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -auto-approve
+#         echo $(terraform output full_node_ips)
+#         echo $(terraform output validator_ips)
+#         echo $(terraform output explorer_ips)
+#         echo $(terraform output light_client_ips)
+#     register: nodes
+#
+#   - name: register full node host group
+#     add_host:
+#       hostname: "{{ item }}"
+#       groupname: full_nodes
+#     loop: "{{ nodes.stdout_lines[-4] }}"
+#
+#   - name: register validators host group
+#     add_host:
+#       hostname: "{{ item }}"
+#       groupname: validators
+#     loop: "{{ nodes.stdout_lines[-3] }}"
+#
+#   - name: register explorers host group
+#     add_host:
+#       hostname: "{{ item }}"
+#       groupname: explorers
+#     loop: "{{ nodes.stdout_lines[-2] }}"
+#
+#   - name: register light clients host group
+#     add_host:
+#       hostname: "{{ item }}"
+#       groupname: light_clients
+#     loop: "{{ nodes.stdout_lines[-1] }}"
+#
+# # TODO: key generation phase, can we combine with provisioning step?
+# # TODO: configure all nodes via ansible and start containers
+#
+#   - name: teardown all terraform resources once done
+#     shell:
+#       cmd: |
+#         sleep 3m
+#         cd /opt/avail_repo/tf/nets/devnet01
+#         terraform init
+#         terraform destroy -no-color -var 'deploy_name=devnet_'"$CLEAN_GIT_BRANCH"'' -var 'owner={{ awx_user_name }}' -auto-approve

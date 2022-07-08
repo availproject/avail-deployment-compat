@@ -31,6 +31,6 @@ module "devnet" {
   source = "../../modules/devnet"
   deployment_name     = var.deploy_name
   route53_zone_id     = "Z0491767NTM9F1P94D5W" # devnet-polygon.com
-  route53_domain_name = "${var.deploy_name}.devnet-polygon.com"
+  route53_domain_name = "${var.subdomain}.devnet-polygon.com"
   owner               = var.owner
 }
