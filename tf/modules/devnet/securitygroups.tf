@@ -25,18 +25,27 @@ resource "aws_security_group" "allow_p2p_validator" {
   name        = format("allow-p2p-validator-%02d", count.index + 1)
   description = "Allow all p2p traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group" "allow_p2p_full_node" {
   count       = length(aws_instance.full_node)
   name        = format("allow-p2p-full-node-%02d", count.index + 1)
   description = "Allow all p2p traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group" "allow_p2p_light_client" {
   count       = length(aws_instance.light_client)
   name        = format("allow-p2p-light-client-%02d", count.index + 1)
   description = "Allow all p2p traffic for avail light clients"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group_rule" "allow_internal_validator" {
   count             = length(aws_instance.validator)
@@ -87,6 +96,9 @@ resource "aws_security_group" "allow_rpc_full_node" {
   name        = "allow-rpc-full-node"
   description = "Allow all rpc and ws traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_security_group_rule" "allow_full_node_rpc" {
@@ -116,6 +128,9 @@ resource "aws_security_group" "allow_http_https_explorer" {
   name        = "allow-http-https-explorer"
   description = "Allow all http and https traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group_rule" "allow_http_explorer" {
   type              = "ingress"
@@ -140,6 +155,9 @@ resource "aws_security_group" "allow_outbound_everywhere" {
   name        = "allow-everything-out"
   description = "Allow all outgoing traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group_rule" "allow_outbound_everywhere" {
   type              = "egress"
