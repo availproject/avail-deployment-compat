@@ -44,10 +44,6 @@ resource "aws_lb" "explorer_rpc" {
   security_groups    = [aws_security_group.allow_http_https_explorer.id, aws_default_security_group.default.id]
   internal           = true
   subnets            = [for subnet in aws_subnet.devnet_private : subnet.id]
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_lb_listener" "avail_explorer_80" {
@@ -63,10 +59,6 @@ resource "aws_lb_listener" "avail_explorer_80" {
       protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 

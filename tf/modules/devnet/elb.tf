@@ -108,9 +108,6 @@ resource "aws_lb_target_group" "explorer_rpc_insecure" {
   protocol    = "TCP"
   target_type = "alb"
   vpc_id      = aws_vpc.devnet.id
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_lb_target_group_attachment" "explorer_rpc_insecure" {
@@ -120,9 +117,6 @@ resource "aws_lb_target_group_attachment" "explorer_rpc_insecure" {
   depends_on = [
     aws_lb_listener.avail_explorer_80
   ]
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_lb_listener" "alb_443_pass" {
