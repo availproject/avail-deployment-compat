@@ -34,7 +34,3 @@ module "devnet" {
   route53_domain_name = "${var.deploy_name}.devnet-polygon.com"
   owner               = var.owner
 }
-
-resource "aws_route53_zone" "my_hosted_zone" {
-  name = var.domain_name
-}
