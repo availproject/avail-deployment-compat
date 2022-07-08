@@ -39,6 +39,9 @@ resource "aws_lb_target_group_attachment" "avail_explorer_http" {
   target_group_arn = aws_lb_target_group.avail_explorer_http.arn
   target_id        = element(aws_instance.explorer, count.index).id
   port             = var.avail_explorer_port
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb" "explorer_rpc" {
@@ -66,6 +69,9 @@ resource "aws_lb_listener" "avail_explorer_80" {
       status_code = "HTTP_301"
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "avail_explorer_443" {
@@ -77,6 +83,9 @@ resource "aws_lb_listener" "avail_explorer_443" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.avail_explorer_http.arn
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -96,6 +105,9 @@ resource "aws_lb_listener_rule" "avail_ws" {
       values = ["/ws"]
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 
 }
 resource "aws_lb_listener_rule" "avail_rpc" {
@@ -111,6 +123,9 @@ resource "aws_lb_listener_rule" "avail_rpc" {
     path_pattern {
       values = ["/rpc"]
     }
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 
 }

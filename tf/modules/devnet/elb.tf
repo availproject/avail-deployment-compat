@@ -103,6 +103,9 @@ resource "aws_lb_target_group_attachment" "explorer_rpc" {
   depends_on = [
     aws_lb_listener.avail_explorer_443
   ]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_target_group" "explorer_rpc_insecure" {
@@ -123,6 +126,9 @@ resource "aws_lb_target_group_attachment" "explorer_rpc_insecure" {
   depends_on = [
     aws_lb_listener.avail_explorer_80
   ]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "alb_443_pass" {
@@ -134,6 +140,9 @@ resource "aws_lb_listener" "alb_443_pass" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.explorer_rpc.arn
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_lb_listener" "alb_80_pass" {
   load_balancer_arn = aws_lb.avail_nodes.arn
@@ -143,5 +152,8 @@ resource "aws_lb_listener" "alb_80_pass" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.explorer_rpc_insecure.arn
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
