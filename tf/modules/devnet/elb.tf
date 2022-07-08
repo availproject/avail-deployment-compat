@@ -91,6 +91,9 @@ resource "aws_lb_target_group" "explorer_rpc" {
   protocol    = "TCP"
   target_type = "alb"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_target_group_attachment" "explorer_rpc" {
@@ -108,6 +111,9 @@ resource "aws_lb_target_group" "explorer_rpc_insecure" {
   protocol    = "TCP"
   target_type = "alb"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_target_group_attachment" "explorer_rpc_insecure" {

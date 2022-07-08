@@ -30,6 +30,9 @@ resource "aws_lb_target_group" "avail_explorer_http" {
   target_type = "instance"
   vpc_id      = aws_vpc.devnet.id
   port        = var.avail_explorer_port
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_lb_target_group_attachment" "avail_explorer_http" {
   count            = length(aws_instance.explorer)
@@ -44,6 +47,9 @@ resource "aws_lb" "explorer_rpc" {
   security_groups    = [aws_security_group.allow_http_https_explorer.id, aws_default_security_group.default.id]
   internal           = true
   subnets            = [for subnet in aws_subnet.devnet_private : subnet.id]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "avail_explorer_80" {
