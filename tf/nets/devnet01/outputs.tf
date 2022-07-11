@@ -16,4 +16,5 @@ output "light_client_ips" {
 
 output "pk_ansible" {
   value = "${module.devnet.pk_ansible}"
+  sensitive = true
 }
