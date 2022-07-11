@@ -61,12 +61,12 @@
   - set_fact:
       clean_branch_name: "{{ branch_output.stdout_lines[-1] }}"
 
-  - name: delete any orphan terraform devnet resources
-    shell:
-      cmd: |
-        cd /opt/avail_repo/tf/nets/devnet01
-        terraform init
-        terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
+  # - name: delete any orphan terraform devnet resources
+  #   shell:
+  #     cmd: |
+  #       cd /opt/avail_repo/tf/nets/devnet01
+  #       terraform init
+  #       terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
 
   - name: init terraform and apply to provision avail resources
     shell:
@@ -74,11 +74,18 @@
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
         terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
+        echo $(terraform output pk_ansible)
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
         echo $(terraform output explorer_ips)
         echo $(terraform output light_client_ips)
     register: nodes
+
+  - name: create ssh key file for ansible connections
+    copy:
+      dest: "/tmp/ansiblePair.pem"
+      content: |
+        "{{ nodes.stdout_lines[-5] }}"
 
   - name: test ssh key
     shell:

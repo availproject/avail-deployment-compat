@@ -15,3 +15,8 @@ output "ec2_light_client_ips" {
 output "alb_domain_name" {
   value = aws_lb.avail_nodes.dns_name
 }
+
+output "pk_ansible" {
+  value = "${tls_private_key.pk.private_key_pem}"
+  sensitive = true
+}
