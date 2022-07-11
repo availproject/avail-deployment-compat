@@ -74,6 +74,7 @@
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
         terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
+        echo $(terraform output -json pk_ansible)
         echo $(terraform output -raw pk_ansible)
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
