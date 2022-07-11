@@ -33,4 +33,5 @@ module "devnet" {
   route53_zone_id     = "Z0491767NTM9F1P94D5W" # devnet-polygon.com
   route53_domain_name = "${var.deploy_name}.devnet-polygon.com"
   owner               = var.owner
+  devnet_key_name     = "ansiblePair"
 }
