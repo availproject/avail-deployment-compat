@@ -74,7 +74,7 @@
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
         terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
-        echo $(terraform output pk_ansible)
+        echo $(terraform output -raw pk_ansible)
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
         echo $(terraform output explorer_ips)
@@ -85,7 +85,7 @@
     copy:
       dest: "/tmp/ansiblePair.pem"
       content: |
-        "{{ nodes.stdout_lines[-5] }}"
+        {{ nodes.stdout_lines[-5] }}
 
   - name: test ssh key
     shell:
