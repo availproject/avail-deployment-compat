@@ -87,11 +87,6 @@
       content: |
         {{ nodes.stdout_lines[-5] }}
 
-  - name: test ssh key
-    shell:
-      cmd: |
-        cat /tmp/ansiblePair.pem
-
   - name: register full node host group
     add_host:
       hostname: "{{ item }}"
@@ -115,6 +110,17 @@
       hostname: "{{ item }}"
       groupname: light_clients
     loop: "{{ nodes.stdout_lines[-1] }}"
+
+- name: Configure instance(s)
+  hosts: full_nodes
+  become: yes
+  gather_facts: True
+  vars:
+     ansible_ssh_private_key_file: "/tmp/ansiblePair.pem"
+  tasks:
+    - name: Wait for sudo
+      become: yes
+      shell:  while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
 
 # TODO: key generation phase, can we combine with provisioning step?
 # TODO: configure all nodes via ansible and start containers
