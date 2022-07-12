@@ -124,6 +124,7 @@
   - name: test ssm
     shell:
       cmd: |
+        unset PYTHONPATH
         aws ssm start-session --target i-071dfa3c428b9c381 --document-name AWS-StartSSHSession --parameters 'portNumber=22' --region us-west-2
 
 - name: Configure instance(s)
