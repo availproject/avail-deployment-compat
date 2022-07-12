@@ -60,6 +60,7 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         CLEAN_GIT_BRANCH=$(sed -E 's/[^[:alnum:][:space:]]+/-/g' <<<{{ GIT_BRANCH_NAME }})
+        echo "$CLEAN_GIT_BRANCH"
     register: branch_output
 
   - set_fact:
