@@ -84,7 +84,6 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
-        terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
         echo $(terraform output -json pk_ansible) > /tmp/ansiblePair.pem
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
@@ -124,7 +123,7 @@
   - name: test ssm
     shell:
       cmd: |
-        unset PYTHONPATH
+        pip uninstall -y enum34
         aws ssm start-session --target i-071dfa3c428b9c381 --document-name AWS-StartSSHSession --parameters 'portNumber=22' --region us-west-2
 
 - name: Configure instance(s)
