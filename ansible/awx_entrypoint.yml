@@ -21,15 +21,9 @@
         . /tmp/pyenv/.pyenvrc && pyenv versions
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
-        which pip
         pip install --user boto3 botocore
         sudo pip3 install awscli --force-reinstall --upgrade
-        echo $SHELL
-        echo $PATH
-        aws --version
-        which python3
-        which python3.6
-        echo '{{ ansible_playbook_python }}'
+        ansible --version | grep "python version"
         mkdir -p /opt/avail_repo
         cat /etc/os-release
         sudo yum install -y yum-utils
@@ -144,7 +138,6 @@
   become: yes
   gather_facts: True
   vars:
-    - ansible_python_interpreter: /tmp/pyenv/.pyenvrc
     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
     - ansible_user: ubuntu
     - ansible_become: true
