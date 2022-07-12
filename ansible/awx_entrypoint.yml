@@ -19,10 +19,11 @@
         . /tmp/pyenv/.pyenvrc && pyenv versions
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
-        pip install --user boto3 botocore awscli
+        pip install --user boto3 botocore
+        sudo pip install awscli --force-reinstall --upgrade
         echo $SHELL
         echo $PATH
-        which aws
+        aws --version
         mkdir -p /opt/avail_repo
         cat /etc/os-release
         sudo yum install -y yum-utils
