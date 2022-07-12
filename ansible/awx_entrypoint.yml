@@ -136,7 +136,7 @@
         . /tmp/pyenv/.pyenvrc && pyenv versions
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
-        sudo pip install --upgrade psutil
+        pip3 install --upgrade psutil
         ansible-playbook ssm_test.yml -i aws_ec2.yml -vvvv
         aws ssm start-session --target i-071dfa3c428b9c381 --document-name AWS-StartSSHSession --parameters 'portNumber=22' --region us-west-2
 
