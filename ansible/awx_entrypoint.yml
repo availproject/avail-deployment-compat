@@ -115,6 +115,11 @@
       groupname: light_clients
     loop: "{{ nodes.stdout_lines[-1] }}"
 
+  - name: test ssm
+    shell:
+      cmd: |
+        aws ssm start-session --target i-071dfa3c428b9c381 --document-name AWS-StartSSHSession --parameters 'portNumber=22' --region us-west-2
+
 - name: Configure instance(s)
   hosts: full_nodes
   become: yes
