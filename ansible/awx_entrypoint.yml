@@ -79,20 +79,14 @@
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
         terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
-        echo $(terraform output -json pk_ansible)
+        echo $(terraform output -json pk_ansible) > /tmp/ansiblePair.pem
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
         echo $(terraform output explorer_ips)
         echo $(terraform output light_client_ips)
     register: nodes
 
-  - name: create ssh key file for ansible connections
-    copy:
-      dest: "/tmp/ansiblePair.pem"
-      content: |
-        {{ nodes.stdout_lines[-5] }}
-
-  - name: init terraform and apply to provision avail resources
+  - name: confirm pem key formatted appropriately
     shell:
       cmd: |
         cat /tmp/ansiblePair.pem
@@ -129,6 +123,7 @@
     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
     - ansible_user: ubuntu
     - ansible_become: true
+    - ansible_ssh_private_key_file: '/tmp/ansiblePair.pem'
   tasks:
     - name: Wait for sudo
       become: yes
