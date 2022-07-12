@@ -26,6 +26,7 @@
         echo $SHELL
         echo $PATH
         aws --version
+        which python3
         mkdir -p /opt/avail_repo
         cat /etc/os-release
         sudo yum install -y yum-utils
