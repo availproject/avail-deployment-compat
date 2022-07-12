@@ -136,22 +136,23 @@
         . /tmp/pyenv/.pyenvrc && pyenv versions
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
+        sudo pip install --upgrade psutil
         ansible-playbook ssm_test.yml -i aws_ec2.yml -vvvv
         aws ssm start-session --target i-071dfa3c428b9c381 --document-name AWS-StartSSHSession --parameters 'portNumber=22' --region us-west-2
 
-- name: Configure instance(s)
-  hosts: full_nodes
-  become: yes
-  gather_facts: True
-  vars:
-    - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
-    - ansible_become: true
-    - ansible_ssh_private_key_file: '/tmp/ansiblePair.pem'
-  tasks:
-    - name: Wait for sudo
-      become: yes
-      shell:  while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
+# - name: Configure instance(s)
+#   hosts: full_nodes
+#   become: yes
+#   gather_facts: True
+#   vars:
+#     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
+#     - ansible_user: ubuntu
+#     - ansible_become: true
+#     - ansible_ssh_private_key_file: '/tmp/ansiblePair.pem'
+#   tasks:
+#     - name: Wait for sudo
+#       become: yes
+#       shell:  while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
 
 # TODO: key generation phase, can we combine with provisioning step?
 # TODO: configure all nodes via ansible and start containers
