@@ -21,12 +21,14 @@
         unset PYTHONPATH
         pip install --user boto3 botocore awscli
         mkdir -p /opt/avail_repo
+        cat /etc/os-release
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
         sudo yum -y install curl
         curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
         sudo yum install -y session-manager-plugin.rpm
+        session-manager-plugin
 
   - name: create tf cloud authentication config
     copy:
