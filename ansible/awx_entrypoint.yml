@@ -104,6 +104,8 @@
     add_host:
       hostname: "{{ item }}"
       groupname: full_nodes
+    vars:
+      - ansible_python_interpreter: /usr/bin/python3
     loop: "{{ nodes.stdout_lines[-4] }}"
 
   - name: register validators host group
@@ -127,8 +129,6 @@
 
 - name: testing ssm
   hosts: localhost
-  vars:
-    ansible_python_interpreter: '{{ ansible_playbook_python }}'
   tasks:
   - name: test ssm
     shell:
