@@ -128,6 +128,7 @@
   hosts: localhost
   vars:
     ansible_python_interpreter: /usr/bin/python3.6
+  tasks:
   - name: test ssm
     shell:
       cmd: |
