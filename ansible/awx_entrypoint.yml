@@ -29,6 +29,7 @@
         aws --version
         which python3
         which python3.6
+        echo '{{ ansible_playbook_python }}'
         mkdir -p /opt/avail_repo
         cat /etc/os-release
         sudo yum install -y yum-utils
@@ -132,6 +133,10 @@
   - name: test ssm
     shell:
       cmd: |
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
         aws ssm start-session --target i-071dfa3c428b9c381 --document-name AWS-StartSSHSession --parameters 'portNumber=22' --region us-west-2
 
 - name: Configure instance(s)
