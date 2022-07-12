@@ -137,12 +137,7 @@
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
         pip3 install --upgrade psutil
-        ansible-playbook ssm_test.yml -i aws_ec2.yml -vvv
-
-  - name: confirm key again
-    shell:
-      cmd: |
-        cat /tmp/ansiblePair.pem
+        ansible-playbook ssm_test.yml -i aws_ec2.yml
 
 # - name: Configure instance(s)
 #   hosts: full_nodes
