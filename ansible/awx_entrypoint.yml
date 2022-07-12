@@ -140,7 +140,6 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         ansible-playbook ssm_test.yml -i aws_ec2.yml -vvvv
-        aws ssm start-session --target i-071dfa3c428b9c381 --document-name AWS-StartSSHSession --parameters 'portNumber=22' --region us-west-2
 
 # - name: Configure instance(s)
 #   hosts: full_nodes
