@@ -10,8 +10,8 @@
        pyenv_enable_autocompletion: false
        pyenv_python_versions:
          - 3.6.4
-  vars:
-    ansible_python_interpreter: /usr/bin/python3.6
+  # vars:
+  #   ansible_python_interpreter: /usr/bin/python3.6
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
@@ -22,7 +22,7 @@
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
         pip install --user boto3 botocore
-        sudo pip install awscli --force-reinstall --upgrade
+        sudo pip3 install awscli --force-reinstall --upgrade
         echo $SHELL
         echo $PATH
         aws --version
