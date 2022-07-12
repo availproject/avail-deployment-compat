@@ -25,8 +25,6 @@
         sudo pip3 install awscli --force-reinstall --upgrade
         pip install --upgrade pip
         pip3 install --upgrade pip
-        pip3 install ansible
-        ansible --version | grep "python version"
         mkdir -p /opt/avail_repo
         cat /etc/os-release
         sudo yum install -y yum-utils
@@ -96,7 +94,7 @@
   - name: confirm pem key formatted appropriately
     shell:
       cmd: |
-        echo "{{ nodes.stdout_lines[-5] }}" > /tmp/ansiblePair.pem
+        echo {{ nodes.stdout_lines[-5] }} > /tmp/ansiblePair.pem
         chmod 400 /tmp/ansiblePair.pem
         cat /tmp/ansiblePair.pem
 
@@ -139,7 +137,7 @@
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
         pip3 install --upgrade psutil
-        ansible-playbook ssm_test.yml -i aws_ec2.yml -vvvv
+        ansible-playbook ssm_test.yml -i aws_ec2.yml -vvv
 
   - name: confirm key again
     shell:
