@@ -141,6 +141,11 @@
         pip3 install --upgrade psutil
         ansible-playbook ssm_test.yml -i aws_ec2.yml -vvvv
 
+  - name: confirm key again
+    shell:
+      cmd: |
+        cat /tmp/ansiblePair.pem
+
 # - name: Configure instance(s)
 #   hosts: full_nodes
 #   become: yes
