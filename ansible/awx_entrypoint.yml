@@ -11,7 +11,7 @@
        pyenv_python_versions:
          - 3.6.4
   vars:
-    ansible_python_interpreter: /usr/bin/python3
+    ansible_python_interpreter: /usr/bin/python3.6
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
