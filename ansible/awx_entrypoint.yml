@@ -10,8 +10,6 @@
        pyenv_enable_autocompletion: false
        pyenv_python_versions:
          - 3.6.4
-  # vars:
-  #   ansible_python_interpreter: /usr/bin/python3.6
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
@@ -23,18 +21,13 @@
         unset PYTHONPATH
         pip install --user boto3 botocore
         sudo pip3 install awscli --force-reinstall --upgrade
-        pip install --upgrade pip
-        pip3 install --upgrade pip
         mkdir -p /opt/avail_repo
-        cat /etc/os-release
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
         sudo yum -y install curl
         curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
         sudo yum install -y session-manager-plugin.rpm
-        session-manager-plugin
-        cat /etc/ansible/ansible.cfg
 
   - name: create tf cloud authentication config
     copy:
@@ -44,11 +37,11 @@
           token = "{{ lookup("env", "TF_TOKEN") }}"
         }
 
-  - name: update safe directory for avail repo
+  - name: add safe directory for avail repo
     command: git config --global --add safe.directory /opt/avail_repo
     check_mode: no
 
-  - name: clone specific avail repo branch to localhost
+  - name: clone avail repo branch
     ansible.builtin.git:
       repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/maticnetwork/avail-deployment.git'
       dest: /opt/avail_repo
@@ -61,12 +54,11 @@
     no_log: false
     register: git_clone
 
-  - name: set reused vars for reference across tasks
+  - name: set vars for reference across tasks
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         CLEAN_GIT_BRANCH=$(sed -E 's/[^[:alnum:][:space:]]+/-/g' <<<{{ GIT_BRANCH_NAME }})
-        echo "$CLEAN_GIT_BRANCH"
     register: branch_output
 
   - set_fact:
@@ -84,19 +76,13 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
-        echo $(terraform output -json pk_ansible)
+        echo $(terraform output -json pk_ansible) > /tmp/ansiblePair.pem
+        chmod 400 /tmp/ansiblePair.pem
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
         echo $(terraform output explorer_ips)
         echo $(terraform output light_client_ips)
     register: nodes
-
-  - name: confirm pem key formatted appropriately
-    shell:
-      cmd: |
-        echo {{ nodes.stdout_lines[-5] }} > /tmp/ansiblePair.pem
-        chmod 400 /tmp/ansiblePair.pem
-        cat /tmp/ansiblePair.pem
 
   - name: register full node host group
     add_host:
@@ -138,20 +124,6 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         ansible-playbook ssm_test.yml -i aws_ec2.yml
-
-# - name: Configure instance(s)
-#   hosts: full_nodes
-#   become: yes
-#   gather_facts: True
-#   vars:
-#     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-#     - ansible_user: ubuntu
-#     - ansible_become: true
-#     - ansible_ssh_private_key_file: '/tmp/ansiblePair.pem'
-#   tasks:
-#     - name: Wait for sudo
-#       become: yes
-#       shell:  while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
 
 # TODO: key generation phase, can we combine with provisioning step?
 # TODO: configure all nodes via ansible and start containers
