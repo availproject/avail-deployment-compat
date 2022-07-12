@@ -125,7 +125,7 @@
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
         pip3 install --upgrade psutil
-        ansible-playbook ssm_test.yml -i aws_ec2.yml -vvvv
+        ansible-playbook ssm_test.yml -i aws_ec2.yml
 
 # TODO: key generation phase, can we combine with provisioning step?
 # TODO: configure all nodes via ansible and start containers
