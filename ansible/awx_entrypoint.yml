@@ -86,7 +86,7 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
-        echo $(terraform output -json pk_ansible) > /tmp/ansiblePair.pem
+        echo $(terraform output -json pk_ansible)
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
         echo $(terraform output explorer_ips)
@@ -96,6 +96,7 @@
   - name: confirm pem key formatted appropriately
     shell:
       cmd: |
+        echo "{{ nodes.stdout_lines[-5] }}" > /tmp/ansiblePair.pem
         chmod 400 /tmp/ansiblePair.pem
         cat /tmp/ansiblePair.pem
 
