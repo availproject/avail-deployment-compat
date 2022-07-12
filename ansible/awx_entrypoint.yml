@@ -10,6 +10,8 @@
        pyenv_enable_autocompletion: false
        pyenv_python_versions:
          - 3.6.4
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
