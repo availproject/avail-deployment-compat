@@ -96,6 +96,7 @@
   - name: confirm pem key formatted appropriately
     shell:
       cmd: |
+        chmod 400 /tmp/ansiblePair.pem
         cat /tmp/ansiblePair.pem
 
   - name: register full node host group
