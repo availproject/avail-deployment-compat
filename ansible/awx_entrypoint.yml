@@ -11,7 +11,7 @@
        pyenv_python_versions:
          - 3.6.4
   tasks:
-  - name: setup python3 and terraform on controller machine
+  - name: install terraform and ssm agent on controller machine
     shell:
       cmd: |
         export PATH="/tmp/pyenv/shims:$PATH"
@@ -19,11 +19,14 @@
         . /tmp/pyenv/.pyenvrc && pyenv versions
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
-        pip install --user boto3 botocore
+        pip install --user boto3 botocore awscli
         mkdir -p /opt/avail_repo
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
+        sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+        sudo systemctl enable amazon-ssm-agent
+        sudo systemctl start amazon-ssm-agent
 
   - name: create tf cloud authentication config
     copy:
