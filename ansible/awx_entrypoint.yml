@@ -115,6 +115,7 @@
       accept_hostkey: true
       force: yes
       update: yes
+      depth: 1
     ignore_errors: false
     no_log: false
     register: git_clone
