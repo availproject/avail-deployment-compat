@@ -121,7 +121,7 @@
         unset PYTHONPATH
         pip install jq
         sudo yum install wget -y
-        ARCH="arm64" && \
+        ARCH="arm" && \
             wget "https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_${ARCH}_v2.0.0.zip" -O op.zip && \
             unzip -d op op.zip && \
             sudo mv op/op /usr/local/bin && \
