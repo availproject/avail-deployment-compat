@@ -22,6 +22,7 @@
         pip install --user boto3 botocore
         sudo pip3 install awscli --force-reinstall --upgrade
         mkdir -p /opt/avail_repo
+        mkdir -p /opt/avail_source
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
@@ -42,13 +43,25 @@
     command: git config --global --add safe.directory /opt/avail_repo
     check_mode: no
 
-  - name: clone avail repo branch
+  - name: clone avail-deployment repo branch
     ansible.builtin.git:
       repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/maticnetwork/avail-deployment.git'
       dest: /opt/avail_repo
       clone: yes
       accept_hostkey: true
       version: "{{ GIT_BRANCH_NAME }}"
+      force: yes
+      update: yes
+    ignore_errors: false
+    no_log: false
+    register: git_clone
+
+  - name: clone avail source
+    ansible.builtin.git:
+      repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/maticnetwork/avail.git'
+      dest: /opt/avail_source
+      clone: yes
+      accept_hostkey: true
       force: yes
       update: yes
     ignore_errors: false
@@ -125,15 +138,9 @@
           && unzip -od /usr/local/bin/ op.zip \
           && rm op.zip
         op --version
-        sudo yum install -y yum-utils
-        sudo yum-config-manager \
-          --add-repo \
-          https://download.docker.com/linux/centos/docker-ce.repo
-        sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-        sudo systemctl list-units | grep -i docker
-        sudo systemctl status docker
-        sudo dockerd
-        sudo docker run hello-world
+        curl https://sh.rustup.rs -sSf | sh
+        cd /opt/avail_source
+        cargo build --release -p data-avail
 
 # - name: testing ssm
 #   hosts: localhost
