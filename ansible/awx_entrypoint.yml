@@ -29,6 +29,7 @@
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
         sudo yum -y install curl
+        sudo yum install git -y
         curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
         sudo yum install -y session-manager-plugin.rpm
         session-manager-plugin
@@ -107,25 +108,14 @@
     no_log: false
     register: git_clone
 
-  - name: clone llvm
-    ansible.builtin.git:
-      repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/llvm/llvm-project.git'
-      dest: /opt/llvm_source
-      clone: yes
-      accept_hostkey: true
-      force: yes
-      update: yes
-      depth: 1
-    ignore_errors: false
-    no_log: false
-    register: git_clone
-
   - name: install clang version
     shell:
       cmd: |
         cd /opt/llvm_source
+        git clone --depth=1 https://github.com/llvm/llvm-project.git
+        cd llvm-project
         mkdir build
-        ls /opt/llvm_source
+        ls /opt/llvm_source/llvm-project
         cd build
         cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
         make
