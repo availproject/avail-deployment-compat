@@ -130,9 +130,8 @@
           --add-repo \
           https://download.docker.com/linux/centos/docker-ce.repo
         sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-        systemctl start docker
+        sudo service docker restart
         docker run hello-world
-        systemctl --version
 
 # - name: testing ssm
 #   hosts: localhost
