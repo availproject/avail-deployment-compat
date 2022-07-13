@@ -145,6 +145,7 @@
         sudo yum install epel-release -y
         sudo yum install clang -y
         clang --version
+        cargo build --release -p data-avail
         ls /opt/avail_source/target/release
 
 # - name: testing ssm
