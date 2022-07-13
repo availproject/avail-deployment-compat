@@ -193,7 +193,7 @@
         enabled_metadata=1" >> /etc/yum.repos.d/epel.repo
         rpm --import https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-3.9.0/pubkey.gpg
         sudo yum update
-        sudo yum uninstall clang-3.9.0 -y
+        sudo yum install clang-3.9.0 -y
         clang --version
         ls /opt/avail_source/target/release
 
