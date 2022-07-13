@@ -112,20 +112,34 @@
       groupname: light_clients
     loop: "{{ nodes.stdout_lines[-1] }}"
 
-
-- name: testing ssm
-  hosts: localhost
-  tasks:
-  - name: test ssm
+  - name: install key generation script dependencies
     shell:
       cmd: |
-        cd /opt/avail_repo/ansible
         eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
         . /tmp/pyenv/.pyenvrc && pyenv versions
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
-        pip3 install --upgrade psutil
-        ansible-playbook ssm_test.yml -i aws_ec2.yml
+        pip install jq
+        pip install 1password
+        sudo yum check-update
+        sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+        sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        sudo yum install docker
+        sudo systemctl start docker
+
+# - name: testing ssm
+#   hosts: localhost
+#   tasks:
+#   - name: test ssm
+#     shell:
+#       cmd: |
+#         cd /opt/avail_repo/ansible
+#         eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+#         . /tmp/pyenv/.pyenvrc && pyenv versions
+#         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+#         unset PYTHONPATH
+#         pip3 install --upgrade psutil
+#         ansible-playbook ssm_test.yml -i aws_ec2.yml
 
 # TODO: key generation phase, can we combine with provisioning step?
 # TODO: configure all nodes via ansible and start containers
