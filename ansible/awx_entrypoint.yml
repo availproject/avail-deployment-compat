@@ -179,12 +179,14 @@
         curl https://sh.rustup.rs -sSf | sh -s -- -y
         which rustup
         source "$HOME/.cargo/env"
-        cd /opt/avail_source
-        sudo yum remove clang -y
-        yum install llvm-toolset-7.0 -y
-        scl enable llvm-toolset-7.0 'bash'
-        locate clang
+        sudo yum install subversion -y
+        svn --version
+        sudo yum install cmake -y
+        mkdir ~/sourceInstallations
+        cd ~/sourceInstallations
+        svn ls http://llvm.org/svn/llvm-project/llvm/tags | grep RELEASE
         clang --version
+        cd /opt/avail_source
         ls /opt/avail_source/target/release
 
 # - name: testing ssm
