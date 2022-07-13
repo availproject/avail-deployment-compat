@@ -112,7 +112,7 @@
     shell:
       cmd: |
         cd /opt/llvm_source
-        git clone --depth=1 https://github.com/llvm/llvm-project.git
+        git clone -b llvmorg-7.1.0 https://github.com/llvm/llvm-project.git .
         cd llvm-project
         mkdir build
         ls /opt/llvm_source/llvm-project
