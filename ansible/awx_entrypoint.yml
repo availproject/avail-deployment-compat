@@ -138,7 +138,7 @@
           && unzip -od /usr/local/bin/ op.zip \
           && rm op.zip
         op --version
-        curl https://sh.rustup.rs -sSf | sh
+        curl https://sh.rustup.rs -sSf | sh -y
         cd /opt/avail_source
         cargo build --release -p data-avail
         ls /opt/avail_source/target/release
