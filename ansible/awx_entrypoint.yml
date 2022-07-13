@@ -1,15 +1,15 @@
 ---
 - name: provision avail resources and configure nodes with ansible
   hosts: localhost
-  roles:
-     - role: staticdev.pyenv
-       pyenv_path: "/tmp/pyenv"
-       pyenv_owner: "root"
-       pyenv_global:
-         - 3.6.4
-       pyenv_enable_autocompletion: false
-       pyenv_python_versions:
-         - 3.6.4
+  # roles:
+  #    - role: staticdev.pyenv
+  #      pyenv_path: "/tmp/pyenv"
+  #      pyenv_owner: "root"
+  #      pyenv_global:
+  #        - 3.6.4
+  #      pyenv_enable_autocompletion: false
+  #      pyenv_python_versions:
+  #        - 3.6.4
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
