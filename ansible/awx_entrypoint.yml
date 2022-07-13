@@ -184,8 +184,9 @@
         sudo yum install cmake -y
         mkdir ~/sourceInstallations
         cd ~/sourceInstallations
-        svn ls http://llvm.org/svn/llvm-project/llvm/tags | grep RELEASE
+        svn ls https://llvm.org/svn/llvm-project/llvm/tags | grep RELEASE
         clang --version
+        gcc --version
         cd /opt/avail_source
         ls /opt/avail_source/target/release
 
