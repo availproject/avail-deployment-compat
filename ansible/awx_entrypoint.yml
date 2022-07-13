@@ -142,9 +142,8 @@
         which rustup
         source "$HOME/.cargo/env"
         cd /opt/avail_source
-        sudo yum install centos-release-scl -y
-        sudo yum install llvm-toolset-7 -y
-        scl enable llvm-toolset-7 'bash'
+        sudo yum install epel-release
+        sudo yum install clang
         clang --version
         ls /opt/avail_source/target/release
 
