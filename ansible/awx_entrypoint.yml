@@ -39,7 +39,7 @@
         sudo yum install llvm-toolset-7 -y
         scl enable llvm-toolset-7 bash
         echo $PATH
-        export PATH="/opt/rh/llvm-toolset-7/root/usr/bin/clang:$PATH"
+        export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         echo $PATH
         clang --version
 
