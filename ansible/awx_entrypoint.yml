@@ -142,8 +142,8 @@
         which rustup
         source "$HOME/.cargo/env"
         cd /opt/avail_source
-        sudo yum install epel-release
-        sudo yum install clang
+        sudo yum install epel-release -y
+        sudo yum install clang -y
         clang --version
         ls /opt/avail_source/target/release
 
