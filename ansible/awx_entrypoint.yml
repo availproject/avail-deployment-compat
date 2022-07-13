@@ -33,8 +33,12 @@
         sudo yum install -y session-manager-plugin.rpm
         session-manager-plugin
 
-        sudo dnf makecache
-        sudo dnf -y install clang
+        sudo yum install mlocate -y
+        sudo updatedb
+        sudo yum install centos-release-scl -y
+        sudo yum install llvm-toolset-7 -y
+        scl enable llvm-toolset-7 bash
+        locate clang
         clang --version
 
   - name: fix epel repo
