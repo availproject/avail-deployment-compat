@@ -107,24 +107,25 @@
     no_log: false
     register: git_clone
 
-  - name: clone llvm
-    ansible.builtin.git:
-      repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/llvm/llvm-project.git'
-      dest: /opt/llvm_source
-      clone: yes
-      accept_hostkey: true
-      force: yes
-      update: yes
-      depth: 1
-    ignore_errors: false
-    no_log: false
-    register: git_clone
+  # - name: clone llvm
+  #   ansible.builtin.git:
+  #     repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/llvm/llvm-project.git'
+  #     dest: /opt/llvm_source
+  #     clone: yes
+  #     accept_hostkey: true
+  #     force: yes
+  #     update: yes
+  #     depth: 1
+  #   ignore_errors: false
+  #   no_log: false
+  #   register: git_clone
 
   - name: install clang version
     shell:
       cmd: |
         cd /opt/llvm_source
         mkdir build
+        ls /opt/llvm_source
         cd build
         cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
         make
