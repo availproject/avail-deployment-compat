@@ -24,7 +24,6 @@
         sudo pip3 install awscli --force-reinstall --upgrade
         mkdir -p /opt/avail_repo
         mkdir -p /opt/avail_source
-        mkdir -p /opt/llvm_source
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
@@ -43,42 +42,42 @@
         echo $PATH
         clang --version
 
-  - name: fix epel repo
-    copy:
-      dest: "/etc/yum.repos.d/epel.repo"
-      content: |
-        [epel]
-        name=Extra Packages for Enterprise Linux 7 - $basearch
-        # It is much more secure to use the metalink, but if you wish to use a local mirror
-        # place its address here.
-        #baseurl=http://download.example/pub/epel/7/$basearch
-        metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch&infra=$infra&content=$contentdir
-        failovermethod=priority
-        enabled=1
-        gpgcheck=1
-        gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-
-        [epel-debuginfo]
-        name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
-        # It is much more secure to use the metalink, but if you wish to use a local mirror
-        # place its address here.
-        #baseurl=http://download.example/pub/epel/7/$basearch/debug
-        metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&arch=$basearch&infra=$infra&content=$contentdir
-        failovermethod=priority
-        enabled=0
-        gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-        gpgcheck=1
-
-        [epel-source]
-        name=Extra Packages for Enterprise Linux 7 - $basearch - Source
-        # It is much more secure to use the metalink, but if you wish to use a local mirror
-        # place it's address here.
-        #baseurl=http://download.example/pub/epel/7/source/tree/
-        metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&arch=$basearch&infra=$infra&content=$contentdir
-        failovermethod=priority
-        enabled=0
-        gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-        gpgcheck=1
+  # - name: fix epel repo
+  #   copy:
+  #     dest: "/etc/yum.repos.d/epel.repo"
+  #     content: |
+  #       [epel]
+  #       name=Extra Packages for Enterprise Linux 7 - $basearch
+  #       # It is much more secure to use the metalink, but if you wish to use a local mirror
+  #       # place its address here.
+  #       #baseurl=http://download.example/pub/epel/7/$basearch
+  #       metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch&infra=$infra&content=$contentdir
+  #       failovermethod=priority
+  #       enabled=1
+  #       gpgcheck=1
+  #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+  #
+  #       [epel-debuginfo]
+  #       name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+  #       # It is much more secure to use the metalink, but if you wish to use a local mirror
+  #       # place its address here.
+  #       #baseurl=http://download.example/pub/epel/7/$basearch/debug
+  #       metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&arch=$basearch&infra=$infra&content=$contentdir
+  #       failovermethod=priority
+  #       enabled=0
+  #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+  #       gpgcheck=1
+  #
+  #       [epel-source]
+  #       name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+  #       # It is much more secure to use the metalink, but if you wish to use a local mirror
+  #       # place it's address here.
+  #       #baseurl=http://download.example/pub/epel/7/source/tree/
+  #       metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&arch=$basearch&infra=$infra&content=$contentdir
+  #       failovermethod=priority
+  #       enabled=0
+  #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+  #       gpgcheck=1
 
   - name: create tf cloud authentication config
     copy:
@@ -215,15 +214,8 @@
         curl https://sh.rustup.rs -sSf | sh -s -- -y
         which rustup
         source "$HOME/.cargo/env"
-        sudo yum install subversion -y
-        svn --version
-        sudo yum install cmake -y
-        mkdir ~/sourceInstallations
-        cd ~/sourceInstallations
-        svn ls https://llvm.org/svn/llvm-project/llvm/tags | grep RELEASE
-        clang --version
-        gcc --version
         cd /opt/avail_source
+        cargo build --release -p data-avail
         ls /opt/avail_source/target/release
 
 # - name: testing ssm
