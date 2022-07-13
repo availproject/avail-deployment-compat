@@ -24,6 +24,7 @@
         sudo pip3 install awscli --force-reinstall --upgrade
         mkdir -p /opt/avail_repo
         mkdir -p /opt/avail_source
+        mkdir -p /opt/llvm_source
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
@@ -105,6 +106,28 @@
     ignore_errors: false
     no_log: false
     register: git_clone
+
+  - name: clone llvm
+    ansible.builtin.git:
+      repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/llvm/llvm-project.git'
+      dest: /opt/llvm_source
+      clone: yes
+      accept_hostkey: true
+      force: yes
+      update: yes
+    ignore_errors: false
+    no_log: false
+    register: git_clone
+
+  - name: install clang version
+    shell:
+      cmd: |
+        cd /opt/llvm_source
+        mkdir build
+        cd build
+        cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
+        make
+        clang --version
 
   - name: set vars for reference across tasks
     shell:
