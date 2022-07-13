@@ -112,8 +112,8 @@
     shell:
       cmd: |
         wget https://cmake.org/files/v3.23/cmake-3.23.2.tar.gz
-        tar zxvf cmake-3.*
-        cd cmake-3.*
+        tar zxvf cmake-3.23.2.tar.gz
+        cd cmake-3.23.2.tar.gz
         ./bootstrap --prefix=/usr/local
         make -j$(nproc)
         make install
