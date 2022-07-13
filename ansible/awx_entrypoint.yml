@@ -34,6 +34,13 @@
         sudo yum install -y session-manager-plugin.rpm
         session-manager-plugin
 
+        sudo yum install centos-release-scl -y
+        sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
+        sudo yum install devtoolset-8 -y
+        scl enable devtoolset-8 bash
+        gcc --version
+        clang --version
+
   - name: fix epel repo
     copy:
       dest: "/etc/yum.repos.d/epel.repo"
@@ -108,30 +115,30 @@
     no_log: false
     register: git_clone
 
-  - name: install clang version
-    shell:
-      cmd: |
-        mkdir -p /opt/cmake
-        gcc --version
-        cd /opt/cmake
-        wget https://cmake.org/files/v3.23/cmake-3.23.2.tar.gz
-        tar zxf cmake-3.23.2.tar.gz
-        cd cmake-3.23.2
-        ./bootstrap --prefix=/usr/local
-        make -j$(nproc)
-        make install
-        cmake --version
-
-        cd /opt/llvm_source
-        rm -f -r llvm-project
-        git clone -b llvmorg-7.1.0 https://github.com/llvm/llvm-project.git .
-        cd llvm-project
-        mkdir build
-        ls /opt/llvm_source/llvm-project
-        cd build
-        cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
-        make
-        clang --version
+  # - name: install clang version
+  #   shell:
+  #     cmd: |
+  #       mkdir -p /opt/cmake
+  #       gcc --version
+  #       cd /opt/cmake
+  #       wget https://cmake.org/files/v3.23/cmake-3.23.2.tar.gz
+  #       tar zxf cmake-3.23.2.tar.gz
+  #       cd cmake-3.23.2
+  #       ./bootstrap --prefix=/usr/local
+  #       make -j$(nproc)
+  #       make install
+  #       cmake --version
+  #
+  #       cd /opt/llvm_source
+  #       rm -f -r llvm-project
+  #       git clone -b llvmorg-7.1.0 https://github.com/llvm/llvm-project.git .
+  #       cd llvm-project
+  #       mkdir build
+  #       ls /opt/llvm_source/llvm-project
+  #       cd build
+  #       cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
+  #       make
+  #       clang --version
 
   - name: set vars for reference across tasks
     shell:
