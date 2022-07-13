@@ -115,7 +115,7 @@
         cd /opt/cmake
         wget https://cmake.org/files/v3.23/cmake-3.23.2.tar.gz
         tar zxf cmake-3.23.2.tar.gz
-        ls /opt/cmake
+        cd cmake-3.23.2
         ./bootstrap --prefix=/usr/local
         make -j$(nproc)
         make install
