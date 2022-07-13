@@ -139,7 +139,8 @@
           && rm op.zip
         op --version
         curl https://sh.rustup.rs -sSf | sh -s -- -y
-        whereis rustc
+        which rustup
+        source "$HOME/.cargo/env"
         cd /opt/avail_source
         cargo build --release -p data-avail
         ls /opt/avail_source/target/release
