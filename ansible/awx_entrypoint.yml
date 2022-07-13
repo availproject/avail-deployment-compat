@@ -14,6 +14,7 @@
   - name: install terraform and ssm agent on controller machine
     shell:
       cmd: |
+        cat /etc/yum.repos.d/epel.repo
         export PATH="/tmp/pyenv/shims:$PATH"
         eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
         . /tmp/pyenv/.pyenvrc && pyenv versions
