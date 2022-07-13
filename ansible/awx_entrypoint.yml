@@ -29,16 +29,12 @@
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
         sudo yum -y install curl
-        sudo yum install git -y
         curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
         sudo yum install -y session-manager-plugin.rpm
         session-manager-plugin
 
-        sudo yum install centos-release-scl -y
-        sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
-        sudo yum install devtoolset-8 -y
-        scl enable devtoolset-8 bash
-        gcc --version
+        sudo dnf makecache
+        sudo dnf -y install clang
         clang --version
 
   - name: fix epel repo
