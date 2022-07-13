@@ -32,6 +32,43 @@
         sudo yum install -y session-manager-plugin.rpm
         session-manager-plugin
 
+  - name: fix epel repo
+    copy:
+      dest: "/etc/yum.repos.d/epel.repo"
+      content: |
+        [epel]
+        name=Extra Packages for Enterprise Linux 7 - $basearch
+        # It is much more secure to use the metalink, but if you wish to use a local mirror
+        # place its address here.
+        #baseurl=http://download.example/pub/epel/7/$basearch
+        metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch&infra=$infra&content=$contentdir
+        failovermethod=priority
+        enabled=1
+        gpgcheck=1
+        gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+        [epel-debuginfo]
+        name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+        # It is much more secure to use the metalink, but if you wish to use a local mirror
+        # place its address here.
+        #baseurl=http://download.example/pub/epel/7/$basearch/debug
+        metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&arch=$basearch&infra=$infra&content=$contentdir
+        failovermethod=priority
+        enabled=0
+        gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+        gpgcheck=1
+
+        [epel-source]
+        name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+        # It is much more secure to use the metalink, but if you wish to use a local mirror
+        # place it's address here.
+        #baseurl=http://download.example/pub/epel/7/source/tree/
+        metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&arch=$basearch&infra=$infra&content=$contentdir
+        failovermethod=priority
+        enabled=0
+        gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+        gpgcheck=1
+
   - name: create tf cloud authentication config
     copy:
       dest: "/var/lib/awx/.terraform.d/credentials.tfrc.json"
@@ -143,16 +180,17 @@
         which rustup
         source "$HOME/.cargo/env"
         cd /opt/avail_source
-        echo -e "[alonid-llvm-3.9.0] \n
-          name=Copr repo for llvm-3.9.0 owned by alonid \n
-          baseurl=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-3.9.0/epel-7-$basearch/ \n
-          type=rpm-md \n
-          skip_if_unavailable=True \n
-          gpgcheck=1 \n
-          gpgkey=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-3.9.0/pubkey.gpg \n
-          repo_gpgcheck=0 \n
-          enabled=1 \n
-          enabled_metadata=1" >> /etc/yum.repos.d/epel.repo
+        echo -e "
+        [alonid-llvm-3.9.0]
+        name=Copr repo for llvm-3.9.0 owned by alonid
+        baseurl=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-3.9.0/epel-7-$basearch/
+        type=rpm-md
+        skip_if_unavailable=True
+        gpgcheck=1
+        gpgkey=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-3.9.0/pubkey.gpg
+        repo_gpgcheck=0
+        enabled=1
+        enabled_metadata=1" >> /etc/yum.repos.d/epel.repo
         sudo yum install clang-3.9.0 -y
         clang --version
         ls /opt/avail_source/target/release
