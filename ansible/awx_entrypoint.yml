@@ -111,7 +111,16 @@
   - name: install clang version
     shell:
       cmd: |
+        wget https://cmake.org/files/v3.23/cmake-3.23.2.tar.gz
+        tar zxvf cmake-3.*
+        cd cmake-3.*
+        ./bootstrap --prefix=/usr/local
+        make -j$(nproc)
+        make install
+        cmake --version
+
         cd /opt/llvm_source
+        rm -f -r llvm-project
         git clone -b llvmorg-7.1.0 https://github.com/llvm/llvm-project.git .
         cd llvm-project
         mkdir build
