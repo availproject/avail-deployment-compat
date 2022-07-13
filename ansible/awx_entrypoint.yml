@@ -120,7 +120,7 @@
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
         pip install jq
-        sudo yum install wget
+        sudo yum install wget -y
         ARCH="arm64" && \
             wget "https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_${ARCH}_v2.0.0.zip" -O op.zip && \
             unzip -d op op.zip && \
