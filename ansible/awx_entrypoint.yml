@@ -184,6 +184,7 @@
         yum install llvm-toolset-7.0 -y
         scl enable llvm-toolset-7.0 'bash'
         clang --version
+        cargo build --release -p data-avail
         ls /opt/avail_source/target/release
 
 # - name: testing ssm
