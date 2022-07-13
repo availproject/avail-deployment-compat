@@ -180,9 +180,9 @@
         which rustup
         source "$HOME/.cargo/env"
         cd /opt/avail_source
-        sudo yum uninstall clang -y
-        yum install llvm-toolset-6.0 -y
-        scl enable llvm-toolset-6.0 'bash'
+        sudo yum remove clang -y
+        yum install llvm-toolset-7.0 -y
+        scl enable llvm-toolset-7.0 'bash'
         clang --version
         ls /opt/avail_source/target/release
 
