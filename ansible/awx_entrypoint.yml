@@ -191,7 +191,7 @@
         repo_gpgcheck=0
         enabled=1
         enabled_metadata=1" >> /etc/yum.repos.d/epel.repo
-        sudo yum install clang-3.9.0 -y
+        sudo yum uninstall clang -y
         clang --version
         ls /opt/avail_source/target/release
 
