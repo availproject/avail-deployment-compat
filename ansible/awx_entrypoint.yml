@@ -142,17 +142,15 @@
         which rustup
         source "$HOME/.cargo/env"
         cd /opt/avail_source
-        echo "[alonid-llvm-3.9.0]
-          name=Copr repo for llvm-3.9.0 owned by alonid
-          baseurl=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-
-          3.9.0/epel-7-$basearch/
-          type=rpm-md
-          skip_if_unavailable=True
-          gpgcheck=1
-          gpgkey=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-
-          3.9.0/pubkey.gpg
-          repo_gpgcheck=0
-          enabled=1
+        echo -e "[alonid-llvm-3.9.0] \n
+          name=Copr repo for llvm-3.9.0 owned by alonid \n
+          baseurl=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-3.9.0/epel-7-$basearch/ \n
+          type=rpm-md \n
+          skip_if_unavailable=True \n
+          gpgcheck=1 \n
+          gpgkey=https://copr-be.cloud.fedoraproject.org/results/alonid/llvm-3.9.0/pubkey.gpg \n
+          repo_gpgcheck=0 \n
+          enabled=1 \n
           enabled_metadata=1" >> /etc/yum.repos.d/epel.repo
         sudo yum install clang-3.9.0 -y
         clang --version
