@@ -150,9 +150,11 @@
         source "$HOME/.cargo/env"
         cd /opt/avail_source
         clang --version
+        sudo yum install centos-release-scl -y
+        sudo yum install llvm-toolset-7 -y
         scl enable llvm-toolset-7 bash
+        export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         clang --version
-        export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/bin"
         cargo build --release -p data-avail
         ls /opt/avail_source/target/release
         cd /opt/avail_source/target/release
