@@ -37,9 +37,7 @@
         export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         clang --version
 
-        sudo yum install mlocate -y
-        sudo updatedb
-        locate terraform
+        mkdir -p $HOME/.terraform.d
 
   - name: create tf cloud authentication config
     copy:
