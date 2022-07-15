@@ -120,6 +120,7 @@
         op --version
         cd /opt/avail_binaries
         aws s3 cp s3://avail-binaries/data-avail .
+        chmod +x data-avail
         ./data-avail key generate --output-type json --scheme Sr25519 -w 21
 
 # - name: testing ssm
