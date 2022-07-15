@@ -23,6 +23,10 @@
         sudo pip3 install awscli --force-reinstall --upgrade
         mkdir -p /opt/avail_repo
         mkdir -p /opt/avail_source
+        mkdir -p /opt/avail_binary
+        cp /opt/avail_source/target/release/data-avail /opt/avail_binary
+        cd /opt/avail_binary
+        ./data-avail key generate --output-type json --scheme Sr25519 -w 21
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
@@ -149,7 +153,6 @@
         curl https://sh.rustup.rs -sSf | sh -s -- -y
         source "$HOME/.cargo/env"
         cd /opt/avail_source
-        clang --version
         sudo yum install centos-release-scl -y
         sudo yum install llvm-toolset-7 -y
         sudo yum install gcc-c++ -y
@@ -158,9 +161,10 @@
         clang --version
         export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/lib64/"
         yum whatprovides *libclang.so
-        cargo build --release -p data-avail
-        cd /opt/avail_source/target/release
-        ./data-avail key generate --output-type json --scheme Sr25519 -w 21
+        cd /opt/avail_binary
+        aws s3 cp s3://avail-binaries/data-avail-amd64 .
+        sudo chmod +x data-avail-amd64
+        ./data-avail-amd64 key generate --output-type json --scheme Sr25519 -w 21
 
 # - name: testing ssm
 #   hosts: localhost
