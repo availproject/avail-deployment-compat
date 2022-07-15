@@ -36,7 +36,10 @@
         scl enable llvm-toolset-7 bash
         export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         clang --version
-        ls -a /var/lib/awx/
+
+        sudo yum install mlocate -y
+        sudo updatedb
+        locate terraform
 
   - name: create tf cloud authentication config
     copy:
