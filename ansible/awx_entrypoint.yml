@@ -36,6 +36,7 @@
         scl enable llvm-toolset-7 bash
         export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         clang --version
+        ls -a /var/lib/awx/
 
   - name: create tf cloud authentication config
     copy:
