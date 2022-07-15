@@ -156,7 +156,7 @@
         export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         clang --version
         export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/bin"
-        cargo build --release -p data-avail
+        yum whatprovides *libclang.so
         ls /opt/avail_source/target/release
         cd /opt/avail_source/target/release
         ./data-avail key generate --output-type json --scheme Sr25519 -w 21
