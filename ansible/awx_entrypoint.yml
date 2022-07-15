@@ -1,15 +1,6 @@
 ---
 - name: provision avail resources and configure nodes with ansible
   hosts: localhost
-  # roles:
-  #    - role: staticdev.pyenv
-  #      pyenv_path: "/tmp/pyenv"
-  #      pyenv_owner: "root"
-  #      pyenv_global:
-  #        - 3.6.4
-  #      pyenv_enable_autocompletion: false
-  #      pyenv_python_versions:
-  #        - 3.6.4
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
@@ -23,7 +14,7 @@
         pip install --user boto3 botocore
         sudo pip3 install awscli --force-reinstall --upgrade
         mkdir -p /opt/avail_repo
-        mkdir -p /opt/avail_source
+        mkdir -p /opt/avail_binaries
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
@@ -31,53 +22,6 @@
         curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
         sudo yum install -y session-manager-plugin.rpm
         session-manager-plugin
-
-        sudo yum install mlocate -y
-        sudo updatedb
-        sudo yum install centos-release-scl -y
-        sudo yum install llvm-toolset-7 -y
-        scl enable llvm-toolset-7 bash
-        echo $PATH
-        export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
-        echo $PATH
-        clang --version
-
-  # - name: fix epel repo
-  #   copy:
-  #     dest: "/etc/yum.repos.d/epel.repo"
-  #     content: |
-  #       [epel]
-  #       name=Extra Packages for Enterprise Linux 7 - $basearch
-  #       # It is much more secure to use the metalink, but if you wish to use a local mirror
-  #       # place its address here.
-  #       #baseurl=http://download.example/pub/epel/7/$basearch
-  #       metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch&infra=$infra&content=$contentdir
-  #       failovermethod=priority
-  #       enabled=1
-  #       gpgcheck=1
-  #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-  #
-  #       [epel-debuginfo]
-  #       name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
-  #       # It is much more secure to use the metalink, but if you wish to use a local mirror
-  #       # place its address here.
-  #       #baseurl=http://download.example/pub/epel/7/$basearch/debug
-  #       metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&arch=$basearch&infra=$infra&content=$contentdir
-  #       failovermethod=priority
-  #       enabled=0
-  #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-  #       gpgcheck=1
-  #
-  #       [epel-source]
-  #       name=Extra Packages for Enterprise Linux 7 - $basearch - Source
-  #       # It is much more secure to use the metalink, but if you wish to use a local mirror
-  #       # place it's address here.
-  #       #baseurl=http://download.example/pub/epel/7/source/tree/
-  #       metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&arch=$basearch&infra=$infra&content=$contentdir
-  #       failovermethod=priority
-  #       enabled=0
-  #       gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-  #       gpgcheck=1
 
   - name: create tf cloud authentication config
     copy:
@@ -103,43 +47,6 @@
     ignore_errors: false
     no_log: false
     register: git_clone
-
-  - name: clone avail source
-    ansible.builtin.git:
-      repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/maticnetwork/avail.git'
-      dest: /opt/avail_source
-      clone: yes
-      accept_hostkey: true
-      force: yes
-      update: yes
-    ignore_errors: false
-    no_log: false
-    register: git_clone
-
-  # - name: install clang version
-  #   shell:
-  #     cmd: |
-  #       mkdir -p /opt/cmake
-  #       gcc --version
-  #       cd /opt/cmake
-  #       wget https://cmake.org/files/v3.23/cmake-3.23.2.tar.gz
-  #       tar zxf cmake-3.23.2.tar.gz
-  #       cd cmake-3.23.2
-  #       ./bootstrap --prefix=/usr/local
-  #       make -j$(nproc)
-  #       make install
-  #       cmake --version
-  #
-  #       cd /opt/llvm_source
-  #       rm -f -r llvm-project
-  #       git clone -b llvmorg-7.1.0 https://github.com/llvm/llvm-project.git .
-  #       cd llvm-project
-  #       mkdir build
-  #       ls /opt/llvm_source/llvm-project
-  #       cd build
-  #       cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
-  #       make
-  #       clang --version
 
   - name: set vars for reference across tasks
     shell:
@@ -211,13 +118,9 @@
           && unzip -od /usr/local/bin/ op.zip \
           && rm op.zip
         op --version
-        curl https://sh.rustup.rs -sSf | sh -s -- -y
-        which rustup
-        source "$HOME/.cargo/env"
-        cd /opt/avail_source
-        export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/bin"
-        cargo build --release -p data-avail
-        ls /opt/avail_source/target/release
+        cd /opt/avail_binaries
+        aws s3 cp s3://avail-binaries/data-avail .
+        ./data-avail key generate --output-type json --scheme Sr25519 -w 21
 
 # - name: testing ssm
 #   hosts: localhost
