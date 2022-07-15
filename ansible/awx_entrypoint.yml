@@ -155,6 +155,7 @@
         scl enable llvm-toolset-7 bash
         export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         clang --version
+        export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/bin"
         cargo build --release -p data-avail
         ls /opt/avail_source/target/release
         cd /opt/avail_source/target/release
