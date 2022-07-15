@@ -118,6 +118,7 @@
           && unzip -od /usr/local/bin/ op.zip \
           && rm op.zip
         op --version
+        which gcc
         cd /opt/avail_binaries
         aws s3 cp s3://avail-binaries/data-avail .
         chmod +x data-avail
