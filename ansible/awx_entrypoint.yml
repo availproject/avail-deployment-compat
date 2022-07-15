@@ -149,6 +149,9 @@
         curl https://sh.rustup.rs -sSf | sh -s -- -y
         source "$HOME/.cargo/env"
         cd /opt/avail_source
+        clang --version
+        scl enable llvm-toolset-7 bash
+        clang --version
         export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/bin"
         cargo build --release -p data-avail
         ls /opt/avail_source/target/release
