@@ -1,11 +1,19 @@
 ---
 - name: provision avail resources and configure nodes with ansible
   hosts: localhost
+  roles:
+     - role: staticdev.pyenv
+       pyenv_path: "/tmp/pyenv"
+       pyenv_owner: "root"
+       pyenv_global:
+         - 3.6.4
+       pyenv_enable_autocompletion: false
+       pyenv_python_versions:
+         - 3.6.4
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
       cmd: |
-        cat /etc/yum.repos.d/epel.repo
         export PATH="/tmp/pyenv/shims:$PATH"
         eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
         . /tmp/pyenv/.pyenvrc && pyenv versions
@@ -14,7 +22,7 @@
         pip install --user boto3 botocore
         sudo pip3 install awscli --force-reinstall --upgrade
         mkdir -p /opt/avail_repo
-        mkdir -p /opt/avail_binaries
+        mkdir -p /opt/avail_source
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         sudo yum -y install terraform
@@ -22,6 +30,12 @@
         curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
         sudo yum install -y session-manager-plugin.rpm
         session-manager-plugin
+
+        sudo yum install centos-release-scl -y
+        sudo yum install llvm-toolset-7 -y
+        scl enable llvm-toolset-7 bash
+        export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
+        clang --version
 
   - name: create tf cloud authentication config
     copy:
@@ -42,6 +56,18 @@
       clone: yes
       accept_hostkey: true
       version: "{{ GIT_BRANCH_NAME }}"
+      force: yes
+      update: yes
+    ignore_errors: false
+    no_log: false
+    register: git_clone
+
+  - name: clone avail source
+    ansible.builtin.git:
+      repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/maticnetwork/avail.git'
+      dest: /opt/avail_source
+      clone: yes
+      accept_hostkey: true
       force: yes
       update: yes
     ignore_errors: false
@@ -118,13 +144,13 @@
           && unzip -od /usr/local/bin/ op.zip \
           && rm op.zip
         op --version
-        which gcc
-        ls /usr/bin/gcc
-        export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:/usr/local/lib64:/usr/lib64:$LD_LIBRARY_PATH
-        export LD_LIBRARY_PATH=/usr/bin/gcc/lib64/:$LD_LIBRARY_PATH
-        cd /opt/avail_binaries
-        aws s3 cp s3://avail-binaries/data-avail .
-        chmod +x data-avail
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        source "$HOME/.cargo/env"
+        cd /opt/avail_source
+        export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/bin"
+        cargo build --release -p data-avail
+        ls /opt/avail_source/target/release
+        cd /opt/avail_source/target/release
         ./data-avail key generate --output-type json --scheme Sr25519 -w 21
 
 # - name: testing ssm
