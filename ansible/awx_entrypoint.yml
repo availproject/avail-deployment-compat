@@ -152,6 +152,7 @@
         clang --version
         sudo yum install centos-release-scl -y
         sudo yum install llvm-toolset-7 -y
+        sudo yum install gcc-c++ -y
         scl enable llvm-toolset-7 bash
         export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
         clang --version
