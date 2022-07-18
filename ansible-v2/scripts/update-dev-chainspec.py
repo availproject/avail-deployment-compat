@@ -73,6 +73,3 @@ rt["sudo"]["key"] = nodes["sudo-01"]["wallet"]["sr25519"]["ss58PublicKey"]
 
 with open(work_dir + "/populated.devnet.chainspec.json", 'w') as f:
     json.dump(chainspec, f, indent = 4)
-
-
-
