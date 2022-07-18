@@ -72,13 +72,13 @@ cat $tmp_dir/names.txt | while IFS= read -r node_name; do
     /opt/avail_binary/data-avail-amd64 key inspect --scheme Ed25519 --output-type json /out/$node_name.wallet.secret > $tmp_dir/$node_name.wallet.ed25519.json
 done
 
-consolidate-keys.py $tmp_dir
+python3 consolidate-keys.py $tmp_dir
 
 op vault create "Avail Devnet: $deployment_name"
 find $tmp_dir -type f -name '*.op.tpl.json' | xargs -I xxx op item create --vault "Avail Devnet: $deployment_name" --template=xxx
 
-cp templates/genesis/devnet.template.json $tmp_dir
-update-dev-chainspec.py $tmp_dir
+cp ../templates/genesis/devnet.template.json $tmp_dir
+python3 update-dev-chainspec.py $tmp_dir
 
 /opt/avail_binary/data-avail-amd64 build-spec --chain=/out/populated.devnet.chainspec.json --raw --disable-default-bootnode > $tmp_dir/populated.devnet.chainspec.raw.json
 
