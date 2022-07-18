@@ -12,6 +12,7 @@
          - 3.6.4
   collections:
   - amazon.aws
+  - community.docker
   tasks:
   - name: install terraform and ssm agent on controller machine
     shell:
@@ -186,8 +187,6 @@
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
         pip3 install --upgrade psutil
-        ansible-galaxy --version
-        ansible-galaxy collection install community.docker
         cd /opt/avail_repo/ansible-v2
         ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
 

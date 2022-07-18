@@ -1,6 +1,6 @@
 ---
 - name: restart node
-  community.docker.docker_container:
+  docker_container:
     name: da-client
     state: started
     restart: yes

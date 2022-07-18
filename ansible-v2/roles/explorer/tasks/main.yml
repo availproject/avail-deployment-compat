@@ -1,5 +1,5 @@
 - name: create explorer dapp
-  community.docker.docker_container:
+  docker_container:
     name: dapp
     image: 0xpolygon/avail-apps:{{ explorer_docker_tag }}
     ports:

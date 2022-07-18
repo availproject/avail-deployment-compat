@@ -69,7 +69,7 @@
   notify: restart node
 
 - name: Start avail docker image
-  community.docker.docker_container:
+  docker_container:
     name: da-client
     image: 0xpolygon/avail:{{ node_docker_tag }}
     entrypoint: "/var/avail/da.sh"

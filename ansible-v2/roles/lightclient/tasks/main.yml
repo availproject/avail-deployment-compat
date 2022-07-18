@@ -1,5 +1,5 @@
 - name: Start light client
-  community.docker.docker_container:
+  docker_container:
     name: light-client
     image: 0xpolygon/avail-light:{{ lightclient_docker_tag }}
     entrypoint: "/avail-light/start.sh"
