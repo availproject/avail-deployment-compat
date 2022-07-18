@@ -69,8 +69,7 @@ cat $tmp_dir/names.txt | while IFS= read -r node_name; do
     /opt/avail_binary/data-avail-amd64 key generate --output-type json --scheme Sr25519 -w 21 > $tmp_dir/$node_name.wallet.sr25519.json
     cat $tmp_dir/$node_name.wallet.sr25519.json | jq -r '.secretPhrase' > $tmp_dir/$node_name.wallet.secret
     /opt/avail_binary/data-avail-amd64 key generate-node-key 2> $tmp_dir/$node_name.public.key 1> $tmp_dir/$node_name.private.key
-    /opt/avail_binary/data-avail-amd64 key inspect --scheme Ed25519 --output-type json /out/$node_name.wallet.secret > $tmp_dir/$node_name.wallet.ed25519.json
-    printf "$tmp_dir"/"$node_name".wallet.ed25519.json
+    /opt/avail_binary/data-avail-amd64 key inspect --scheme Ed25519 --output-type json $tmp_dir/$node_name.wallet.secret > $tmp_dir/$node_name.wallet.ed25519.json
 done
 
 python3 consolidate-keys.py $tmp_dir
@@ -81,7 +80,7 @@ find $tmp_dir -type f -name '*.op.tpl.json' | xargs -I xxx op item create --vaul
 cp ../templates/genesis/devnet.template.json $tmp_dir
 python3 update-dev-chainspec.py $tmp_dir
 
-/opt/avail_binary/data-avail-amd64 build-spec --chain=/out/populated.devnet.chainspec.json --raw --disable-default-bootnode > $tmp_dir/populated.devnet.chainspec.raw.json
+/opt/avail_binary/data-avail-amd64 build-spec --chain=$tmp_dir/populated.devnet.chainspec.json --raw --disable-default-bootnode > $tmp_dir/populated.devnet.chainspec.raw.json
 
 cp $tmp_dir/master.json build/$deployment_name/
 cp $tmp_dir/populated.devnet.chainspec.* build/$deployment_name/
