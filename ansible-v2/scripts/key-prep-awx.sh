@@ -70,6 +70,7 @@ cat $tmp_dir/names.txt | while IFS= read -r node_name; do
     cat $tmp_dir/$node_name.wallet.sr25519.json | jq -r '.secretPhrase' > $tmp_dir/$node_name.wallet.secret
     /opt/avail_binary/data-avail-amd64 key generate-node-key 2> $tmp_dir/$node_name.public.key 1> $tmp_dir/$node_name.private.key
     /opt/avail_binary/data-avail-amd64 key inspect --scheme Ed25519 --output-type json /out/$node_name.wallet.secret > $tmp_dir/$node_name.wallet.ed25519.json
+    printf "$tmp_dir"/"$node_name".wallet.ed25519.json
 done
 
 python3 consolidate-keys.py $tmp_dir

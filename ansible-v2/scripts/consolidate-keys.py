@@ -28,6 +28,7 @@ for node in node_data:
 
     wallet = {}
     p2p = {}
+    print(work_dir + "/" + node_info["tag_name"] + ".wallet.ed25519.json")
     with open(work_dir + "/" + node_info["tag_name"] + ".wallet.ed25519.json", 'r') as ed25519_wallet:
         wallet["ed25519"] = json.load(ed25519_wallet)
     with open(work_dir + "/" + node_info["tag_name"] + ".wallet.sr25519.json", 'r') as sr25519_wallet:
@@ -84,5 +85,3 @@ for node in node_data:
 
 with open(work_dir + "/master.json", 'w') as f:
     json.dump(master_list, f)
-
-
