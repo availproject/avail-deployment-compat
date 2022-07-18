@@ -106,6 +106,7 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
+        echo $(terraform output -json pk_ansible)
         echo $(terraform output -json pk_ansible) > /tmp/ansiblePair.pem
         chmod 400 /tmp/ansiblePair.pem
         echo $(terraform output full_node_ips)
