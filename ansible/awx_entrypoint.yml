@@ -170,6 +170,9 @@
         eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
         op read op://DevOps/awx-test-ui/password
 
+        cd /opt/avail_repo/ansible-v2/scripts
+        bash key-prep-awx.sh -d {{ clean_branch_name }}
+
 # - name: testing ssm
 #   hosts: localhost
 #   tasks:
