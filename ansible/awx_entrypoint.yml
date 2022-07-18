@@ -166,9 +166,8 @@
         sudo chmod +x data-avail-amd64
         ./data-avail-amd64 key generate --output-type json --scheme Sr25519 -w 21
 
-        (set -x; $(echo '{{ lookup("env", "OP_PASS") }}' | op add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }} --secret-key {{ lookup("env", "OP_SECRET") }} --shorthand awx))
-        (set -x; $(echo '{{ lookup("env", "OP_PASS") }}' | op --account awx))
-        op read op://DevOps/awx-test-ui/password
+        (set -x; $(echo '{{ lookup("env", "OP_PASS") }}' | add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }} --secret-key {{ lookup("env", "OP_SECRET") }} --shorthand awx))
+        (set -x; $(echo '{{ lookup("env", "OP_PASS") }}' | --account awx))
 
 # - name: testing ssm
 #   hosts: localhost
