@@ -139,7 +139,7 @@
       groupname: light_clients
     loop: "{{ nodes.stdout_lines[-1] }}"
 
-  - name: install key generation script dependencies
+  - name: wallet, node key, and chainspec generation
     shell:
       cmd: |
         eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
@@ -177,6 +177,18 @@
         ansible-inventory --graph -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
         rm -r -f build/{{ clean_branch_name }}
         bash key-prep-awx.sh -d {{ clean_branch_name }}
+
+  - name: configure all nodes
+    shell:
+      cmd: |
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
+        pip3 install --upgrade psutil
+        cd /opt/avail_repo/ansible-v2
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
+
 
 # - name: testing ssm
 #   hosts: localhost
