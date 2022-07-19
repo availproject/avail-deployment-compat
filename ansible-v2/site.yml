@@ -1,48 +1,31 @@
 - hosts: all
-  become: true
   gather_facts: True
-  vars:
-    - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
-    - ansible_become: true
   tags:
     - init
   roles:
     - common
-    - datadog
-
-- hosts: validator:full_node
-  gather_facts: True
-  vars:
-    - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
-    - ansible_become: true
-  become: true
-  tags:
-    - availnode
-  roles:
-    - availnode
-
-- hosts: explorer
-  gather_facts: True
-  vars:
-    - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
-    - ansible_become: true
-  become: true
-  tags:
-    - explorer
-  roles:
-    - explorer
-
-- hosts: light_client
-  gather_facts: True
-  vars:
-    - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
-    - ansible_become: true
-  become: true
-  tags:
-    - light_client
-  roles:
-    - lightclient
+    # - datadog
+#
+# - hosts: validator:full_node
+#   gather_facts: True
+#   become: true
+#   tags:
+#     - availnode
+#   roles:
+#     - availnode
+#
+# - hosts: explorer
+#   gather_facts: True
+#   become: true
+#   tags:
+#     - explorer
+#   roles:
+#     - explorer
+#
+# - hosts: light_client
+#   gather_facts: True
+#   become: true
+#   tags:
+#     - light_client
+#   roles:
+#     - lightclient
