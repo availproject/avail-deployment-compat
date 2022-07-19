@@ -121,9 +121,9 @@
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
         mkdir -p ~/.ssh
-        echo {{ nodes.stdout_lines[-5] }} > ~/.ssh/awxSshKey.pem
+        echo {{ nodes.stdout_lines[-5] }} > /tmp/awxSshKey.pem
+        echo "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
-        cat ~/.ssh/awxSshKey.pem
         aws s3 cp ~/.ssh/awxSshKey.pem s3://avail-binaries/
 
   - name: configure all nodes
