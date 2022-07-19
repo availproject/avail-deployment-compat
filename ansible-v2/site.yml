@@ -1,6 +1,5 @@
 - hosts: all
   gather_facts: True
-  become: yes
   tags:
     - init
   roles:

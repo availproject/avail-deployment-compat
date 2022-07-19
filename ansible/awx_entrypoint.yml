@@ -124,7 +124,6 @@
         echo {{ nodes.stdout_lines[-5] }} > /tmp/awxSshKey.pem
         echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
-        aws s3 cp ~/.ssh/awxSshKey.pem s3://avail-binaries/
 
   - name: configure all nodes
     shell:
@@ -135,7 +134,7 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         cd /opt/avail_repo/ansible-v2
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvvvvv
 
   - name: register full node host group
     add_host:
