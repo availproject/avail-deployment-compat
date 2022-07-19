@@ -116,6 +116,10 @@
   - name: set ssh key path
     shell:
       cmd: |
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
         mkdir -p ~/.ssh
         echo {{ nodes.stdout_lines[-5] }} > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
