@@ -3,7 +3,7 @@
   gather_facts: True
   vars:
     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
+    - ansible_user: ssm-user
     - ansible_become: true
   tags:
     - init
@@ -15,7 +15,7 @@
   gather_facts: True
   vars:
     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
+    - ansible_user: ssm-user
     - ansible_become: true
   become: true
   tags:
@@ -27,7 +27,7 @@
   gather_facts: True
   vars:
     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
+    - ansible_user: ssm-user
     - ansible_become: true
   become: true
   tags:
@@ -39,7 +39,7 @@
   gather_facts: True
   vars:
     - ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
-    - ansible_user: ubuntu
+    - ansible_user: ssm-user
     - ansible_become: true
   become: true
   tags:

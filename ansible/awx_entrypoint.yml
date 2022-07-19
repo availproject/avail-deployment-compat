@@ -189,9 +189,7 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         cd /opt/avail_repo/ansible-v2
-        sleep 5; ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvvv
-    async: 0
-    poll: 0
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvvv
 
 # - name: testing ssm
 #   hosts: localhost
