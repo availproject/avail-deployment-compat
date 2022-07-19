@@ -114,4 +114,4 @@
     mode: '0755'
     owner: ubuntu
   vars:
-    myTemplateVariable: {{ clean_deploy_name }}
+    cleanDeployName: "{{ clean_deploy_name }}"
