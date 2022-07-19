@@ -145,7 +145,7 @@
         chmod 400 ~/.ssh/awxSshKey.pem
         cd /opt/avail_repo/ansible-v2
         source /opt/my-envs/custom-venv-2/bin/activate
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -v
         deactivate
 
   - name: wallet, node key, and chainspec generation
