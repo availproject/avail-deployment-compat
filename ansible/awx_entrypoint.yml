@@ -38,7 +38,7 @@
         sudo /opt/my-envs/custom-venv-2/bin/pip list
         deactivate
 
-  - name: install terraform and ssm agent on controller machine
+  - name: setup controller machine dependencies
     shell:
       cmd: |
         export PATH="/tmp/pyenv/shims:$PATH"
@@ -70,7 +70,7 @@
 
         mkdir -p $HOME/.terraform.d
 
-  - name: create tf cloud authentication config
+  - name: create terraform cloud auth config
     copy:
       dest: "/var/lib/awx/.terraform.d/credentials.tfrc.json"
       content: |
@@ -133,21 +133,6 @@
         echo $(terraform output -json pk_ansible)
     register: nodes
 
-  - name: configure all nodes
-    shell:
-      cmd: |
-        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
-        . /tmp/pyenv/.pyenvrc && pyenv versions
-        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
-        unset PYTHONPATH
-        echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
-        echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
-        chmod 400 ~/.ssh/awxSshKey.pem
-        cd /opt/avail_repo/ansible-v2
-        source /opt/my-envs/custom-venv-2/bin/activate
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -v
-        deactivate
-
   - name: wallet, node key, and chainspec generation
     shell:
       cmd: |
@@ -194,9 +179,15 @@
         . /tmp/pyenv/.pyenvrc && pyenv versions
         . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
         unset PYTHONPATH
-        pip3 install --upgrade psutil
+        echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
+        echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
+        chmod 400 ~/.ssh/awxSshKey.pem
         cd /opt/avail_repo/ansible-v2
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
+        source /opt/my-envs/custom-venv-2/bin/activate
+        export OP_DEVICE={{ OP_DEVICE_ID }}
+        eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -v
+        deactivate
 
 # - name: testing ssm
 #   hosts: localhost
