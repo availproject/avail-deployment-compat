@@ -46,17 +46,6 @@
 
         mkdir -p $HOME/.terraform.d
 
-  - name: configure all nodes test
-    shell:
-      cmd: |
-        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
-        . /tmp/pyenv/.pyenvrc && pyenv versions
-        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
-        unset PYTHONPATH
-        pip3 install --upgrade psutil
-        cd /opt/avail_repo/ansible-v2
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
-
   - name: create tf cloud authentication config
     copy:
       dest: "/var/lib/awx/.terraform.d/credentials.tfrc.json"
@@ -118,13 +107,29 @@
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
         echo $(terraform output -json pk_ansible)
-        echo $(terraform output -json pk_ansible) > /tmp/ansiblePair.pem
-        chmod 400 /tmp/ansiblePair.pem
         echo $(terraform output full_node_ips)
         echo $(terraform output validator_ips)
         echo $(terraform output explorer_ips)
         echo $(terraform output light_client_ips)
     register: nodes
+
+  - name: set ssh key path
+    shell:
+      cmd: |
+        echo {{ nodes.stdout_lines[-5] }} > ~/.ssh/awxSshKey.pem
+        chmod 400 ~/.ssh/awxSshKey.pem
+        cat ~/.ssh/awxSshKey.pem
+
+  - name: configure all nodes
+    shell:
+      cmd: |
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
+        pip3 install --upgrade psutil
+        cd /opt/avail_repo/ansible-v2
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
 
   - name: register full node host group
     add_host:
@@ -216,7 +221,7 @@
 #         pip3 install --upgrade psutil
 #         ansible-playbook ssm_test.yml -i aws_ec2.yml
 
-# TODO: key generation phase, can we combine with provisioning step?
+# TODO: key generation phase, can we combine with provisioning step? .. could copy all templates at end of tf stage...
 # TODO: configure all nodes via ansible and start containers
   #
   # - name: teardown all terraform resources once done
