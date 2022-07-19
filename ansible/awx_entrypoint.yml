@@ -20,11 +20,12 @@
         sudo yum install python-virtualenv -y
         sudo mkdir -p /opt/my-envs
         sudo chmod 0755 /opt/my-envs
-        sudo chown awx:awx /opt/my-envs
         sudo python3 -m venv /opt/my-envs/custom-venv
-        yum install gcc
+        sudo yum install gcc -y
+        sudo yum install python-devel -y
+        sudo yum install python3-devel -y
         sudo /opt/my-envs/custom-venv/bin/pip install psutil
-        sudo /opt/my-envs/custom-venv/bin/pip install -U "ansible == 2.12.6"
+        sudo /opt/my-envs/custom-venv/bin/pip install -U ansible
         source /opt/my-envs/custom-venv/bin/activate
         python -V
         pip list
