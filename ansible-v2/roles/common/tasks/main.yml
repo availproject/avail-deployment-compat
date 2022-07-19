@@ -4,8 +4,8 @@
     src: "./templates/avail-deployment"
     dest: "/etc/avail-deployment"
     mode: '0755'
-    owner: ubuntu
-    group: ubuntu
+    owner: root
+    group: root
 
 #
 # - name: Check whether /etc/avail-deployment contains "{{ deployment_name }}"
