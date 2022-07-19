@@ -31,6 +31,7 @@
         sudo yum install python3-devel -y
         source /opt/my-envs/custom-venv-2/bin/activate
         pip install --upgrade pip
+        pip install boto3 botocore
         sudo /opt/my-envs/custom-venv-2/bin/pip install psutil
         sudo /opt/my-envs/custom-venv-2/bin/pip install -U ansible
         python -V
