@@ -159,7 +159,9 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         cd /opt/avail_repo/ansible-v2
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv -e 'ansible_python_interpreter=/usr/bin/python3'
+        source /opt/my-envs/custom-venv-2/bin/activate
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv
+        deactivate
 
   - name: register full node host group
     add_host:
