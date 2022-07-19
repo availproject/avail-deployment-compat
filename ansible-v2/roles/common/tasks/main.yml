@@ -6,6 +6,7 @@
     mode: '0755'
     owner: ubuntu
     group: ubuntu
+    ignore_errors: yes
 #
 # - name: Check whether /etc/avail-deployment contains "{{ deployment_name }}"
 #   command: grep -Fxq "{{ deployment_name }}" /etc/avail-deployment
