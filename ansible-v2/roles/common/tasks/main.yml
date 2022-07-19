@@ -1,7 +1,7 @@
 - name: Create deployment_name file
   ansible.builtin.template:
     force: no
-    src: "./templates/avail-deployment"
+    src: "/opt/avail_repo/ansible-v2/roles/common/templates/avail-deployment"
     dest: "/etc/avail-deployment"
     mode: 755
 
@@ -78,7 +78,7 @@
   tags:
     - motd
   ansible.builtin.template:
-    src: "./templates/motd.sh"
+    src: "/opt/avail_repo/ansible-v2/roles/common/templates/motd.sh"
     dest: "/etc/update-motd.d/00-avl-logo"
     mode: 755
 
@@ -86,7 +86,7 @@
   tags:
     - motd
   ansible.builtin.template:
-    src: "./templates/info.sh"
+    src: "/opt/avail_repo/ansible-v2/roles/common/templates/info.sh"
     dest: "/etc/update-motd.d/10-sys-info"
     mode: 755
 
@@ -94,6 +94,6 @@
   tags:
     - motd
   ansible.builtin.template:
-    src: "./templates/network.sh"
+    src: "/opt/avail_repo/ansible-v2/roles/common/templates/network.sh"
     dest: "/etc/update-motd.d/20-network-info"
     mode: 755
