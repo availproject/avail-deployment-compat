@@ -124,8 +124,12 @@
         echo {{ nodes.stdout_lines[-5] }} > /tmp/awxSshKey.pem
         echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
+        which python3
+        which python
 
   - name: configure all nodes
+    vars:
+      - ansible_python_interpreter: /usr/bin/env python3
     shell:
       cmd: |
         eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
@@ -134,7 +138,7 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         cd /opt/avail_repo/ansible-v2
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvvvvv
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv
 
   - name: register full node host group
     add_host:

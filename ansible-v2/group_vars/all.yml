@@ -9,7 +9,7 @@ node_hostname: "{{ node_name }}.{{ avail_domain}}"
 global_rpc: "https://{{ avail_domain }}/rpc"
 global_ws: "wss://{{ avail_domain }}/ws"
 
-# depending on how we load blance this might need to be moved to the host level
+# depending on how we load balance this might need to be moved to the host level
 node_port: 30333
 node_ws_port: 9944
 node_rpc_port: 9933
