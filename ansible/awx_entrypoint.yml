@@ -18,6 +18,7 @@
     shell:
       cmd: |
         pip install --upgrade pip
+        sudo -H pip3 install --upgrade pip
         sudo yum install python-virtualenv -y
         sudo mkdir -p /opt/my-envs
         sudo chmod 0755 /opt/my-envs
