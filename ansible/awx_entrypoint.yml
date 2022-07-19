@@ -128,8 +128,6 @@
         which python
 
   - name: configure all nodes
-    vars:
-      - ansible_python_interpreter: /usr/bin/env python3
     shell:
       cmd: |
         eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
@@ -138,7 +136,7 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         cd /opt/avail_repo/ansible-v2
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv -e 'ansible_python_interpreter=/usr/bin/env python3'
 
   - name: register full node host group
     add_host:
