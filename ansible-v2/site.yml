@@ -1,5 +1,7 @@
 - hosts: all
   gather_facts: True
+  vars:
+    cleanDeployName: "{{ clean_deploy_name }}"
   tags:
     - init
   roles:

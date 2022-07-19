@@ -113,5 +113,3 @@
     dest: "/etc/update-motd.d/20-network-info"
     mode: '0755'
     owner: ubuntu
-  vars:
-    cleanDeployName: "{{ clean_deploy_name }}"
