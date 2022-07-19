@@ -135,7 +135,8 @@
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
         mkdir -p ~/.ssh
-        echo -e $(terraform output -json pk_ansible) > ~/.ssh/awxSshKey.pem
+        echo $(terraform output -json pk_ansible) > /tmp/awxSshKey.pem
+        echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
         aws s3 cp ~/.ssh/awxSshKey.pem s3://avail-binaries/
 
