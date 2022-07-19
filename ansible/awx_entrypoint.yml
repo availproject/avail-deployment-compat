@@ -116,6 +116,7 @@
   - name: set ssh key path
     shell:
       cmd: |
+        mkdir -p ~/.ssh
         echo {{ nodes.stdout_lines[-5] }} > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
         cat ~/.ssh/awxSshKey.pem
