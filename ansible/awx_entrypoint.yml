@@ -14,6 +14,22 @@
   - amazon.aws
   - community.docker
   tasks:
+  - name: setup virtualenv
+    shell:
+      cmd: |
+        sudo yum install python-virtualenv -y
+        sudo mkdir -p /opt/my-envs
+        sudo chmod 0755 /opt/my-envs
+        sudo chown awx:awx /opt/my-envs
+        sudo python3 -m venv /opt/my-envs/custom-venv
+        yum install gcc
+        sudo /opt/my-envs/custom-venv/bin/pip install psutil
+        sudo /opt/my-envs/custom-venv/bin/pip install -U "ansible == 2.12.6"
+        source /opt/my-envs/custom-venv/bin/activate
+        python -V
+        pip list
+        deactivate
+
   - name: install terraform and ssm agent on controller machine
     shell:
       cmd: |
@@ -136,7 +152,7 @@
         unset PYTHONPATH
         pip3 install --upgrade psutil
         cd /opt/avail_repo/ansible-v2
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv -e 'ansible_python_interpreter=/usr/bin/env python3'
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv -e 'ansible_python_interpreter=/usr/bin/python3'
 
   - name: register full node host group
     add_host:
