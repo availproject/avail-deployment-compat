@@ -136,6 +136,10 @@
   - name: configure all nodes
     shell:
       cmd: |
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
         echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
         echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
