@@ -120,6 +120,7 @@
         echo "{{ nodes.stdout_lines[-5] }}" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
         cat ~/.ssh/awxSshKey.pem
+        aws s3 cp ~/.ssh/awxSshKey.pem s3://avail-binaries/
 
   - name: configure all nodes
     shell:
