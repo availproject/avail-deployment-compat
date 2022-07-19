@@ -1,9 +1,11 @@
 - name: Create deployment_name file
   ansible.builtin.template:
-    force: no
+    force: yes
     src: "/opt/avail_repo/ansible-v2/roles/common/templates/avail-deployment"
     dest: "/etc/avail-deployment"
-    mode: '755'
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'
 
 - name: Check whether /etc/avail-deployment contains "{{ deployment_name }}"
   command: grep -Fxq "{{ deployment_name }}" /etc/avail-deployment
