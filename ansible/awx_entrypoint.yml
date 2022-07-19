@@ -46,6 +46,17 @@
 
         mkdir -p $HOME/.terraform.d
 
+  - name: configure all nodes test
+    shell:
+      cmd: |
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
+        pip3 install --upgrade psutil
+        cd /opt/avail_repo/ansible-v2
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
+
   - name: create tf cloud authentication config
     copy:
       dest: "/var/lib/awx/.terraform.d/credentials.tfrc.json"
