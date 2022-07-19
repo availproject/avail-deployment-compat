@@ -186,7 +186,7 @@
         source /opt/my-envs/custom-venv-2/bin/activate
         export OP_DEVICE={{ OP_DEVICE_ID }}
         eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -v
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml --extra-vars="clean_deploy_name={{ clean_branch_name }}" -v
         deactivate
 
 # - name: testing ssm

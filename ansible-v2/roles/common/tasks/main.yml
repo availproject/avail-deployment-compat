@@ -95,7 +95,6 @@
     dest: "/etc/update-motd.d/00-avl-logo"
     mode: '0755'
     owner: ubuntu
-    owner: ubuntu
 
 - name: create sysinfo
   tags:
@@ -104,7 +103,6 @@
     src: "./templates/info.sh"
     dest: "/etc/update-motd.d/10-sys-info"
     mode: '0755'
-    owner: ubuntu
     owner: ubuntu
 
 - name: create network info
@@ -115,4 +113,5 @@
     dest: "/etc/update-motd.d/20-network-info"
     mode: '0755'
     owner: ubuntu
-    owner: ubuntu
+  vars:
+    myTemplateVariable: {{ clean_deploy_name }}
