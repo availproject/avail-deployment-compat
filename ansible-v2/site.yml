@@ -3,7 +3,7 @@
   tags:
     - init
   roles:
-    - common
+    - templating
     # - datadog
 #
 # - hosts: validator:full_node
