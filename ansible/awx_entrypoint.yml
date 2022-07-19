@@ -122,7 +122,7 @@
         unset PYTHONPATH
         mkdir -p ~/.ssh
         echo {{ nodes.stdout_lines[-5] }} > /tmp/awxSshKey.pem
-        echo "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
+        echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
         aws s3 cp ~/.ssh/awxSshKey.pem s3://avail-binaries/
 
