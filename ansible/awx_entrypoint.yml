@@ -125,31 +125,15 @@
   #       terraform init
   #       terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
 
-  - name: init terraform and apply to provision avail resources
+  - name: init terraform and apply avail resources
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
-        echo $(terraform output -json pk_ansible)
-        echo $(terraform output full_node_ips)
-        echo $(terraform output validator_ips)
-        echo $(terraform output explorer_ips)
-        echo $(terraform output light_client_ips)
-    register: nodes
-
-  - name: set ssh key path
-    shell:
-      cmd: |
-        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
-        . /tmp/pyenv/.pyenvrc && pyenv versions
-        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
-        unset PYTHONPATH
         mkdir -p ~/.ssh
-        echo {{ nodes.stdout_lines[-5] }} > /tmp/awxSshKey.pem
-        echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
+        echo -e $(terraform output -json pk_ansible) > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
-        which python3
-        which python
+        aws s3 cp ~/.ssh/awxSshKey.pem s3://avail-binaries/
 
   - name: configure all nodes
     shell:
@@ -163,32 +147,6 @@
         source /opt/my-envs/custom-venv-2/bin/activate
         ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml -vvv
         deactivate
-
-  - name: register full node host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: full_nodes
-    vars:
-      - ansible_python_interpreter: /usr/bin/python3
-    loop: "{{ nodes.stdout_lines[-4] }}"
-
-  - name: register validators host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: validators
-    loop: "{{ nodes.stdout_lines[-3] }}"
-
-  - name: register explorers host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: explorers
-    loop: "{{ nodes.stdout_lines[-2] }}"
-
-  - name: register light clients host group
-    add_host:
-      hostname: "{{ item }}"
-      groupname: light_clients
-    loop: "{{ nodes.stdout_lines[-1] }}"
 
   - name: wallet, node key, and chainspec generation
     shell:
