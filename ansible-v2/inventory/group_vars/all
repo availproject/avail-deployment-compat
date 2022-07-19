@@ -1,4 +1,4 @@
 ---
-ansible_ssh_common_args: -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
+ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --region us-west-2 --parameters 'portNumber=%p'\""
 ansible_user: ubuntu
 ansible_become: true
