@@ -123,13 +123,14 @@
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
-        terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}'
+        terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
 
   - name: init terraform and apply avail resources
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
+        terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
         echo $(terraform output -json pk_ansible)
     register: nodes
 
