@@ -1,7 +1,7 @@
 ---
-deployment_name: devnet01
+deployment_name: "{{ clean_deploy_title }}"
 # once we have the deployment_name, it should possible to retrive this lb_dns value dynamically from the tf provisioning
-lb_dns: devnet01.dataavailability.link
+lb_dns: "{{ clean_deploy_title }}.devnet-polygon.com"
 node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
 avail_domain: "{{ lb_dns }}"
 node_hostname: "{{ node_name }}.{{ avail_domain}}"

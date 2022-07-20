@@ -19,6 +19,8 @@
 
 - hosts: explorer
   gather_facts: True
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
   become: true
   tags:
     - explorer

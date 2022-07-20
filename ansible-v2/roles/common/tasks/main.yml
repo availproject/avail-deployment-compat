@@ -8,8 +8,8 @@
     group: ubuntu
 
 
-- name: Check whether /etc/avail-deployment contains "{{ deployment_name }}"
-  command: grep -Fxq "{{ deployment_name }}" /etc/avail-deployment
+- name: Check whether /etc/avail-deployment contains "{{ clean_deploy_title }}"
+  command: grep -Fxq "{{ clean_deploy_title }}" /etc/avail-deployment
   register: checkdeployment
   check_mode: no
   ignore_errors: yes
