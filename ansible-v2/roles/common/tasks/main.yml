@@ -1,6 +1,6 @@
 - name: Create deployment_name file
   ansible.builtin.template:
-    force: yes
+    force: no
     src: "./templates/avail-deployment"
     dest: "/etc/avail-deployment"
     mode: '0755'
@@ -95,6 +95,7 @@
     dest: "/etc/update-motd.d/00-avl-logo"
     mode: '0755'
     owner: ubuntu
+    group: ubuntu
 
 - name: create sysinfo
   tags:
@@ -104,6 +105,7 @@
     dest: "/etc/update-motd.d/10-sys-info"
     mode: '0755'
     owner: ubuntu
+    group: ubuntu
 
 - name: create network info
   tags:
@@ -113,3 +115,4 @@
     dest: "/etc/update-motd.d/20-network-info"
     mode: '0755'
     owner: ubuntu
+    group: ubuntu
