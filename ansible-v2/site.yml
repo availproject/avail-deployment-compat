@@ -16,19 +16,21 @@
     - availnode
   roles:
     - availnode
-#
-# - hosts: explorer
-#   gather_facts: True
-#   become: true
-#   tags:
-#     - explorer
-#   roles:
-#     - explorer
-#
-# - hosts: light_client
-#   gather_facts: True
-#   become: true
-#   tags:
-#     - light_client
-#   roles:
-#     - lightclient
+
+- hosts: explorer
+  gather_facts: True
+  become: true
+  tags:
+    - explorer
+  roles:
+    - explorer
+
+- hosts: light_client
+  gather_facts: True
+  become: true
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
+  tags:
+    - light_client
+  roles:
+    - lightclient
