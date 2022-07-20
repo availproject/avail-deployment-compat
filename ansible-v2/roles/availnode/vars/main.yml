@@ -1,5 +1,5 @@
 ---
-secret_phrase: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + deployment_name, field='recoveryPhrase') | trim }}"
-p2p_priv_key: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + deployment_name, field='libP2PPriv') | trim }}"
-p2p_pub_key: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + deployment_name, field='libP2PPub') | trim }}"
+secret_phrase: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + clean_deploy_title, field='recoveryPhrase') | trim }}"
+p2p_priv_key: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + clean_deploy_title, field='libP2PPriv') | trim }}"
+p2p_pub_key: "{{ lookup('op', 'Wallet Credentials for ' + node_name, vault='Avail Devnet: ' + clean_deploy_title, field='libP2PPub') | trim }}"
 node_port: "{{ hostvars[inventory_hostname].tags.AvailPort }}"

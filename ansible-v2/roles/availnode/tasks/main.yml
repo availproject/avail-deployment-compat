@@ -30,14 +30,18 @@
   ansible.builtin.template:
     src: "./templates/da.sh"
     dest: "{{ node_base_path }}/da.sh"
-    mode: 755
+    mode: '0755'
+    owner: ubuntu
+    group: ubuntu
   notify: restart node
 
 - name: create secret.txt
   ansible.builtin.template:
     src: "./templates/secret.txt"
     dest: "{{ node_base_path }}/secret.txt"
-    mode: 755
+    mode: '0755'
+    owner: ubuntu
+    group: ubuntu
   notify: restart node
   # TODO if this changes we need to rotate keys
 
@@ -51,7 +55,9 @@
   ansible.builtin.template:
     src: "./templates/nodeprivkey.txt"
     dest: "{{ node_base_path }}/nodeprivkey.txt"
-    mode: 755
+    mode: '0755'
+    owner: ubuntu
+    group: ubuntu
   notify: restart node
 
 - name: Dropping new lines from node key
@@ -63,9 +69,11 @@
 
 - name: create chainspec
   ansible.builtin.template:
-    src: "../../build/{{ deployment_name }}/populated.devnet.chainspec.raw.json"
+    src: "/opt/avail_repo/ansible-v2/scripts/build/{{ clean_deploy_title }}/populated.devnet.chainspec.raw.json"
     dest: "{{ node_base_path }}/genesis/devnet.chain.spec.raw.json"
-    mode: 755
+    mode: '0755'
+    owner: ubuntu
+    group: ubuntu
   notify: restart node
 
 - name: Start avail docker image

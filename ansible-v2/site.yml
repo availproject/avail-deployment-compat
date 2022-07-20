@@ -7,14 +7,15 @@
   roles:
     - common
     - datadog
-#
-# - hosts: validator:full_node
-#   gather_facts: True
-#   become: true
-#   tags:
-#     - availnode
-#   roles:
-#     - availnode
+
+- hosts: validator:full_node
+  gather_facts: True
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
+  tags:
+    - availnode
+  roles:
+    - availnode
 #
 # - hosts: explorer
 #   gather_facts: True

@@ -37,7 +37,7 @@ fi
     {% endif %}
     --public-addr /dns/{{ lb_dns }}/tcp/{{ node_port }}/p2p/{{ p2p_pub_key }} \
     {%  for item in hostvars %}{% if (hostvars[item].tags.Role == "validator" or hostvars[item].tags.Role == "full-node" and item != inventory_hostname) %}
-    --reserved-nodes /dns/{{ lb_dns }}/tcp/{{ hostvars[item].tags.AvailPort }}/p2p/{{ lookup('op', 'Wallet Credentials for ' + hostvars[item].tags.Name, vault='Avail Devnet: ' + deployment_name, field='libP2PPub') | trim }}\
+    --reserved-nodes /dns/{{ lb_dns }}/tcp/{{ hostvars[item].tags.AvailPort }}/p2p/{{ lookup('op', 'Wallet Credentials for ' + hostvars[item].tags.Name, vault='Avail Devnet: ' + clean_deploy_title, field='libP2PPub') | trim }}\
     {% endif %}{% endfor %}
     --chain /var/avail/genesis/devnet.chain.spec.raw.json \
     --base-path /var/avail/state \
@@ -62,4 +62,3 @@ fi
     {% endif %}
 
     2>&1
-
