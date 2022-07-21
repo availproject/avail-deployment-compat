@@ -118,74 +118,75 @@
   - set_fact:
       clean_branch_name: "{{ branch_output.stdout_lines[-1] }}"
 
-  # - name: delete any orphan terraform devnet resources
-  #   shell:
-  #     cmd: |
-  #       cd /opt/avail_repo/tf/nets/devnet01
-  #       terraform init
-  #       terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
+  - name: delete any orphan terraform devnet resources
+    shell:
+      cmd: |
+        cd /opt/avail_repo/tf/nets/devnet01
+        terraform init
+        terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
 
   - name: init terraform and apply avail resources
     shell:
       cmd: |
         cd /opt/avail_repo/tf/nets/devnet01
         terraform init
+        terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -auto-approve
         echo $(terraform output -json pk_ansible)
     register: nodes
 
-  # - name: wallet, node key, and chainspec generation
-  #   shell:
-  #     cmd: |
-  #       eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
-  #       . /tmp/pyenv/.pyenvrc && pyenv versions
-  #       . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
-  #       unset PYTHONPATH
-  #       yum install jq -y
-  #       jq -Version
-  #       curl -sSfo op.zip \
-  #         https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_amd64_v2.0.0.zip \
-  #         && unzip -od /usr/local/bin/ op.zip \
-  #         && rm op.zip
-  #       op --version
-  #       curl https://sh.rustup.rs -sSf | sh -s -- -y
-  #       source "$HOME/.cargo/env"
-  #       cd /opt/avail_source
-  #       sudo yum install centos-release-scl -y
-  #       sudo yum install llvm-toolset-7 -y
-  #       sudo yum install gcc-c++ -y
-  #       scl enable llvm-toolset-7 bash
-  #       export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
-  #       clang --version
-  #       export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/lib64/"
-  #       yum whatprovides *libclang.so
-  #       cd /opt/avail_binary
-  #       aws s3 cp s3://avail-binaries/data-avail-amd64 .
-  #       sudo chmod +x data-avail-amd64
-  #       ./data-avail-amd64 key generate --output-type json --scheme Sr25519 -w 21
-  #
-  #       export OP_DEVICE={{ OP_DEVICE_ID }}
-  #       eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-  #
-  #       sudo yum -y install python-boto3
-  #       cd /opt/avail_repo/ansible-v2/scripts
-  #       ansible-inventory --graph -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
-  #       rm -r -f build/{{ clean_branch_name }}
-  #       bash key-prep-awx.sh -d {{ clean_branch_name }}
+  - name: wallet, node key, and chainspec generation
+    shell:
+      cmd: |
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
+        yum install jq -y
+        jq -Version
+        curl -sSfo op.zip \
+          https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_amd64_v2.0.0.zip \
+          && unzip -od /usr/local/bin/ op.zip \
+          && rm op.zip
+        op --version
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        source "$HOME/.cargo/env"
+        cd /opt/avail_source
+        sudo yum install centos-release-scl -y
+        sudo yum install llvm-toolset-7 -y
+        sudo yum install gcc-c++ -y
+        scl enable llvm-toolset-7 bash
+        export PATH="/opt/rh/llvm-toolset-7/root/usr/bin:$PATH"
+        clang --version
+        export LIBCLANG_PATH="/opt/rh/llvm-toolset-7/root/usr/lib64/"
+        yum whatprovides *libclang.so
+        cd /opt/avail_binary
+        aws s3 cp s3://avail-binaries/data-avail-amd64 .
+        sudo chmod +x data-avail-amd64
+        ./data-avail-amd64 key generate --output-type json --scheme Sr25519 -w 21
 
-  # - name: configure all nodes
-  #   shell:
-  #     cmd: |
-  #       sleep 10m
-  #       eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
-  #       . /tmp/pyenv/.pyenvrc && pyenv versions
-  #       . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
-  #       unset PYTHONPATH
-  #       echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
-  #       echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
-  #       chmod 400 ~/.ssh/awxSshKey.pem
-  #       cd /opt/avail_repo/ansible-v2
-  #       source /opt/my-envs/custom-venv-2/bin/activate
-  #       export OP_DEVICE={{ OP_DEVICE_ID }}
-  #       eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-  #       ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml --extra-vars="clean_deploy_name={{ clean_branch_name }}" -vvv
-  #       deactivate
+        export OP_DEVICE={{ OP_DEVICE_ID }}
+        eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+
+        sudo yum -y install python-boto3
+        cd /opt/avail_repo/ansible-v2/scripts
+        ansible-inventory --graph -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml
+        rm -r -f build/{{ clean_branch_name }}
+        bash key-prep-awx.sh -d {{ clean_branch_name }}
+
+  - name: configure all nodes
+    shell:
+      cmd: |
+        sleep 10m
+        eval "$(. /tmp/pyenv/.pyenvrc && pyenv init --path)"
+        . /tmp/pyenv/.pyenvrc && pyenv versions
+        . /tmp/pyenv/.pyenvrc && pyenv global 3.6.4
+        unset PYTHONPATH
+        echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
+        echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
+        chmod 400 ~/.ssh/awxSshKey.pem
+        cd /opt/avail_repo/ansible-v2
+        source /opt/my-envs/custom-venv-2/bin/activate
+        export OP_DEVICE={{ OP_DEVICE_ID }}
+        eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml --extra-vars="clean_deploy_name={{ clean_branch_name }}"
+        deactivate
