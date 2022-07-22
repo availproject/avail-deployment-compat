@@ -34,4 +34,6 @@ module "devnet" {
   route53_domain_name = "${var.deploy_name}.devnet-polygon.com"
   owner               = var.owner
   devnet_key_name     = "ansiblePair"
+  full_node_count     = var.full_node_count
+  validator_count     = var.validator_count
 }
