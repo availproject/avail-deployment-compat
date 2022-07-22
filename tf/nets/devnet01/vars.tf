@@ -9,7 +9,7 @@ variable "owner" {
 }
 
 variable "full_node_count" {
-  description = number of full nodes in devnet"
+  description = "number of full nodes in devnet"
   type        = number
 }
 
