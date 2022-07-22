@@ -173,7 +173,7 @@
         rm -r -f build/{{ clean_branch_name }}
         bash key-prep-awx.sh -d {{ clean_branch_name }}
 
-  - name: configure all nodes
+  - name: configure all avail devnet nodes
     shell:
       cmd: |
         sleep 10m
