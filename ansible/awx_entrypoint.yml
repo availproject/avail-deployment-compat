@@ -99,7 +99,7 @@
     vars:
       query: "[?name=='{{ GITHUB_BINARY_FILENAME }}'].url | [0]"
 
-  - name: Get Binary asset's location
+  - name: Get binary asset location
     uri:
       url: "{{ binary_asset_url }}"
       return_content: no
@@ -115,11 +115,6 @@
       url: "{{ assets.location }}"
       dest: "/opt/avail_binary/data-avail-amd64"
       mode: 0755
-
-  - name: test binary pulled and runs successfully
-    shell:
-      cmd: |
-        /opt/avail_binary/data-avail-amd64 key generate --output-type json --scheme Sr25519 -w 21
 
   - name: wallet, node key, and chainspec generation
     shell:
