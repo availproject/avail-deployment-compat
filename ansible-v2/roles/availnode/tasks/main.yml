@@ -69,7 +69,7 @@
 
 - name: create chainspec
   ansible.builtin.template:
-    src: "/opt/avail_repo/ansible-v2/scripts/build/{{ clean_deploy_title }}/populated.devnet.chainspec.raw.json"
+    src: "{{ avail_scripts_path }}/build/{{ clean_deploy_title }}/populated.devnet.chainspec.raw.json"
     dest: "{{ node_base_path }}/genesis/devnet.chain.spec.raw.json"
     mode: '0755'
     owner: ubuntu

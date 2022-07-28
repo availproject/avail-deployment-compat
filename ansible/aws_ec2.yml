@@ -1,6 +1,0 @@
-# This will return the Instance IDs matching the filter
-plugin: aws_ec2
-regions:
-   - us-west-2
-hostnames:
-   - instance-id

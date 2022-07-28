@@ -1,6 +1,5 @@
 ---
 deployment_name: "{{ clean_deploy_title }}"
-# once we have the deployment_name, it should possible to retrive this lb_dns value dynamically from the tf provisioning
 lb_dns: "{{ clean_deploy_title }}.devnet-polygon.com"
 node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
 avail_domain: "{{ lb_dns }}"
@@ -22,7 +21,6 @@ node_ws_max_connections: 1000
 explorer_docker_tag: v1.0.1
 explorer_http_port: 8080
 lightclient_docker_tag: 1.0.1
-ansible_python_interpreter: /usr/bin/python3
 
 prometheus:
   port: 9615

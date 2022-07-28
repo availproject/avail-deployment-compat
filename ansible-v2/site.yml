@@ -12,6 +12,7 @@
   gather_facts: True
   vars:
     clean_deploy_title: "{{ clean_deploy_name }}"
+    avail_scripts_path: "{{ avail_scripts_dir }}"
   tags:
     - availnode
   roles:
