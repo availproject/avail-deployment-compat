@@ -22,7 +22,8 @@
         deactivate
 
   - name: setup terraform and aws session manager
-    warn: false
+    args:
+       warn: false
     shell:
       cmd: |
         mkdir -p /opt/avail_repo && mkdir -p /opt/avail_binary && mkdir -p $HOME/.terraform.d
