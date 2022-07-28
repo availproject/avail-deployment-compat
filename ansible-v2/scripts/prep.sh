@@ -26,10 +26,10 @@ do
     esac
 done
 
-while getopts r: flag
+while getopts a: flag
 do
     case "$flag" in
-        r) repo_name=${OPTARG};;
+        a) repo_name=${OPTARG};;
     esac
 done
 
@@ -56,7 +56,7 @@ fi
 
 if [ -z "$repo_name" ]
 then
-    echo "Please use the -r switch to provide a repo_name for setup"
+    echo "Please use the -a switch to provide a repo_name for setup"
     exit
 fi
 

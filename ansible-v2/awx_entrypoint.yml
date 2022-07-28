@@ -116,7 +116,7 @@
           source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
           export OP_DEVICE={{ OP_DEVICE_ID }}
           eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-          bash prep.sh -d {{ clean_branch_name }} -r {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
+          bash prep.sh -d {{ clean_branch_name }} -a {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
           deactivate
 
     - name: prep ssh key for remote node connections
