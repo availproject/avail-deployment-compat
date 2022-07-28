@@ -9,7 +9,7 @@
     shell:
       cmd: |
         unset PYTHONPATH
-        yum install curl gcc install jq python3-devel python-boto3 python-devel python-virtualenv yum-utils -y
+        yum install curl gcc jq python3-devel python-boto3 python-devel python-virtualenv yum-utils -y
         curl -sSfo op.zip \
           https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_amd64_v2.0.0.zip \
           && unzip -od /usr/local/bin/ op.zip \
@@ -17,6 +17,7 @@
         mkdir -p /opt/my-envs && chmod 0755 /opt/my-envs
         python3 -m venv /opt/my-envs/{{ CUSTOM_VENV }}
         source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
+        pip install --upgrade pip
         pip install boto3 botocore psutil ansible
         deactivate
 
