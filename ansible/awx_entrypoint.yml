@@ -78,14 +78,13 @@
   #       terraform init
   #       terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
   #
-  # - name: init terraform and apply avail resources
-  #   shell:
-  #     cmd: |
-  #       cd /opt/avail_repo/tf/nets/devnet01
-  #       terraform init
-  #       terraform apply -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
-  #       echo $(terraform output -json pk_ansible)
-  #   register: nodes
+  - name: init terraform and apply avail resources
+    shell:
+      cmd: |
+        cd /opt/avail_repo/tf/nets/devnet01
+        terraform init
+        echo $(terraform output -json pk_ansible)
+    register: nodes
 
   - name: Get latest avail binary release version
     uri:
