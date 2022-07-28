@@ -26,6 +26,27 @@ do
     esac
 done
 
+while getopts r: flag
+do
+    case "$flag" in
+        r) repo_name=${OPTARG};;
+    esac
+done
+
+while getopts b: flag
+do
+    case "$flag" in
+        b) binary_name=${OPTARG};;
+    esac
+done
+
+while getopts i: flag
+do
+    case "$flag" in
+        i) inventory_path=${OPTARG};;
+    esac
+done
+
 
 if [ -z "$deployment_name" ]
 then
@@ -33,7 +54,28 @@ then
     exit
 fi
 
+if [ -z "$repo_name" ]
+then
+    echo "Please use the -r switch to provide a repo_name for setup"
+    exit
+fi
+
+if [ -z "$binary_name" ]
+then
+    echo "Please use the -b switch to provide a binary_name for setup"
+    exit
+fi
+
+if [ -z "$inventory_path" ]
+then
+    echo "Please use the -i switch to provide a inventory_path for setup"
+    exit
+fi
+
 echo "Deployment name: $deployment_name";
+echo "Repo name: $repo_name";
+echo "Binary name: $binary_name";
+echo "Inventory path: $inventory_path";
 
 echo $deployment_name > $tmp_dir/deployment_name.txt
 
@@ -51,7 +93,7 @@ fi
 mkdir build/$deployment_name
 
 echo "Generating list of nodes based on the current ansible inventory"
-ansible-inventory -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml --list | jq '._meta.hostvars[] | {tag_name: .tags.Name, tag_role: .tags.Role, instance_id: .instance_id}'  | jq -s '.' > $tmp_dir/nodes.json
+ansible-inventory -i /opt/$repo_name/$inventory_path --list | jq '._meta.hostvars[] | {tag_name: .tags.Name, tag_role: .tags.Role, instance_id: .instance_id}'  | jq -s '.' > $tmp_dir/nodes.json
 cat $tmp_dir/nodes.json | jq -r '.[].tag_name' > $tmp_dir/names.txt
 
 echo "Adding wallets that aren't tied to physical hosts"
@@ -66,10 +108,10 @@ echo "tech-committee-03" >> $tmp_dir/names.txt
 echo "Generating p2p keys and wallets for all nodes"
 cat $tmp_dir/names.txt | while IFS= read -r node_name; do
     printf 'Generating keys for %s\n' "$node_name"
-    /opt/avail_binary/data-avail-amd64 key generate --output-type json --scheme Sr25519 -w 21 > $tmp_dir/$node_name.wallet.sr25519.json
+    /opt/$repo_name/$binary_name key generate --output-type json --scheme Sr25519 -w 21 > $tmp_dir/$node_name.wallet.sr25519.json
     cat $tmp_dir/$node_name.wallet.sr25519.json | jq -r '.secretPhrase' > $tmp_dir/$node_name.wallet.secret
-    /opt/avail_binary/data-avail-amd64 key generate-node-key 2> $tmp_dir/$node_name.public.key 1> $tmp_dir/$node_name.private.key
-    /opt/avail_binary/data-avail-amd64 key inspect --scheme Ed25519 --output-type json $tmp_dir/$node_name.wallet.secret > $tmp_dir/$node_name.wallet.ed25519.json
+    /opt/$repo_name/$binary_name key generate-node-key 2> $tmp_dir/$node_name.public.key 1> $tmp_dir/$node_name.private.key
+    /opt/$repo_name/$binary_name key inspect --scheme Ed25519 --output-type json $tmp_dir/$node_name.wallet.secret > $tmp_dir/$node_name.wallet.ed25519.json
 done
 
 python3 consolidate-keys.py $tmp_dir
@@ -80,7 +122,7 @@ find $tmp_dir -type f -name '*.op.tpl.json' | xargs -I xxx op item create --vaul
 cp ../templates/genesis/devnet.template.json $tmp_dir
 python3 update-dev-chainspec.py $tmp_dir
 
-/opt/avail_binary/data-avail-amd64 build-spec --chain=$tmp_dir/populated.devnet.chainspec.json --raw --disable-default-bootnode > $tmp_dir/populated.devnet.chainspec.raw.json
+/opt/$repo_name/$binary_name build-spec --chain=$tmp_dir/populated.devnet.chainspec.json --raw --disable-default-bootnode > $tmp_dir/populated.devnet.chainspec.raw.json
 
 cp $tmp_dir/master.json build/$deployment_name/
 cp $tmp_dir/populated.devnet.chainspec.* build/$deployment_name/
