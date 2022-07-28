@@ -1,6 +1,6 @@
 ---
 - name: restart light client
-  docker_container:
+  community.docker.docker_container:
     name: light-client
     state: started
     restart: yes

@@ -2,8 +2,6 @@
 - name: avail devnet
   hosts: localhost
   become: true
-  collections:
-    - amazon.aws
   tasks:
     - name: setup virtualenv and system dependencies
       shell:
@@ -19,6 +17,7 @@
           source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
           pip install --upgrade pip
           pip install boto3 botocore psutil ansible
+          ansible-galaxy collection install amazon.aws community.docker
           deactivate
 
     - name: setup terraform and aws session manager

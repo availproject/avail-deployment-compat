@@ -4,7 +4,7 @@
     name: docker
 
 - name: Pull datadog docker image and run
-  docker_container:
+  community.docker.docker_container:
     name: dd-agent
     image: "datadog/agent:latest"
     memory: 256MB
