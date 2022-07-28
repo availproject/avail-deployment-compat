@@ -1,54 +1,34 @@
 ---
-- name: provision avail resources and configure nodes with ansible
+- name: avail devnet
   hosts: localhost
+  become: true
   collections:
   - amazon.aws
   tasks:
-  - name: setup virtualenv
+  - name: setup virtualenv and system dependencies
     shell:
       cmd: |
         unset PYTHONPATH
-        sudo yum install python-virtualenv -y
-        sudo mkdir -p /opt/my-envs
-        sudo chmod 0755 /opt/my-envs
-        sudo python3 -m venv /opt/my-envs/custom-venv-2
-        sudo yum install gcc -y
-        sudo yum install python-devel -y
-        sudo yum install python3-devel -y
-        source /opt/my-envs/custom-venv-2/bin/activate
-        pip install --upgrade pip
-        pip install boto3 botocore
-        sudo /opt/my-envs/custom-venv-2/bin/pip install psutil
-        sudo /opt/my-envs/custom-venv-2/bin/pip install -U ansible
+        yum install curl gcc install jq python3-devel python-boto3 python-devel python-virtualenv yum-utils -y
+        curl -sSfo op.zip \
+          https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_amd64_v2.0.0.zip \
+          && unzip -od /usr/local/bin/ op.zip \
+          && rm op.zip
+        mkdir -p /opt/my-envs && chmod 0755 /opt/my-envs
+        python3 -m venv /opt/my-envs/{{ CUSTOM_VENV }}
+        source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
+        pip install boto3 botocore psutil ansible
         deactivate
 
-  - name: setup controller machine dependencies
+  - name: setup terraform and aws session manager
     shell:
       cmd: |
-        mkdir -p /opt/avail_repo
-        mkdir -p /opt/avail_binary
-        sudo yum install -y yum-utils
-        sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
-        sudo yum -y install terraform
-        sudo yum -y install curl
+        mkdir -p /opt/avail_repo && mkdir -p /opt/avail_binary && mkdir -p $HOME/.terraform.d
+        yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
         curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
-        sudo yum install -y session-manager-plugin.rpm
-        session-manager-plugin
-        mkdir -p $HOME/.terraform.d
+        yum install terraform session-manager-plugin.rpm -y
 
-  - name: create terraform cloud auth config
-    copy:
-      dest: "/var/lib/awx/.terraform.d/credentials.tfrc.json"
-      content: |
-        credentials "app.terraform.io" {
-          token = "{{ lookup("env", "TF_TOKEN") }}"
-        }
-
-  - name: add safe directory for avail repo
-    command: git config --global --add safe.directory /opt/avail_repo
-    check_mode: no
-
-  - name: clone avail-deployment repo branch
+  - name: clone repo branch
     ansible.builtin.git:
       repo: 'https://{{ lookup("env", "PAT_TOKEN") }}@github.com/maticnetwork/avail-deployment.git'
       dest: /opt/avail_repo
@@ -59,7 +39,6 @@
       update: yes
     ignore_errors: false
     no_log: false
-    register: git_clone
 
   - name: set vars for reference across tasks
     shell:
@@ -70,6 +49,14 @@
 
   - set_fact:
       clean_branch_name: "{{ branch_output.stdout_lines[-1] }}"
+
+  - name: create terraform cloud auth config
+    copy:
+      dest: "/var/lib/awx/.terraform.d/credentials.tfrc.json"
+      content: |
+        credentials "app.terraform.io" {
+          token = "{{ lookup("env", "TF_TOKEN") }}"
+        }
 
   # - name: delete any orphan terraform devnet resources
   #   shell:
@@ -86,7 +73,7 @@
         echo $(terraform output -json pk_ansible)
     register: nodes
 
-  - name: Get latest avail binary release version
+  - name: get binary release metadata
     uri:
       url: "https://api.github.com/repos/maticnetwork/avail/releases/latest"
       return_content: yes
@@ -99,7 +86,7 @@
     vars:
       query: "[?name=='{{ GITHUB_BINARY_FILENAME }}'].url | [0]"
 
-  - name: Get binary asset location
+  - name: get binary asset location
     uri:
       url: "{{ binary_asset_url }}"
       return_content: no
@@ -110,7 +97,7 @@
         Accept: "application/octet-stream"
     register: assets
 
-  - name: Download binary
+  - name: download binary
     get_url:
       url: "{{ assets.location }}"
       dest: "/opt/avail_binary/data-avail-amd64"
@@ -120,34 +107,26 @@
     shell:
       cmd: |
         unset PYTHONPATH
-        yum install jq -y
-        jq -Version
-        curl -sSfo op.zip \
-          https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_amd64_v2.0.0.zip \
-          && unzip -od /usr/local/bin/ op.zip \
-          && rm op.zip
-        op --version
-
         export OP_DEVICE={{ OP_DEVICE_ID }}
         eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-
-        sudo yum -y install python-boto3
-        cd /opt/avail_repo/ansible-v2/scripts
-        rm -r -f build/{{ clean_branch_name }}
-        source /opt/my-envs/custom-venv-2/bin/activate
-        bash key-prep-awx.sh -d {{ clean_branch_name }}
+        rm -r -f /opt/avail_repo/ansible-v2/scripts/build/{{ clean_branch_name }}
+        source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
+        bash /opt/avail_repo/ansible-v2/scripts/key-prep-awx.sh -d {{ clean_branch_name }}
         deactivate
 
-  - name: configure all avail devnet nodes
+  - name: prep ssh key for remote node connections
     shell:
       cmd: |
-        unset PYTHONPATH
         echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
         echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
-        cd /opt/avail_repo/ansible-v2
-        source /opt/my-envs/custom-venv-2/bin/activate
+
+  - name: configure avail devnet nodes
+    shell:
+      cmd: |
+        unset PYTHONPATH
+        source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
         export OP_DEVICE={{ OP_DEVICE_ID }}
         eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-        ansible-playbook site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml --extra-vars="clean_deploy_name={{ clean_branch_name }} avail_scripts_dir=/opt/avail_repo/ansible-v2/scripts"
+        ansible-playbook /opt/avail_repo/ansible-v2/site.yml -i /opt/avail_repo/ansible-v2/inventory/aws_ec2.yaml --extra-vars="clean_deploy_name={{ clean_branch_name }} avail_scripts_dir=/opt/avail_repo/ansible-v2/scripts"
         deactivate
