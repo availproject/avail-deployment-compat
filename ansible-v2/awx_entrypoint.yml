@@ -129,7 +129,6 @@
     - name: configure avail devnet nodes after letting them initialize
       shell:
         cmd: |
-          sleep 5m
           unset PYTHONPATH
           source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
           export OP_DEVICE={{ OP_DEVICE_ID }}
