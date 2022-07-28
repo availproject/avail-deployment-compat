@@ -3,7 +3,6 @@
     name: light-client
     image: 0xpolygon/avail-light:{{ lightclient_docker_tag }}
     entrypoint: "/avail-light/start.sh"
-    recreate: yes
     env:
       APP_ID: "0"
       AVAIL_PATH: "/state/avail"

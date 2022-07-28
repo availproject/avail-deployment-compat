@@ -7,4 +7,3 @@
     env:
       WS_URL: "{{ global_ws }}"
     restart_policy: always
-    recreate: yes

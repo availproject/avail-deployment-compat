@@ -93,4 +93,3 @@
       - "{{ node_base_path }}:/var/avail"
     state: started
     restart_policy: always
-    recreate: yes
