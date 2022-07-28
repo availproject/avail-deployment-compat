@@ -113,7 +113,7 @@
       url: "https://api.github.com/repos/maticnetwork/avail/releases/latest"
       return_content: yes
       headers:
-        Authorization: "token {{ lookup("env", "PAT_TOKEN") }}"
+        Authorization: 'token {{ lookup("env", "PAT_TOKEN") }}'
     register: github_response
 
   - set_fact:
@@ -128,7 +128,7 @@
       follow_redirects: none
       status_code: 302
       headers:
-        Authorization: "token {{ lookup("env", "PAT_TOKEN") }}"
+        Authorization: 'token {{ lookup("env", "PAT_TOKEN") }}'
         Accept: "application/octet-stream"
     register: assets
 
