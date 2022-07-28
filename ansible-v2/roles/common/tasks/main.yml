@@ -3,9 +3,7 @@
     force: no
     src: "./templates/avail-deployment"
     dest: "/etc/avail-deployment"
-    mode: '0755'
-    owner: ubuntu
-    group: ubuntu
+    mode: 755
 
 #
 # - name: Check whether /etc/avail-deployment contains "{{ clean_deploy_title }}"

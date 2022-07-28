@@ -4,6 +4,8 @@
   become: true
   tasks:
     - name: setup virtualenv and system dependencies
+      args:
+        warn: false
       shell:
         cmd: |
           unset PYTHONPATH

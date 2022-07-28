@@ -1,4 +1,5 @@
 - hosts: all
+  become: true
   gather_facts: True
   vars:
     clean_deploy_title: "{{ clean_deploy_name }}"
