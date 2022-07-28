@@ -125,6 +125,7 @@
   - name: wallet, node key, and chainspec generation
     shell:
       cmd: |
+        unset PYTHONPATH
         yum install jq -y
         jq -Version
         curl -sSfo op.zip \
@@ -146,6 +147,7 @@
   - name: configure all avail devnet nodes
     shell:
       cmd: |
+        unset PYTHONPATH
         echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
         echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
         chmod 400 ~/.ssh/awxSshKey.pem
