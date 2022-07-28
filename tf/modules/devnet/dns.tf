@@ -36,3 +36,5 @@ resource "aws_acm_certificate_validation" "avail" {
   certificate_arn         = aws_acm_certificate.avail_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.avail_validation : record.fqdn]
 }
+
+

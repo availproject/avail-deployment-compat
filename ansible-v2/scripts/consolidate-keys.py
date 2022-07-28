@@ -84,3 +84,5 @@ for node in node_data:
 
 with open(work_dir + "/master.json", 'w') as f:
     json.dump(master_list, f)
+
+
