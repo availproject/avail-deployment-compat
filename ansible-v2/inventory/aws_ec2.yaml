@@ -6,7 +6,7 @@ regions:
   
 filters:
   # All instances with current deployment name
-  tag:DeploymentName: avail-one
+  tag:DeploymentName: "{{ DEPLOY_NAME_OVERRIDE }}"
 
 #Takes Key:NodeType and dynamically creates group for respecitve value for Value:value of Key.
 keyed_groups:
