@@ -6,7 +6,7 @@ regions:
   
 filters:
   # All instances with current deployment name
-  tag:Name: avail-one
+  tag:Name: "{{ lookup('var', 'clean_deploy') }}"
 
 #Takes Key:NodeType and dynamically creates group for respecitve value for Value:value of Key.
 keyed_groups:
