@@ -14,9 +14,9 @@
             https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_amd64_v2.0.0.zip \
             && unzip -od /usr/local/bin/ op.zip \
             && rm op.zip
-          mkdir -p /opt/my-envs && chmod 0755 /opt/my-envs
-          python3 -m venv /opt/my-envs/{{ CUSTOM_VENV }}
-          source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
+          mkdir -p /opt/venv && chmod 0755 /opt/venv
+          python3 -m venv /opt/venv/{{ CUSTOM_VENV }}
+          source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
           pip install --upgrade pip
           pip install boto3 botocore psutil ansible
           ansible-galaxy collection install amazon.aws community.docker
@@ -27,7 +27,7 @@
         warn: false
       shell:
         cmd: |
-          mkdir -p /opt/{{ REPO_NAME }} && mkdir -p $HOME/.terraform.d
+          mkdir -p /tmp/{{ REPO_NAME }} && mkdir -p $HOME/.terraform.d
           yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
           curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
           yum install terraform session-manager-plugin.rpm -y
@@ -35,7 +35,7 @@
     - name: clone repo branch
       ansible.builtin.git:
         repo: https://{{ lookup("env", "PAT_TOKEN") }}@github.com/{{ ORG_NAME }}/{{ REPO_NAME }}.git
-        dest: /opt/{{ REPO_NAME }}
+        dest: /tmp/{{ REPO_NAME }}
         clone: true
         accept_hostkey: true
         version: '{{ GIT_BRANCH_NAME }}'
@@ -65,14 +65,14 @@
     # - name: delete any orphan terraform devnet resources
     #   shell:
     #     cmd: |
-    #       cd /opt/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
+    #       cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
     #       terraform init
     #       terraform destroy -no-color -var 'deploy_name={{ clean_branch_name }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
 
     - name: init terraform and apply avail resources
       shell:
         cmd: |
-          cd /opt/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
+          cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
           terraform init
           echo $(terraform output -json pk_ansible)
       register: nodes
@@ -104,19 +104,19 @@
     - name: download binary
       get_url:
         url: '{{ assets.location }}'
-        dest: /opt/{{ REPO_NAME }}/{{ GITHUB_BINARY_FILENAME }}
+        dest: /tmp/{{ REPO_NAME }}/{{ GITHUB_BINARY_FILENAME }}
         mode: 0755
 
     - name: wallet, node key, and chainspec generation
       shell:
         cmd: |
           unset PYTHONPATH
-          cd /opt/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}
+          cd /tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}
           rm -r -f build/{{ clean_branch_name }}
-          source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
+          source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
           export OP_DEVICE={{ OP_DEVICE_ID }}
           eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-          bash prep.sh -d {{ clean_branch_name }} -a {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
+          bash prep.sh -d {{ clean_branch_name }} -r {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
           deactivate
 
     - name: prep ssh key for remote node connections
@@ -130,8 +130,8 @@
       shell:
         cmd: |
           unset PYTHONPATH
-          source /opt/my-envs/{{ CUSTOM_VENV }}/bin/activate
+          source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
           export OP_DEVICE={{ OP_DEVICE_ID }}
           eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-          ansible-playbook /opt/{{ REPO_NAME }}/{{ SITE_PLAYBOOK_PATH }} -i /opt/{{ REPO_NAME }}/{{ INVENTORY_PATH }} --extra-vars="clean_deploy_name={{ clean_branch_name }} avail_scripts_dir=/opt/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}"
+          ansible-playbook /tmp/{{ REPO_NAME }}/{{ SITE_PLAYBOOK_PATH }} -i /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }} --extra-vars="clean_deploy_name={{ clean_branch_name }} avail_scripts_dir=/tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}"
           deactivate
