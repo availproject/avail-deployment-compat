@@ -2,7 +2,7 @@ resource "aws_instance" "full_node" {
   ami                  = var.base_ami
   instance_type        = var.base_instance_type
   count                = var.full_node_count
-  key_name             = var.devnet_key_name
+  key_name             = "${var.devnet_key_name}-${var.deployment_name}"
   subnet_id            = element(aws_subnet.devnet_private, count.index).id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
@@ -25,7 +25,7 @@ resource "aws_instance" "validator" {
   ami                  = var.base_ami
   instance_type        = var.base_instance_type
   count                = var.validator_count
-  key_name             = var.devnet_key_name
+  key_name             = "${var.devnet_key_name}-${var.deployment_name}"
   subnet_id            = element(aws_subnet.devnet_private, count.index).id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
@@ -48,7 +48,7 @@ resource "aws_instance" "explorer" {
   ami                  = var.base_ami
   instance_type        = var.base_instance_type
   count                = var.explorer_count
-  key_name             = var.devnet_key_name
+  key_name             = "${var.devnet_key_name}-${var.deployment_name}"
   subnet_id            = element(aws_subnet.devnet_private, count.index).id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
@@ -70,7 +70,7 @@ resource "aws_instance" "light_client" {
   ami                  = var.base_ami
   instance_type        = var.base_instance_type
   count                = var.light_client_count
-  key_name             = var.devnet_key_name
+  key_name             = "${var.devnet_key_name}-${var.deployment_name}"
   subnet_id            = element(aws_subnet.devnet_private, count.index).id
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 

@@ -76,13 +76,13 @@
             token = "{{ lookup("env", "TF_TOKEN") }}"
           }
 
-    # - name: delete any orphan terraform devnet resources
-    #   shell:
-    #     cmd: |
-    #       cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
-    #       terraform init
-    #       terraform destroy -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
-    #       terraform destroy -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
+    - name: delete any orphan terraform devnet resources
+      shell:
+        cmd: |
+          cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
+          terraform init
+          terraform destroy -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
+          terraform destroy -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
 
     - name: init terraform and apply avail resources
       shell:
