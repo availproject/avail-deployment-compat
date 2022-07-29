@@ -49,7 +49,11 @@
         cmd: |
           CLEAN_DEPLOY_NAME=$(sed -E 's/[^[:alnum:][:space:]]+/-/g' <<<{{ DEPLOY_NAME_OVERRIDE }})
           echo "$CLEAN_DEPLOY_NAME"
-      register: deploy_name
+      register: deploy_name_override
+      when: DEPLOY_NAME_OVERRIDE is defined
+      
+    - set_fact:
+        clean_deploy: '{{ deploy_name_override.stdout_lines[-1] }}'
       when: DEPLOY_NAME_OVERRIDE is defined
       
     - name: set default deploy name as branch name if not explicity given
@@ -59,9 +63,10 @@
           echo "$CLEAN_DEPLOY_NAME"
       register: deploy_name
       when: DEPLOY_NAME_OVERRIDE is undefined
-
+      
     - set_fact:
         clean_deploy: '{{ deploy_name.stdout_lines[-1] }}'
+      when: DEPLOY_NAME_OVERRIDE is undefined
 
     - name: create terraform cloud auth config
       copy:
