@@ -75,20 +75,26 @@
           credentials "app.terraform.io" {
             token = "{{ lookup("env", "TF_TOKEN") }}"
           }
+          
+    - name: set unique module name to allow for concurrent devnet deployments
+      shell:
+        cmd: |
+          sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/main.tf
+          cat /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/main.tf
 
     - name: delete any orphan terraform devnet resources
       shell:
         cmd: |
           cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
           terraform init
-          terraform destroy -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}'
+          terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}'
 
     - name: init terraform and apply avail resources
       shell:
         cmd: |
           cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
           terraform init
-          terraform apply -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}'
+          terraform apply -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}'
           echo $(terraform output -json pk_ansible)
       register: nodes
     

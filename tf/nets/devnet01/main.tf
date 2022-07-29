@@ -27,7 +27,7 @@ terraform {
   required_version = ">= 1.2.0"
 }
 
-module "devnet" {
+module "{module_name}" {
   source              = "../../modules/devnet"
   deployment_name     = var.deploy_name
   route53_zone_id     = "Z0491767NTM9F1P94D5W" # devnet-polygon.com
