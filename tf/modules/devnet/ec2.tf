@@ -13,8 +13,8 @@ resource "aws_instance" "full_node" {
   }
 
   tags = {
-    Name        = format("full-node-%02d", count.index + 1)
-    Hostname    = format("full-node-%02d", count.index + 1)
+    Name        = format("full-node-%s-%02d", var.deployment_name, count.index + 1)
+    Hostname    = format("full-node-%s-%02d", var.deployment_name, count.index + 1)
     AvailPort   = format("30%03d", count.index + 1)
     Role        = "full-node"
     Provisioner = data.aws_caller_identity.provisioner.account_id
@@ -36,8 +36,8 @@ resource "aws_instance" "validator" {
   }
 
   tags = {
-    Name        = format("validator-%02d", count.index + 1)
-    Hostname    = format("validator-%02d", count.index + 1)
+    Name        = format("validator-%s-%02d", var.deployment_name, count.index + 1)
+    Hostname    = format("validator-%s-%02d", var.deployment_name, count.index + 1)
     AvailPort   = format("31%03d", count.index + 1)
     Role        = "validator"
     Provisioner = data.aws_caller_identity.provisioner.account_id
@@ -59,8 +59,8 @@ resource "aws_instance" "explorer" {
   }
 
   tags = {
-    Name        = format("explorer-%02d", count.index + 1)
-    Hostname    = format("explorer-%02d", count.index + 1)
+    Name        = format("explorer-%s-%02d", var.deployment_name, count.index + 1)
+    Hostname    = format("explorer-%s-%02d", var.deployment_name, count.index + 1)
     Role        = "explorer"
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
@@ -81,8 +81,8 @@ resource "aws_instance" "light_client" {
   }
 
   tags = {
-    Name        = format("light-client-%02d", count.index + 1)
-    Hostname    = format("light-client-%02d", count.index + 1)
+    Name        = format("light-client-%s-%02d", var.deployment_name, count.index + 1)
+    Hostname    = format("light-client-%s-%02d", var.deployment_name, count.index + 1)
     Role        = "light-client"
     LightPort   = format("32%03d", count.index + 1)
     Provisioner = data.aws_caller_identity.provisioner.account_id

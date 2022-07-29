@@ -7,6 +7,6 @@ resource "tls_private_key" "pk" {
 }
 
 resource "aws_key_pair" "devnet" {
-  key_name   = var.devnet_key_name
+  key_name   = "${var.devnet_key_name}-${var.deployment_name}"
   public_key = tls_private_key.pk.public_key_openssh
 }

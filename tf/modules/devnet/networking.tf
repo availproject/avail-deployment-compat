@@ -3,7 +3,7 @@ resource "aws_vpc" "devnet" {
   instance_tenancy = "default"
 
   tags = {
-    Name        = "devnet"
+    Name        = "devnet-${var.deployment_name}"
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
@@ -12,7 +12,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.devnet.id
 
   tags = {
-    Name        = "igw"
+    Name        = "igw-${var.deployment_name}"
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
@@ -38,7 +38,7 @@ resource "aws_subnet" "devnet_public" {
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
-    Name        = "public-subnet"
+    Name        = "public-subnet-${var.deployment_name}"
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }
@@ -48,7 +48,7 @@ resource "aws_subnet" "devnet_private" {
   availability_zone = element(var.zones, count.index)
   cidr_block        = element(var.devnet_private_subnet, count.index)
   tags = {
-    Name        = "private-subnet"
+    Name        = "private-subnet-${var.deployment_name}"
     Provisioner = data.aws_caller_identity.provisioner.account_id
   }
 }

@@ -1,12 +1,12 @@
 resource "aws_lb" "avail_nodes" {
-  name               = "avail-lb"
+  name               = "avail-lb-${var.deployment_name}"
   load_balancer_type = "network"
   internal           = false
   subnets            = [for subnet in aws_subnet.devnet_public : subnet.id]
 }
 resource "aws_lb_target_group" "avail_full_node" {
   count       = length(aws_instance.full_node)
-  name        = format("full-node-%02d", count.index + 1)
+  name        = format("full-node-%s-%02d", var.deployment_name, count.index + 1)
   protocol    = "TCP"
   target_type = "instance"
   vpc_id      = aws_vpc.devnet.id
@@ -14,7 +14,7 @@ resource "aws_lb_target_group" "avail_full_node" {
 }
 resource "aws_lb_target_group" "avail_validator" {
   count       = length(aws_instance.validator)
-  name        = format("validator-%02d", count.index + 1)
+  name        = format("validator-%s-%02d", var.deployment_name, count.index + 1)
   protocol    = "TCP"
   target_type = "instance"
   vpc_id      = aws_vpc.devnet.id
@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "avail_validator" {
 }
 resource "aws_lb_target_group" "avail_light_client" {
   count       = length(aws_instance.light_client)
-  name        = format("light-client-%02d", count.index + 1)
+  name        = format("light-client-%s-%02d", var.deployment_name, count.index + 1)
   protocol    = "TCP"
   target_type = "instance"
   vpc_id      = aws_vpc.devnet.id
@@ -86,7 +86,7 @@ resource "aws_lb_listener" "avail_light_client" {
 
 
 resource "aws_lb_target_group" "explorer_rpc" {
-  name        = "avail-alb-target"
+  name        = "avail-alb-target-${var.deployment_name}"
   port        = 443
   protocol    = "TCP"
   target_type = "alb"
@@ -109,7 +109,7 @@ resource "aws_lb_target_group_attachment" "explorer_rpc" {
 }
 
 resource "aws_lb_target_group" "explorer_rpc_insecure" {
-  name        = "avail-alb-target-80"
+  name        = "avail-alb-target-80-${var.deployment_name}"
   port        = 80
   protocol    = "TCP"
   target_type = "alb"
