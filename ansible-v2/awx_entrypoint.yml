@@ -80,7 +80,7 @@
       shell:
         cmd: |
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/main.tf
-          cat /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/main.tf
+          sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/outputs.tf
 
     - name: delete any orphan terraform devnet resources
       shell:
