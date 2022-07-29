@@ -6,7 +6,7 @@ regions:
   
 filters:
   # All instances with current deployment name
-  tag:Name: "{{ lookup('var', 'DEPLOY_NAME_OVERRIDE') }}"
+  tag:DeploymentName: {{ clean_deploy }}
 
 #Takes Key:NodeType and dynamically creates group for respecitve value for Value:value of Key.
 keyed_groups:

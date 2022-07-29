@@ -147,9 +147,8 @@
           unset PYTHONPATH
           source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
           ansible-inventory -i /tmp/{{ REPO_NAME }}/ansible-v2/inventory/aws_ec2.yaml --list
-          ansible-inventory -i /tmp/{{ REPO_NAME }}/ansible-v2/inventory/aws_ec2_test.yaml --list
-          ansible-inventory -i /tmp/{{ REPO_NAME }}/ansible-v2/inventory/aws_ec2_test2.yaml --list   
-          deactivate 
+          ansible-inventory -i /tmp/{{ REPO_NAME }}/ansible-v2/inventory/aws_ec2_test.yaml --list 
+          deactivate
     
     # - name: configure avail devnet nodes after letting them initialize
     #   shell:
