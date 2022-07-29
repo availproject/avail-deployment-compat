@@ -1,4 +1,4 @@
-- hosts: all:&{{ clean_deploy_name }}
+- hosts: all:&{{ current_deploy_inventory }}
   become: true
   gather_facts: True
   vars:
@@ -9,7 +9,7 @@
     - common
 #     - datadog
 # 
-# - hosts: validator:full_node:&"{{ clean_deploy_name }}"
+# - hosts: validator:full_node:&{{ current_deploy_inventory }}
 #   gather_facts: True
 #   vars:
 #     clean_deploy_title: "{{ clean_deploy_name }}"
@@ -19,7 +19,7 @@
 #   roles:
 #     - availnode
 # 
-# - hosts: explorer:&"{{ clean_deploy_name }}"
+# - hosts: explorer:&{{ current_deploy_inventory }}
 #   gather_facts: True
 #   vars:
 #     clean_deploy_title: "{{ clean_deploy_name }}"
@@ -29,7 +29,7 @@
 #   roles:
 #     - explorer
 # 
-# - hosts: light_client:&"{{ clean_deploy_name }}"
+# - hosts: light_client:&{{ current_deploy_inventory }}
 #   gather_facts: True
 #   become: true
 #   vars:
