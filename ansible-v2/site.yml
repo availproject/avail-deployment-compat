@@ -7,34 +7,34 @@
     - init
   roles:
     - common
-#     - datadog
-# 
-# - hosts: validator:full_node:&{{ current_deploy_inventory }}
-#   gather_facts: True
-#   vars:
-#     clean_deploy_title: "{{ clean_deploy_name }}"
-#     avail_scripts_path: "{{ avail_scripts_dir }}"
-#   tags:
-#     - availnode
-#   roles:
-#     - availnode
-# 
-# - hosts: explorer:&{{ current_deploy_inventory }}
-#   gather_facts: True
-#   vars:
-#     clean_deploy_title: "{{ clean_deploy_name }}"
-#   become: true
-#   tags:
-#     - explorer
-#   roles:
-#     - explorer
-# 
-# - hosts: light_client:&{{ current_deploy_inventory }}
-#   gather_facts: True
-#   become: true
-#   vars:
-#     clean_deploy_title: "{{ clean_deploy_name }}"
-#   tags:
-#     - light_client
-#   roles:
-#     - lightclient
+    - datadog
+
+- hosts: validator:full_node:&{{ current_deploy_inventory }}
+  gather_facts: True
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
+    avail_scripts_path: "{{ avail_scripts_dir }}"
+  tags:
+    - availnode
+  roles:
+    - availnode
+
+- hosts: explorer:&{{ current_deploy_inventory }}
+  gather_facts: True
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
+  become: true
+  tags:
+    - explorer
+  roles:
+    - explorer
+
+- hosts: light_client:&{{ current_deploy_inventory }}
+  gather_facts: True
+  become: true
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
+  tags:
+    - light_client
+  roles:
+    - lightclient
