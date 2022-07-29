@@ -75,7 +75,7 @@ fi
 mkdir build/$deployment_name
 
 echo "Generating list of nodes based on the current ansible inventory"
-ansible-inventory -i /tmp/$repo_name/$inventory_path --list | jq '._meta.hostvars[] | {tag_name: .tags.Name, tag_role: .tags.Role, instance_id: .instance_id, tag_deploy: .tags.DeploymentName}'  | jq 'select(.tag_deploy == "$deployment_name")' | jq -s '.' > $tmp_dir/nodes.json
+ansible-inventory -i /tmp/$repo_name/$inventory_path --list | jq '._meta.hostvars[] | {tag_name: .tags.Name, tag_role: .tags.Role, instance_id: .instance_id, tag_deploy: .tags.DeploymentName}'  | jq 'select(.tag_deploy == "'"$deployment_name"'")' | jq -s '.' > $tmp_dir/nodes.json
 cat $tmp_dir/nodes.json | jq -r '.[].tag_name' > $tmp_dir/names.txt
 
 echo "Adding wallets that aren't tied to physical hosts"
