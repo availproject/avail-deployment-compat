@@ -140,24 +140,13 @@
           echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
           echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
           chmod 400 ~/.ssh/awxSshKey.pem
-          
-    - name: test diff inventories
-      vars:
-        deploy_name: "{{ clean_deploy }}"
+    
+    - name: configure avail devnet nodes after letting them initialize
       shell:
         cmd: |
           unset PYTHONPATH
-          echo {{ clean_deploy }}
           source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
-          ansible-inventory -i /tmp/{{ REPO_NAME }}/ansible-v2/inventory/aws_ec2.yaml --list
+          export OP_DEVICE={{ OP_DEVICE_ID }}
+          eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+          ansible-playbook /tmp/{{ REPO_NAME }}/{{ SITE_PLAYBOOK_PATH }} -i /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }} --extra-vars="clean_deploy_name={{ clean_deploy }} avail_scripts_dir=/tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}"
           deactivate
-    
-    # - name: configure avail devnet nodes after letting them initialize
-    #   shell:
-    #     cmd: |
-    #       unset PYTHONPATH
-    #       source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
-    #       export OP_DEVICE={{ OP_DEVICE_ID }}
-    #       eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-    #       ansible-playbook /tmp/{{ REPO_NAME }}/{{ SITE_PLAYBOOK_PATH }} -i /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }} --extra-vars="clean_deploy_name={{ clean_deploy }} avail_scripts_dir=/tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}"
-    #       deactivate
