@@ -4,96 +4,96 @@
     src: "./templates/avail-deployment"
     dest: "/etc/avail-deployment"
     mode: 755
-
-- name: Check whether /etc/avail-deployment contains "{{ clean_deploy_title }}"
-  command: grep -Fxq "{{ clean_deploy_title }}" /etc/avail-deployment
-  register: checkdeployment
-  check_mode: no
-  ignore_errors: yes
-  changed_when: no
-
-- ansible.builtin.assert:
-    that:
-      - checkdeployment.rc == 0
-
-- name: Set a hostname
-  ansible.builtin.hostname:
-    name: "{{ node_hostname }}"
-
-- name: Install aptitude
-  apt:
-    name: aptitude
-    state: latest
-    update_cache: true
-
-- name: Install required system packages
-  tags:
-    - packages
-  apt:
-    pkg:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
-      - python3-pip
-      - virtualenv
-      - python3-setuptools
-      - zile
-      - net-tools
-      - inxi
-    state: latest
-    update_cache: true
-
-- name: Add Docker GPG apt Key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-
-- name: Add Docker Repository
-  apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu focal stable
-    state: present
-
-- name: Update apt and install docker-ce
-  apt:
-    name: docker-ce
-    state: latest
-    update_cache: true
-
-- name: Delete motd
-  tags:
-    - motd
-  file:
-    state: absent
-    path: /etc/update-motd.d/
-
-- name: Create MOTD
-  tags:
-    - motd
-  file:
-    state: directory
-    path: /etc/update-motd.d/
-
-- name: create motd logo
-  tags:
-    - motd
-  ansible.builtin.template:
-    src: "./templates/motd.sh"
-    dest: "/etc/update-motd.d/00-avl-logo"
-    mode: 755
-
-- name: create sysinfo
-  tags:
-    - motd
-  ansible.builtin.template:
-    src: "./templates/info.sh"
-    dest: "/etc/update-motd.d/10-sys-info"
-    mode: 755
-
-- name: create network info
-  tags:
-    - motd
-  ansible.builtin.template:
-    src: "./templates/network.sh"
-    dest: "/etc/update-motd.d/20-network-info"
-    mode: 755
+# 
+# - name: Check whether /etc/avail-deployment contains "{{ clean_deploy_title }}"
+#   command: grep -Fxq "{{ clean_deploy_title }}" /etc/avail-deployment
+#   register: checkdeployment
+#   check_mode: no
+#   ignore_errors: yes
+#   changed_when: no
+# 
+# - ansible.builtin.assert:
+#     that:
+#       - checkdeployment.rc == 0
+# 
+# - name: Set a hostname
+#   ansible.builtin.hostname:
+#     name: "{{ node_hostname }}"
+# 
+# - name: Install aptitude
+#   apt:
+#     name: aptitude
+#     state: latest
+#     update_cache: true
+# 
+# - name: Install required system packages
+#   tags:
+#     - packages
+#   apt:
+#     pkg:
+#       - apt-transport-https
+#       - ca-certificates
+#       - curl
+#       - software-properties-common
+#       - python3-pip
+#       - virtualenv
+#       - python3-setuptools
+#       - zile
+#       - net-tools
+#       - inxi
+#     state: latest
+#     update_cache: true
+# 
+# - name: Add Docker GPG apt Key
+#   apt_key:
+#     url: https://download.docker.com/linux/ubuntu/gpg
+#     state: present
+# 
+# - name: Add Docker Repository
+#   apt_repository:
+#     repo: deb https://download.docker.com/linux/ubuntu focal stable
+#     state: present
+# 
+# - name: Update apt and install docker-ce
+#   apt:
+#     name: docker-ce
+#     state: latest
+#     update_cache: true
+# 
+# - name: Delete motd
+#   tags:
+#     - motd
+#   file:
+#     state: absent
+#     path: /etc/update-motd.d/
+# 
+# - name: Create MOTD
+#   tags:
+#     - motd
+#   file:
+#     state: directory
+#     path: /etc/update-motd.d/
+# 
+# - name: create motd logo
+#   tags:
+#     - motd
+#   ansible.builtin.template:
+#     src: "./templates/motd.sh"
+#     dest: "/etc/update-motd.d/00-avl-logo"
+#     mode: 755
+# 
+# - name: create sysinfo
+#   tags:
+#     - motd
+#   ansible.builtin.template:
+#     src: "./templates/info.sh"
+#     dest: "/etc/update-motd.d/10-sys-info"
+#     mode: 755
+# 
+# - name: create network info
+#   tags:
+#     - motd
+#   ansible.builtin.template:
+#     src: "./templates/network.sh"
+#     dest: "/etc/update-motd.d/20-network-info"
+#     mode: 755
