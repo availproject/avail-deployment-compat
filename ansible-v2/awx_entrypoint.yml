@@ -142,7 +142,7 @@
           chmod 400 ~/.ssh/awxSshKey.pem
           
     - name: test diff inventories
-      environment:
+      vars:
         deploy_name: "{{ clean_deploy }}"
       shell:
         cmd: |
