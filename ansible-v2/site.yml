@@ -1,4 +1,12 @@
 - hosts: all:&{{ current_deploy_inventory }}
+  gather_facts: no
+  tasks:
+  - name: Wait for instances to become reachable
+    ansible.builtin.wait_for_connection:
+      delay: 30
+      timeout: 300
+
+- hosts: all:&{{ current_deploy_inventory }}
   become: true
   gather_facts: True
   vars:
