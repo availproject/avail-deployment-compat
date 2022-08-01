@@ -86,6 +86,7 @@
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }}
 
     - name: delete any orphan one password devnet resources
+      ignore_errors: yes
       shell:
         cmd: |
           export OP_DEVICE={{ OP_DEVICE_ID }}
