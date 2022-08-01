@@ -77,25 +77,27 @@
           }
           
     - name: set unique module name to allow for concurrent devnet deployments
+      args:
+        warn: false
       shell:
         cmd: |
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/main.tf
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/outputs.tf
+          sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }}
 
-    - name: delete any orphan terraform devnet resources
-      shell:
-        cmd: |
-          cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
-          terraform init
-          terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
-          terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
-    
+    # - name: delete any orphan terraform devnet resources
+    #   shell:
+    #     cmd: |
+    #       cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
+    #       terraform init
+    #       terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
+    #       terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
+    # 
     - name: init terraform and apply avail resources
       shell:
         cmd: |
           cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
           terraform init
-          terraform apply -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
           echo $(terraform output -json pk_ansible)
       register: nodes
     

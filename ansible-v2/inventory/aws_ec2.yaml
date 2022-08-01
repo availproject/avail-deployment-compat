@@ -3,6 +3,9 @@ plugin: amazon.aws.aws_ec2
 
 regions:
   - us-west-2
+  
+filters:
+  tag:DeploymentName: {module_name}
 
 #Takes Key:NodeType and dynamically creates group for respecitve value for Value:value of Key.
 keyed_groups:
