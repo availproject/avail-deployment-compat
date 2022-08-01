@@ -85,78 +85,67 @@
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/outputs.tf
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }}
 
+    - name: delete any orphan one password devnet resources
+      shell:
+        cmd: |
+          export OP_DEVICE={{ OP_DEVICE_ID }}
+          eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+          op vault delete "Avail Devnet: {{ clean_deploy }}"
+
     # - name: delete any orphan terraform devnet resources
+    #   register: tf_result
+    #   retries: 2
+    #   delay: 5
+    #   until: tf_result is not failed
     #   shell:
     #     cmd: |
     #       cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
     #       terraform init
     #       terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
-    #       terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
     # 
-    - name: init terraform and apply avail resources
-      shell:
-        cmd: |
-          cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
-          terraform init
-          echo $(terraform output -json pk_ansible)
-      register: nodes
-    
-    - name: get binary release metadata
-      uri:
-        url: https://api.github.com/repos/maticnetwork/avail/releases/latest
-        return_content: true
-        headers:
-          Authorization: 'token {{ lookup("env", "PAT_TOKEN") }}'
-      register: github_response
-    
-    - set_fact:
-        binary_asset_url: '{{  github_response.json.assets|json_query(query) }}'
-      vars:
-        query: "[?name=='{{ GITHUB_BINARY_FILENAME }}'].url | [0]"
-    
-    - name: get binary asset location
-      uri:
-        url: '{{ binary_asset_url }}'
-        return_content: false
-        follow_redirects: none
-        status_code: 302
-        headers:
-          Authorization: 'token {{ lookup("env", "PAT_TOKEN") }}'
-          Accept: application/octet-stream
-      register: assets
+    # - name: init terraform and apply avail resources
+    #   shell:
+    #     cmd: |
+    #       cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
+    #       terraform init
+    #       terraform apply -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
+    #       echo $(terraform output -json pk_ansible)
+    #   register: nodes
+    # 
     
     - name: download binary
       get_url:
-        url: '{{ assets.location }}'
+        url: https://github.com/{{ ORG_NAME }}/{{ REPO_NAME }}/releases/download/{{ BINARY_VERSION_TAG }}/{{ GITHUB_BINARY_FILENAME }}
         dest: /tmp/{{ REPO_NAME }}/{{ GITHUB_BINARY_FILENAME }}
         mode: 0755
-    
-    - name: wallet, node key, and chainspec generation
-      shell:
-        cmd: |
-          unset PYTHONPATH
-          cd /tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}
-          rm -r -f build/{{ clean_deploy }}
-          source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
-          export OP_DEVICE={{ OP_DEVICE_ID }}
-          eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-          bash prep.sh -d {{ clean_deploy }} -r {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
-          deactivate
-    
-    - name: prep ssh key for remote node connections
-      shell:
-        cmd: |
-          echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
-          echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
-          chmod 400 ~/.ssh/awxSshKey.pem
-    
-    - name: configure avail devnet nodes after letting them initialize
-      shell:
-        cmd: |
-          unset PYTHONPATH
-          source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
-          DEPLOY_SPECIFIC_INV_GROUP=$(echo {{ clean_deploy }} | tr '-' '_')
-          export OP_DEVICE={{ OP_DEVICE_ID }}
-          eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-          ansible-playbook /tmp/{{ REPO_NAME }}/{{ SITE_PLAYBOOK_PATH }} -i /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }} --extra-vars="clean_deploy_name={{ clean_deploy }} current_deploy_inventory=$DEPLOY_SPECIFIC_INV_GROUP avail_scripts_dir=/tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}"
-          deactivate
+
+    # 
+    # - name: wallet, node key, and chainspec generation
+    #   shell:
+    #     cmd: |
+    #       unset PYTHONPATH
+    #       cd /tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}
+    #       rm -r -f build/{{ clean_deploy }}
+    #       source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
+    #       export OP_DEVICE={{ OP_DEVICE_ID }}
+    #       eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+    #       bash prep.sh -d {{ clean_deploy }} -r {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
+    #       deactivate
+    # 
+    # - name: prep ssh key for remote node connections
+    #   shell:
+    #     cmd: |
+    #       echo {{ nodes.stdout_lines[-1] }} > /tmp/awxSshKey.pem
+    #       echo -e "$(</tmp/awxSshKey.pem )" > ~/.ssh/awxSshKey.pem
+    #       chmod 400 ~/.ssh/awxSshKey.pem
+    # 
+    # - name: configure avail devnet nodes after letting them initialize
+    #   shell:
+    #     cmd: |
+    #       unset PYTHONPATH
+    #       source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
+    #       DEPLOY_SPECIFIC_INV_GROUP=$(echo {{ clean_deploy }} | tr '-' '_')
+    #       export OP_DEVICE={{ OP_DEVICE_ID }}
+    #       eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+    #       ansible-playbook /tmp/{{ REPO_NAME }}/{{ SITE_PLAYBOOK_PATH }} -i /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }} --extra-vars="clean_deploy_name={{ clean_deploy }} current_deploy_inventory=$DEPLOY_SPECIFIC_INV_GROUP avail_scripts_dir=/tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}"
+    #       deactivate
