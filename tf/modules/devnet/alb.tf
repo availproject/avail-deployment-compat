@@ -1,5 +1,5 @@
 resource "aws_lb_target_group" "avail_full_node_ws" {
-  name        = "full-node-ws"
+  name        = "full-node-ws-${var.deployment_name}"
   protocol    = "HTTP"
   target_type = "instance"
   vpc_id      = aws_vpc.devnet.id
@@ -12,7 +12,7 @@ resource "aws_lb_target_group_attachment" "avail_full_node_ws" {
   port             = var.avail_ws_port
 }
 resource "aws_lb_target_group" "avail_full_node_rpc" {
-  name        = "full-node-rpc"
+  name        = "full-node-rpc-${var.deployment_name}"
   protocol    = "HTTP"
   target_type = "instance"
   vpc_id      = aws_vpc.devnet.id
@@ -25,25 +25,34 @@ resource "aws_lb_target_group_attachment" "avail_full_node_rpc" {
   port             = var.avail_rpc_port
 }
 resource "aws_lb_target_group" "avail_explorer_http" {
-  name        = "explorer-http"
+  name        = "explorer-http-${var.deployment_name}"
   protocol    = "HTTP"
   target_type = "instance"
   vpc_id      = aws_vpc.devnet.id
   port        = var.avail_explorer_port
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_lb_target_group_attachment" "avail_explorer_http" {
   count            = length(aws_instance.explorer)
   target_group_arn = aws_lb_target_group.avail_explorer_http.arn
   target_id        = element(aws_instance.explorer, count.index).id
   port             = var.avail_explorer_port
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb" "explorer_rpc" {
-  name               = "avail-alb-explorer"
+  name               = "avail-alb-explorer-${var.deployment_name}"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.allow_http_https_explorer.id, aws_default_security_group.default.id]
   internal           = true
   subnets            = [for subnet in aws_subnet.devnet_private : subnet.id]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "avail_explorer_80" {
@@ -60,6 +69,9 @@ resource "aws_lb_listener" "avail_explorer_80" {
       status_code = "HTTP_301"
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb_listener" "avail_explorer_443" {
@@ -71,6 +83,9 @@ resource "aws_lb_listener" "avail_explorer_443" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.avail_explorer_http.arn
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -90,6 +105,9 @@ resource "aws_lb_listener_rule" "avail_ws" {
       values = ["/ws"]
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 
 }
 resource "aws_lb_listener_rule" "avail_rpc" {
@@ -106,6 +124,8 @@ resource "aws_lb_listener_rule" "avail_rpc" {
       values = ["/rpc"]
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 
 }
-

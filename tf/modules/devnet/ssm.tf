@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ec2_role" {
-  name = "ec2_role"
+  name = "ec2_role_${var.deployment_name}"
 
   assume_role_policy = <<POLYGON
 {
@@ -26,7 +26,7 @@ POLYGON
 }
 
 resource "aws_iam_policy" "ec2_policy" {
-  name        = "ec2_policy"
+  name        = "ec2_policy_${var.deployment_name}"
   path        = "/"
   description = "Policy to provide permissin to EC2"
   policy      = <<POLYGON
@@ -133,13 +133,13 @@ POLYGON
 }
 
 resource "aws_iam_policy_attachment" "ec2_policy_role" {
-  name       = "ec2_attachment"
+  name       = "ec2_attachment_${var.deployment_name}"
   roles      = [aws_iam_role.ec2_role.name]
   policy_arn = aws_iam_policy.ec2_policy.arn
 }
 
 resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "ec2_profile"
+  name = "ec2_profile_${var.deployment_name}"
   role = aws_iam_role.ec2_role.name
 }
 

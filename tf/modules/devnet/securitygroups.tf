@@ -22,21 +22,30 @@ resource "aws_default_security_group" "default" {
 
 resource "aws_security_group" "allow_p2p_validator" {
   count       = length(aws_instance.validator)
-  name        = format("allow-p2p-validator-%02d", count.index + 1)
+  name        = format("allow-p2p-validator-%s-%02d", var.deployment_name, count.index + 1)
   description = "Allow all p2p traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group" "allow_p2p_full_node" {
   count       = length(aws_instance.full_node)
-  name        = format("allow-p2p-full-node-%02d", count.index + 1)
+  name        = format("allow-p2p-full-node-%s-%02d", var.deployment_name, count.index + 1)
   description = "Allow all p2p traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group" "allow_p2p_light_client" {
   count       = length(aws_instance.light_client)
-  name        = format("allow-p2p-light-client-%02d", count.index + 1)
+  name        = format("allow-p2p-light-client-%s-%02d", var.deployment_name, count.index + 1)
   description = "Allow all p2p traffic for avail light clients"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group_rule" "allow_internal_validator" {
   count             = length(aws_instance.validator)
@@ -84,9 +93,12 @@ resource "aws_network_interface_sg_attachment" "sg_light_client_attachment_p2p" 
 
 
 resource "aws_security_group" "allow_rpc_full_node" {
-  name        = "allow-rpc-full-node"
+  name        = "allow-rpc-full-node-${var.deployment_name}"
   description = "Allow all rpc and ws traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_security_group_rule" "allow_full_node_rpc" {
@@ -113,9 +125,12 @@ resource "aws_network_interface_sg_attachment" "sg_full_node_attachment_rpc" {
 
 
 resource "aws_security_group" "allow_http_https_explorer" {
-  name        = "allow-http-https-explorer"
+  name        = "allow-http-https-explorer-${var.deployment_name}"
   description = "Allow all http and https traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group_rule" "allow_http_explorer" {
   type              = "ingress"
@@ -137,9 +152,12 @@ resource "aws_security_group_rule" "allow_https_explorer" {
 
 
 resource "aws_security_group" "allow_outbound_everywhere" {
-  name        = "allow-everything-out"
+  name        = "allow-everything-out-${var.deployment_name}"
   description = "Allow all outgoing traffic"
   vpc_id      = aws_vpc.devnet.id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 resource "aws_security_group_rule" "allow_outbound_everywhere" {
   type              = "egress"

@@ -63,7 +63,7 @@
 
 - name: create chainspec
   ansible.builtin.template:
-    src: "../../build/{{ deployment_name }}/populated.devnet.chainspec.raw.json"
+    src: "{{ avail_scripts_path }}/build/{{ clean_deploy_title }}/populated.devnet.chainspec.raw.json"
     dest: "{{ node_base_path }}/genesis/devnet.chain.spec.raw.json"
     mode: 755
   notify: restart node

@@ -1,27 +1,47 @@
-- hosts: all
+- hosts: all:&{{ current_deploy_inventory }}
+  gather_facts: no
+  tasks:
+  - name: Wait for instances to become reachable
+    ansible.builtin.wait_for_connection:
+      delay: 30
+      timeout: 300
+
+- hosts: all:&{{ current_deploy_inventory }}
   become: true
+  gather_facts: True
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
   tags:
     - init
   roles:
     - common
     - datadog
 
-- hosts: validator:full_node
-  become: true
+- hosts: validator:full_node:&{{ current_deploy_inventory }}
+  gather_facts: True
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
+    avail_scripts_path: "{{ avail_scripts_dir }}"
   tags:
     - availnode
   roles:
     - availnode
 
-- hosts: explorer
+- hosts: explorer:&{{ current_deploy_inventory }}
+  gather_facts: True
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
   become: true
   tags:
     - explorer
   roles:
     - explorer
 
-- hosts: light_client
+- hosts: light_client:&{{ current_deploy_inventory }}
+  gather_facts: True
   become: true
+  vars:
+    clean_deploy_title: "{{ clean_deploy_name }}"
   tags:
     - light_client
   roles:

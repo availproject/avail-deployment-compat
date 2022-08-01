@@ -16,7 +16,7 @@
     volumes: "{{ datadog_volumes }}"
     env:
       DD_API_KEY: "{{ datadog_api_key|default('FAKE_KEY') }}"
-      DD_TAGS: "network:avail-devnet, deploy:{{ deployment_name }}"
+      DD_TAGS: "network:avail-devnet, deploy:{{ clean_deploy_title }}"
       DD_PROCESS_AGENT_ENABLED: "true"
       DD_LOGS_STDOUT: "true"
       DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
