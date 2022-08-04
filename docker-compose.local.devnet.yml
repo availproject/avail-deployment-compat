@@ -6,14 +6,12 @@
 # docker-compose -f docker-compose.local.testnet.yml rm
 version: "3.3"
 services:
-  bootstrap_lc:
+  bootstraplc:
     build:  
         context: ./images/client
         dockerfile: Dockerfile-dev
         args:
-          - BRANCH=develop
-    # depends_on:
-    #   - full_node
+          - BRANCH=luka/randomize-seed
     entrypoint: [
       "wait-for-it",
       "-t", "30",
@@ -28,9 +26,10 @@ services:
       - HTTP_SERVER_HOST=0.0.0.0
       - FULL_NODE_RPC=["http://host.docker.internal:9933"]
       - FULL_NODE_WS=["ws://host.docker.internal:9944"]
-      - LOG_LEVEL="INFO"
+      - LOG_LEVEL="DEBUG"
       - PARALLEL_TASKS=8
       - IPFS_SEED=1
+      - IPFS_PORT=37000
       - DISABLE_RPC=true
       - BLOCK_PROCESSING_DELAY=10
     extra_hosts:
@@ -44,25 +43,25 @@ services:
         args:
           - BRANCH=luka/randomize-seed
     depends_on:
-      - bootstrap_lc
+      - bootstraplc
     entrypoint: [
       "wait-for-it",
       "-t", "30",
-      "host.docker.internal:9944",
+      "host.docker.internal:37000",
       "--",
       "/app/avail-light/start.sh"
     ]
     deploy:
       mode: replicated
-      replicas: 20
+      replicas: 2
     environment:
       - HTTP_SERVER_HOST=0.0.0.0
       - FULL_NODE_RPC=["http://host.docker.internal:9933"]
       - FULL_NODE_WS=["ws://host.docker.internal:9944"]
-      - LOG_LEVEL="INFO"
+      - LOG_LEVEL="DEBUG"
       - PARALLEL_TASKS=8
       - IPFS_SEED_RANDOM=true
-      - BOOTSTRAPS=[["12D3KooWMm1c4pzeLPGkkCJMAgFbsfQ8xmVDusg272icWsaNHWzN", "/dns4/host.docker.internal/tcp/37000"]]
+      - BOOTSTRAPS=[["12D3KooWMm1c4pzeLPGkkCJMAgFbsfQ8xmVDusg272icWsaNHWzN", "/ip4/172.17.0.1/tcp/37000"]]
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
