@@ -104,14 +104,13 @@
     #       terraform init
     #       terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
     # 
-    # - name: init terraform and apply avail resources
-    #   shell:
-    #     cmd: |
-    #       cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
-    #       terraform init
-    #       terraform apply -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
-    #       echo $(terraform output -json pk_ansible)
-    #   register: nodes
+    - name: init terraform and apply avail resources
+      shell:
+        cmd: |
+          cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
+          terraform init
+          echo $(terraform output -json pk_ansible)
+      register: nodes
     
     - name: download binary
       get_url:
