@@ -7,7 +7,7 @@ WORKDIR app
 FROM chef AS planner
 
 ARG BRANCH=develop
-RUN git clone -b ${BRANCH} https://github.com/maticnetwork/avail-light.git && cd avail-light
+RUN git clone --depth 1 -b ${BRANCH} https://github.com/maticnetwork/avail-light.git && cd avail-light
 RUN cargo chef prepare  --recipe-path /app/recipe.json
 
 FROM chef AS builder
@@ -18,7 +18,7 @@ RUN apt-get update && \
 
 ARG BRANCH=develop
 # Build application
-RUN rm -rf avail-light && git clone -b ${BRANCH} https://github.com/maticnetwork/avail-light.git
+RUN rm -rf avail-light && git clone --depth 1 -b ${BRANCH} https://github.com/maticnetwork/avail-light.git
 # Build dependencies - this is the caching Docker layer!
 RUN cd avail-light && cargo chef cook --release --recipe-path /app/recipe.json
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
@@ -47,6 +47,7 @@ ENV \
 	LOG_LEVEL="INFO" \
 	PARALLEL_TASKS=8 \
 	IPFS_SEED_RANDOM=false \
+	IPFS_PORT_RANDOM=false \
 	DISABLE_RPC=false \
 	BLOCK_PROCESSING_DELAY=0
 
