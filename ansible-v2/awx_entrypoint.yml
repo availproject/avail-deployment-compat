@@ -9,7 +9,7 @@
       shell:
         cmd: |
           unset PYTHONPATH
-          yum install curl gcc jq python3-devel python-boto3 python-devel python-virtualenv yum-utils -y
+          yum install awscli curl gcc jq python3-devel python-boto3 python-devel python-virtualenv yum-utils -y
           curl -sSfo op.zip \
             https://cache.agilebits.com/dist/1P/op2/pkg/v2.0.0/op_linux_amd64_v2.0.0.zip \
             && unzip -od /usr/local/bin/ op.zip \
@@ -85,31 +85,30 @@
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}/outputs.tf
           sed -i -e 's/{module_name}/{{ clean_deploy }}/g' /tmp/{{ REPO_NAME }}/{{ INVENTORY_PATH }}
 
-    - name: delete any orphan one password devnet resources
-      ignore_errors: yes
-      shell:
-        cmd: |
-          export OP_DEVICE={{ OP_DEVICE_ID }}
-          eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-          op vault delete "Avail Devnet: {{ clean_deploy }}"
-    
-    - name: delete any orphan terraform devnet resources
-      register: tf_result
-      retries: 2
-      delay: 5
-      until: tf_result is not failed
-      shell:
-        cmd: |
-          cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
-          terraform init
-          terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
-    
+    # - name: delete any orphan one password devnet resources
+    #   ignore_errors: yes
+    #   shell:
+    #     cmd: |
+    #       export OP_DEVICE={{ OP_DEVICE_ID }}
+    #       eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+    #       op vault delete "Avail Devnet: {{ clean_deploy }}"
+    # 
+    # - name: delete any orphan terraform devnet resources
+    #   register: tf_result
+    #   retries: 2
+    #   delay: 5
+    #   until: tf_result is not failed
+    #   shell:
+    #     cmd: |
+    #       cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
+    #       terraform init
+    #       terraform destroy -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
+    # 
     - name: init terraform and apply avail resources
       shell:
         cmd: |
           cd /tmp/{{ REPO_NAME }}/{{ TERRAFORM_PATH }}
           terraform init
-          terraform apply -target=module.{{ clean_deploy }} -no-color -var 'deploy_name={{ clean_deploy }}' -var 'owner={{ awx_user_name }}' -var 'full_node_count={{ FULL_NODE_COUNT }}' -var 'validator_count={{ VALIDATOR_COUNT }}' -auto-approve
           echo $(terraform output -json pk_ansible)
       register: nodes
     
@@ -119,17 +118,17 @@
         dest: /tmp/{{ REPO_NAME }}/{{ GITHUB_BINARY_FILENAME }}
         mode: 0755
     
-    - name: wallet, node key, and chainspec generation
-      shell:
-        cmd: |
-          unset PYTHONPATH
-          cd /tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}
-          rm -r -f build/{{ clean_deploy }}
-          source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
-          export OP_DEVICE={{ OP_DEVICE_ID }}
-          eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
-          bash prep.sh -d {{ clean_deploy }} -r {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
-          deactivate
+    # - name: wallet, node key, and chainspec generation
+    #   shell:
+    #     cmd: |
+    #       unset PYTHONPATH
+    #       cd /tmp/{{ REPO_NAME }}/{{ SCRIPTS_PATH }}
+    #       rm -r -f build/{{ clean_deploy }}
+    #       source /opt/venv/{{ CUSTOM_VENV }}/bin/activate
+    #       export OP_DEVICE={{ OP_DEVICE_ID }}
+    #       eval $(echo '{{ lookup("env", "OP_PASS") }}' | op account add --address {{ OP_ADDRESS }} --email {{ OP_EMAIL }}  --secret-key {{ lookup("env", "OP_SECRET") }}  --shorthand awx --signin)
+    #       bash prep.sh -d {{ clean_deploy }} -r {{ REPO_NAME }} -b {{ GITHUB_BINARY_FILENAME }} -i {{ INVENTORY_PATH }}
+    #       deactivate
     
     - name: prep ssh key for remote node connections
       shell:
