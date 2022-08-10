@@ -47,9 +47,10 @@ ENV \
 	LOG_LEVEL="INFO" \
 	PARALLEL_TASKS=8 \
 	IPFS_SEED_RANDOM=false \
-	IPFS_PORT_RANDOM=false \
 	DISABLE_RPC=false \
-	BLOCK_PROCESSING_DELAY=0
+	BLOCK_PROCESSING_DELAY=0 \
+	DISABLE_PROOF_VERIFICATION=false \
+	BLOCK_MATRIX_PARTITION="\"None\""
 
 WORKDIR /app/avail-light
 COPY --from=builder /app/avail-light/target/release/avail-light /app/avail-light/avail-light
