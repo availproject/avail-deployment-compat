@@ -11,6 +11,7 @@
   gather_facts: True
   vars:
     clean_deploy_title: "{{ clean_deploy_name }}"
+    avail_client_version: "{{ avail_client_tag }}"
   tags:
     - init
   roles:
@@ -22,6 +23,7 @@
   vars:
     clean_deploy_title: "{{ clean_deploy_name }}"
     avail_scripts_path: "{{ avail_scripts_dir }}"
+    avail_client_version: "{{ avail_client_tag }}"
   tags:
     - availnode
   roles:
@@ -31,6 +33,7 @@
   gather_facts: True
   vars:
     clean_deploy_title: "{{ clean_deploy_name }}"
+    avail_client_version: "{{ avail_client_tag }}"
   become: true
   tags:
     - explorer
@@ -42,6 +45,7 @@
   become: true
   vars:
     clean_deploy_title: "{{ clean_deploy_name }}"
+    avail_client_version: "{{ avail_client_tag }}"
   tags:
     - light_client
   roles:
