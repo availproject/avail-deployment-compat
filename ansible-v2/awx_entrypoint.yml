@@ -115,7 +115,7 @@
     
     - name: download binary
       get_url:
-        url: https://github.com/{{ ORG_NAME }}/{{ GITHUB_BINARY_REPO }}/releases/download/v{{ CLIENT_VERSION_TAG }}/{{ GITHUB_BINARY_FILENAME }}
+        url: https://github.com/{{ ORG_NAME }}/{{ GITHUB_BINARY_REPO }}/releases/download/{{ CLIENT_VERSION_TAG }}/{{ GITHUB_BINARY_FILENAME }}
         dest: /tmp/{{ REPO_NAME }}/{{ GITHUB_BINARY_FILENAME }}
         mode: 0755
     
