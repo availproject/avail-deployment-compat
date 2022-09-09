@@ -36,4 +36,6 @@ module "{module_name}" {
   devnet_key_name     = "ansiblePair"
   full_node_count     = var.full_node_count
   validator_count     = var.validator_count
+  light_client_count  = var.lightclient_count
+  explorer_count      = var.explorer_count
 }
