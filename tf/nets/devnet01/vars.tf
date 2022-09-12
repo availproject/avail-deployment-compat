@@ -17,3 +17,13 @@ variable "validator_count" {
   description = "number of validator nodes in devnet"
   type        = number
 }
+
+variable "lightclient_count" {
+  description = "number of lightclient nodes in devnet"
+  type        = number
+}
+
+variable "explorer_count" {
+  description = "number of explorer nodes in devnet"
+  type        = number
+}

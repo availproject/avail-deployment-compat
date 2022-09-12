@@ -1,6 +1,6 @@
 ---
 deployment_name: "{{ clean_deploy_title }}"
-lb_dns: "{{ clean_deploy_title }}.devnet-polygon.com"
+lb_dns: "{{ clean_deploy_title }}.dataavailability.link"
 node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
 avail_domain: "{{ lb_dns }}"
 node_hostname: "{{ node_name }}.{{ avail_domain}}"
@@ -18,9 +18,9 @@ node_network_mode: default
 node_in_peers: 50
 node_out_peers: 50
 node_ws_max_connections: 1000
-explorer_docker_tag: v1.0.1
+explorer_docker_tag: "{{ explorer_version }}"
 explorer_http_port: 8080
-lightclient_docker_tag: 1.0.1
+lightclient_docker_tag: "{{ lightclient_version }}"
 ansible_python_interpreter: /usr/bin/python3
 
 prometheus:
