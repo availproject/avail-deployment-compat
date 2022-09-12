@@ -30,8 +30,8 @@ terraform {
 module "{module_name}" {
   source              = "../../modules/devnet"
   deployment_name     = var.deploy_name
-  route53_zone_id     = "Z0491767NTM9F1P94D5W" # devnet-polygon.com
-  route53_domain_name = "${var.deploy_name}.devnet-polygon.com"
+  route53_zone_id     = "Z0313018249JD9NBSCJ1O" # dataavailability.link
+  route53_domain_name = "${var.deploy_name}.dataavailability.link"
   owner               = var.owner
   devnet_key_name     = "ansiblePair"
   full_node_count     = var.full_node_count
