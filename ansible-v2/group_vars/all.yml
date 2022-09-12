@@ -1,6 +1,6 @@
 ---
 deployment_name: "{{ clean_deploy_title }}"
-lb_dns: "{{ clean_deploy_title }}.devnet-polygon.com"
+lb_dns: "{{ clean_deploy_title }}.dataavailability.link"
 node_name: "{{ hostvars[inventory_hostname].tags.Name }}"
 avail_domain: "{{ lb_dns }}"
 node_hostname: "{{ node_name }}.{{ avail_domain}}"
