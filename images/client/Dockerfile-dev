@@ -50,7 +50,8 @@ ENV \
 	DISABLE_RPC=false \
 	BLOCK_PROCESSING_DELAY=0 \
 	DISABLE_PROOF_VERIFICATION=false \
-	BLOCK_MATRIX_PARTITION="\"None\""
+	BLOCK_MATRIX_PARTITION="\"None\"" \
+	QUERY_PROOF_RPC_PARALLEL_TASKS=10
 
 WORKDIR /app/avail-light
 COPY --from=builder /app/avail-light/target/release/avail-light /app/avail-light/avail-light
