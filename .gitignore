@@ -11,3 +11,6 @@ Cargo.lock
 .DS_Store
 /volume/.DS_Store
 __pycache__/
+
+# Vagrant utility files
+.vagrant/

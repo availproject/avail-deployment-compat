@@ -1,0 +1,67 @@
+FULL_NODE_PUBLIC_IP = "192.168.40.100" 
+BOOTSTRAP_LC_PUBLIC_IP = "192.168.40.120" # Range start for fat client IP allocation
+LIGHT_CLIENTS_IP_RANGE_START = "192.168.40.150" # Range start for light client IP allocation
+FAT_CLIENT_VMS = 2
+LIGHT_CLIENT_VMS = 2
+FAT_CLIENT_NUMBER_PER_VM = 2
+LIGHT_CLIENT_NUMBER_PER_VM = 2
+# Number of partitions should be less or equal to FAT_CLIENT_VMS * FAT_CLIENT_NUMBER_PER_VM
+FAT_CLIENT_PARTITION_NUMBER = 10
+# Vagrant public networks are actually bridged networks!
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/ubuntu2204"
+    fat_client_ip_parts = BOOTSTRAP_LC_PUBLIC_IP.split('.')
+    light_client_ip_parts = LIGHT_CLIENTS_IP_RANGE_START.split('.')
+
+    config.vm.define "full_node_vm" do |fn|
+        fn.vm.provision "shell", path: "full_node.sh"
+        fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
+        fn.vm.network "private_network", ip: FULL_NODE_PUBLIC_IP
+        fn.vm.provider "vmware_desktop" do |v|
+            v.vmx["memsize"] = "4096"
+            v.vmx["numvcpus"] = "8"
+        end
+    end
+
+    # Deploy bootstrap client along with a second LC
+    config.vm.define "bootstrap_lc_vm" do |blc|
+        blc.vm.provision "shell", path: "bootstrap_lc.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP]
+        blc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
+        blc.vm.network "private_network", ip: BOOTSTRAP_LC_PUBLIC_IP
+        blc.vm.provider "vmware_desktop" do |v|
+            v.vmx["memsize"] = "1024"
+            v.vmx["numvcpus"] = "2"
+        end
+    end
+
+    # Deploy fat clients
+    (1..FAT_CLIENT_VMS).each do |i|
+        config.vm.define "fat_clients_vm_#{i}" do |fc|
+            ip_address = "#{fat_client_ip_parts[0]}.#{fat_client_ip_parts[1]}.#{fat_client_ip_parts[2]}.#{fat_client_ip_parts[3].to_i+i}"
+            # FAT_CLIENT_NUMBER_PER_VM + i because of the fat client block partitioning
+            fc.vm.provision "shell", path: "fat_client.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP, FAT_CLIENT_NUMBER_PER_VM, i, FAT_CLIENT_PARTITION_NUMBER]
+            fc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
+            fc.vm.network "private_network", ip: ip_address
+            fc.vm.provider "vmware_desktop" do |v|
+                v.vmx["memsize"] = "2048"
+                v.vmx["numvcpus"] = "4"
+            end
+        end
+    end
+        
+    # Deploy regular LCs
+    (1..LIGHT_CLIENT_VMS).each do |i|
+        config.vm.define "light_client_vm_#{i}" do |lc|
+            ip_address = "#{light_client_ip_parts[0]}.#{light_client_ip_parts[1]}.#{light_client_ip_parts[2]}.#{light_client_ip_parts[3].to_i+i}"
+            lc.vm.provision "shell", path: "light_client.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP, LIGHT_CLIENT_NUMBER_PER_VM]
+            lc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
+            lc.vm.network "private_network", ip: ip_address
+            lc.vm.provider "vmware_desktop" do |v|
+                v.vmx["memsize"] = "1024"
+                v.vmx["numvcpus"] = "2"
+            end
+        end
+    end
+
+end
