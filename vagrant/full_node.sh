@@ -7,7 +7,7 @@ echo "Killing Avail process"
 sudo killall data-avail
 
 mkdir -p /home/vagrant/avail
-cp /home/vagrant/sync_folder/full-node/data-avail /home/vagrant/avail/data-avail
+sudo cp /home/vagrant/sync_folder/full-node/data-avail /home/vagrant/avail/data-avail
 
 cd /home/vagrant/avail || exit
 echo "Starting up Avail full node..."

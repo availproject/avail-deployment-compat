@@ -34,7 +34,7 @@ do
         echo "prometheus_port = 952$i"
     } >> config.yaml
     
-    nohup ./lc$i/avail-light &> avail-light-client.txt &
+    nohup ./avail-light &> avail-light-client.txt &
     cd ..
 done
 
