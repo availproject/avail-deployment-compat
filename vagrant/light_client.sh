@@ -24,6 +24,7 @@ do
     mkdir -p /home/vagrant/avail-light-client/lc$i
     cp /home/vagrant/sync_folder/light-client/avail-light /home/vagrant/avail-light-client/lc$i/avail-light
     cp /home/vagrant/sync_folder/light-client/config_light_client.yaml /home/vagrant/avail-light-client/lc$i/config.yaml
+    cd lc$i || exit 
     {
         echo "bootstraps = [[\"12D3KooWStAKPADXqJ7cngPYXd2mSANpdgh1xQ34aouufHA2xShz\",\"/ip4/$2/tcp/39000\"]]"
         echo "full_node_rpc = [\"http://$1:9933\"]"
@@ -31,9 +32,10 @@ do
         echo "libp2p_port = \"3700$i\""
         echo "http_server_port = \"700$i\""
         echo "prometheus_port = 952$i"
-    } >> lc$i/config.yaml
+    } >> config.yaml
     
-    cd lc$i && nohup ./lc$i/avail-light &> avail-light-client.txt && cd ..
+    nohup ./lc$i/avail-light &> avail-light-client.txt &
+    cd ..
 done
 
 
