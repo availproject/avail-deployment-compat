@@ -8,8 +8,6 @@ libp2p_psk_path = "avail_ipfs_store"
 libp2p_tcp_port_reuse = false
 # log_format_json = true
 
-full_node_rpc = ["http://192.168.40.100:9933"]
-full_node_ws = ["ws://192.168.40.100:9944"]
 app_id = 0
 confidence = 92.0
 avail_path = "avail_path"

@@ -20,7 +20,7 @@ cd /home/vagrant/avail-light/bootstrap || exit
 {
     echo "full_node_rpc = [\"http://$1:9933\"]"
     echo "full_node_ws = [\"ws://$1:9944\"]"
-} >> config.yaml
+} >> config.yaml # Bootstrap uses default 9520 Prometheus port
 echo "Starting new avail-light bootstrap"
 nohup ./avail-light &> bootstrap_lc_logs.txt &
 cd ../lc1 || exit
@@ -28,6 +28,7 @@ cd ../lc1 || exit
     echo "bootstraps = [[\"12D3KooWStAKPADXqJ7cngPYXd2mSANpdgh1xQ34aouufHA2xShz\",\"/ip4/$2/tcp/39000\"]]"
     echo "full_node_rpc = [\"http://$1:9933\"]"
     echo "full_node_ws = [\"ws://$1:9944\"]"
+    echo "prometheus_port = 9521"
 } >> config.yaml
 echo "Starting new avail-light client"
 nohup ./avail-light &> lc_logs.txt &

@@ -14,3 +14,4 @@ __pycache__/
 
 # Vagrant utility files
 .vagrant/
+vagrant/targets.json
