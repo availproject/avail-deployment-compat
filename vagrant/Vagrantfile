@@ -8,7 +8,6 @@ FAT_CLIENT_NUMBER_PER_VM = 1
 LIGHT_CLIENT_NUMBER_PER_VM = 20
 # Number of partitions should be less or equal to FAT_CLIENT_VMS * FAT_CLIENT_NUMBER_PER_VM
 FAT_CLIENT_PARTITION_NUMBER = 10
-# Vagrant public networks are actually bridged networks!
 # Port forwarding doesn't work with private networks.
 # sudo lsof -i -P -n
 

@@ -37,6 +37,3 @@ do
     nohup ./avail-light &> avail-light-client.txt &
     cd ..
 done
-
-
-
