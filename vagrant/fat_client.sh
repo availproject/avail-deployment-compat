@@ -31,9 +31,9 @@ do
         echo "bootstraps = [[\"12D3KooWStAKPADXqJ7cngPYXd2mSANpdgh1xQ34aouufHA2xShz\",\"/ip4/$2/tcp/39000\"]]"
         echo "full_node_rpc = [\"http://$1:9933\"]"
         echo "full_node_ws = [\"ws://$1:9944\"]"
-        echo "libp2p_port = \"3700$i\""
-        echo "http_server_port = \"700$i\""
-        echo "prometheus_port = 952$i"
+        echo "libp2p_port = \"370$(printf "%02d" $i)\""
+        echo "http_server_port = \"70$(printf "%02d" $i)\""
+        echo "prometheus_port = 95$(printf "%02d" $i)"
         echo "block_matrix_partition = \"$client_number/$5\""
     } >> config.yaml
     

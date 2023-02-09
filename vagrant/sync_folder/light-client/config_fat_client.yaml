@@ -17,10 +17,11 @@ avail_path = "avail_path"
 disable_client_sync = true
 # block_matrix_partition = "1/10"
 disable_proof_verification = true
-query_proof_rpc_parallel_tasks = 300
+query_proof_rpc_parallel_tasks = 30
 max_cells_per_rpc = 1024
 dht_parallelization_limit = 20
 block_processing_delay = 0
+replication_factor = 5
 
 connection_idle_timeout = 30
 

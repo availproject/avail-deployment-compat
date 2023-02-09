@@ -2,14 +2,15 @@ FULL_NODE_PUBLIC_IP = "192.168.40.101"
 BOOTSTRAP_LC_PUBLIC_IP = "192.168.40.121" # Range start for fat client IP allocation
 LIGHT_CLIENTS_IP_RANGE_START = "192.168.40.151" # Range start for light client IP allocation
 HOST_PROMETHEUS_PORT_RANGE_START = 12000 # Port range for exposing Prometheus metrics on instances
-FAT_CLIENT_VMS = 2
+FAT_CLIENT_VMS = 1
 LIGHT_CLIENT_VMS = 2
-FAT_CLIENT_NUMBER_PER_VM = 2
-LIGHT_CLIENT_NUMBER_PER_VM = 2
+FAT_CLIENT_NUMBER_PER_VM = 1
+LIGHT_CLIENT_NUMBER_PER_VM = 20
 # Number of partitions should be less or equal to FAT_CLIENT_VMS * FAT_CLIENT_NUMBER_PER_VM
 FAT_CLIENT_PARTITION_NUMBER = 10
 # Vagrant public networks are actually bridged networks!
 # Port forwarding doesn't work with private networks.
+# sudo lsof -i -P -n
 
 require 'json'
 
@@ -88,12 +89,12 @@ Vagrant.configure("2") do |config|
             lc.vm.network "public_network", ip: ip_address
             for client_counter in 1..LIGHT_CLIENT_NUMBER_PER_VM
                 sequential_order_port_num = (i-1)*LIGHT_CLIENT_NUMBER_PER_VM + client_counter
-                lc.vm.network "forwarded_port", guest: 9520 + client_counter, host: lc_prometheus_range_start + sequential_order_port_num
+                lc.vm.network "forwarded_port", guest: 9500 + client_counter, host: lc_prometheus_range_start + sequential_order_port_num
                 lc_targets.append("localhost:" + (lc_prometheus_range_start + sequential_order_port_num).to_s)
             end   
             lc.vm.provider "vmware_desktop" do |v|
-                v.vmx["memsize"] = "1024"
-                v.vmx["numvcpus"] = "2"
+                v.vmx["memsize"] = "2048"
+                v.vmx["numvcpus"] = "4"
             end
             if i == LIGHT_CLIENT_VMS
                 prometheus_targets.append( {"targets" => lc_targets, "labels" => { "job" => "light clients" }} )
