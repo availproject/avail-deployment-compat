@@ -1,0 +1,25 @@
+log_level = "info"
+http_server_host = "127.0.0.1"
+http_server_port = "7000"
+
+secret_key = { seed = "1" }
+libp2p_port = "39000"
+libp2p_psk_path = "avail_ipfs_store"
+libp2p_tcp_port_reuse = false
+# log_format_json = true
+
+# full_node_rpc = ["http://192.168.40.100:9933"]
+# full_node_ws = ["ws://192.168.40.100:9944"]
+app_id = 0
+confidence = 92.0
+avail_path = "avail_path"
+prometheus_port = 9520
+query_proof_rpc_parallel_tasks = 20
+disable_client_sync = true
+block_processing_delay = 5
+# secret_key = { key = "1498b5467a63dffa2dc9d9e069caf075d16fc33fdd4c3b01bfadae6433767d93" }
+
+
+connection_idle_timeout = 5
+
+bootstraps = []
