@@ -11,6 +11,12 @@ Local deployment is based on VMware virtual machines with shell scripts used as 
 5. Execute `vagrant up` in vagrant directory containing Vagrantfile to raise the entire network
 6. Copy `target.json` file into Prometheus folder, if Prometheus frontend is used with [dynamic targets](https://prometheus.io/docs/guides/file-sd/#installing-configuring-and-running-prometheus)
 
+## Nomad bridge
+
+1. Copy _hardhat.config.js_ to `sync_folder/da-bridge/agents`, set mining to 5s
+2. Copy monorepo to `sync_folder/da-bridge` and compile source
+3. Copy agents binary (updater, relayer, processor, watcher) to the `sync_folder/da-bridge/agents`
+
 ## Use
 
 - use `vagrant ssh vm_name` to access individual VMs
