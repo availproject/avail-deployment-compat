@@ -3,7 +3,6 @@
 if test -f .setup; then
   echo "Setup already done."
 else
-  #  setup environment for running hardhat and solidity deploy
   echo "deb http://security.ubuntu.com/ubuntu focal-security main" | sudo tee /etc/apt/sources.list.d/nodesource.list
   sudo apt-get -y update
   sudo apt install curl git
@@ -37,10 +36,10 @@ forge script contracts/script/DeployDemo.s.sol --rpc-url $GOERLI_RPC_URL --broad
 
 echo "Move agents"
 rm -rf $AGENTS_HOME && mkdir -p $AGENTS_HOME
-cd $AGENTS_SYNC || exit 1
+cd $AGENTS_SYNC
 cp config_local.json .env_local $AGENTS_HOME
-cd /home/vagrant || exit 1
-mkdir -m777 -p $AGENTS_HOME/{updater,relayer,processor,watcher}
+cd /home/vagrant
+mkdir -p $AGENTS_HOME/{updater,relayer,processor,watcher}
 cp -r $AGENTS_SYNC/updater $AGENTS_HOME/updater/
 cp -r $AGENTS_SYNC/relayer $AGENTS_HOME/relayer/
 cp -r $AGENTS_SYNC/processor $AGENTS_HOME/processor/
