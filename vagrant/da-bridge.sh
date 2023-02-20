@@ -8,10 +8,11 @@ else
   sudo apt-get -y update
   sudo apt-get install -y libssl1.1
   sudo apt install curl git
-  curl https://sh.rustup.rs -sSf | sh -s -- -y
   curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-  sudo apt-get install -y gcc g++ make jq nodejs cargo rustc
-
+  sudo apt-get install -y gcc g++ make jq nodejs
+  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  rustup update stable
+  source "$HOME/.cargo/env"
   cargo install --git https://github.com/foundry-rs/foundry --profile local --locked foundry-cli anvil
   mkdir /home/vagrant/hardhat && cd /home/vagrant/hardhat && npm install --save-dev hardhat
   cp /home/vagrant/sync_folder/da-bridge/hardhat.config.js /home/vagrant/hardhat/ || exit 1
@@ -24,7 +25,7 @@ AGENTS_HOME=/home/vagrant/agents
 AGENTS_SYNC=/home/vagrant/sync_folder/da-bridge/agents
 
 echo "Restarting hardhat"
-sudo killall hardhat
+sudo killall node
 cd /home/vagrant/hardhat && npx hardhat node &>/home/vagrant/hardhat/hardhat_logs.txt &
 
 echo "Deploy contracts to hardhat"
