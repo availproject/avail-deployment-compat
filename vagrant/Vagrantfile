@@ -4,9 +4,9 @@ BOOTSTRAP_LC_PUBLIC_IP = "192.168.40.121" # Range start for fat client IP alloca
 LIGHT_CLIENTS_IP_RANGE_START = "192.168.40.151" # Range start for light client IP allocation
 HOST_PROMETHEUS_PORT_RANGE_START = 12000 # Port range for exposing Prometheus metrics on instances
 FAT_CLIENT_VMS = 1
-LIGHT_CLIENT_VMS = 0
+LIGHT_CLIENT_VMS = 1
 FAT_CLIENT_NUMBER_PER_VM = 1
-LIGHT_CLIENT_NUMBER_PER_VM = 0
+LIGHT_CLIENT_NUMBER_PER_VM = 1
 # Number of partitions should be less or equal to FAT_CLIENT_VMS * FAT_CLIENT_NUMBER_PER_VM
 FAT_CLIENT_PARTITION_NUMBER = 10
 # Port forwarding doesn't work with private networks.
@@ -28,9 +28,10 @@ Vagrant.configure("2") do |config|
         fn.vm.provision "shell", path: "full_node.sh"
         fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
         fn.vm.network "public_network", ip: FULL_NODE_PUBLIC_IP
+#         fn.vm.network "forwarded_port", guest: 9944, host: 9944
         fn.vm.provider "virtualbox" do |v|
                 v.memory = "1024"
-#             v.vmx["numvcpus"] = "24"
+                v.cpus = 2
         end
     end
 
@@ -39,79 +40,81 @@ Vagrant.configure("2") do |config|
             fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder/"
             fn.vm.network "public_network", ip: BRIDGE_NODE_PUBLIC_IP
             fn.vm.provider "virtualbox" do |v|
-                v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-                v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
                 v.memory = "4096"
                 v.cpus = 6
         end
     end
 
     # Deploy bootstrap client along with a second LC
-#     config.vm.define "bootstrap_lc_vm" do |blc|
-#         blc_prometheus_range_start = HOST_PROMETHEUS_PORT_RANGE_START + 20
-#
-#         blc.vm.provision "shell", path: "bootstrap_lc.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP]
-#         blc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
-#         blc.vm.network "public_network", ip: BOOTSTRAP_LC_PUBLIC_IP
-#         for i in 0..1
-#             blc.vm.network "forwarded_port", guest: 9520 + i, host: blc_prometheus_range_start + i
-#         end
-#         prometheus_targets.append( {"targets" => ["localhost:" + blc_prometheus_range_start.to_s], "labels" => { "job" => "bootstrap" }})
-#         lc_targets.append("localhost:" + (blc_prometheus_range_start + 1).to_s)
-#         File.write('targets.json', JSON.dump(prometheus_targets))
-#         blc.vm.provider "virtualbox" do |v|
-#             v.memory = "1024"
-# #             v.vmx["numvcpus"] = "2"
-#         end
-#     end
+    config.vm.define "bootstrap_lc_vm" do |blc|
+        blc_prometheus_range_start = HOST_PROMETHEUS_PORT_RANGE_START + 20
 
-    # Deploy fat clients
-#     (1..FAT_CLIENT_VMS).each do |i|
-#         config.vm.define "fat_clients_vm_#{i}" do |fc|
-#             ip_address = "#{fat_client_ip_parts[0]}.#{fat_client_ip_parts[1]}.#{fat_client_ip_parts[2]}.#{fat_client_ip_parts[3].to_i+i}"
-#             fc_prometheus_range_start = HOST_PROMETHEUS_PORT_RANGE_START + 100
-#
-#             fc.vm.provision "shell", path: "fat_client.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP, FAT_CLIENT_NUMBER_PER_VM, i, FAT_CLIENT_PARTITION_NUMBER]
-#             fc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
-#             fc.vm.network "public_network", ip: ip_address
-#             for client_counter in 1..FAT_CLIENT_NUMBER_PER_VM
-#                 sequential_order_port_num = (i-1)*FAT_CLIENT_NUMBER_PER_VM + client_counter
-#                 fc.vm.network "forwarded_port", guest: 9520 + client_counter, host: fc_prometheus_range_start + sequential_order_port_num
-#                 fc_targets.append("localhost:" + (fc_prometheus_range_start + sequential_order_port_num).to_s)
-#             end
-#             fc.vm.provider "virtualbox" do |v|
-#                 v.memory = "1024"
-# #                 v.vmx["numvcpus"] = "6"
-#             end
-#             if i == FAT_CLIENT_VMS
-#                 prometheus_targets.append( {"targets" => fc_targets, "labels" => { "job" => "fat clients" }} )
-#                 File.write('targets.json', JSON.dump(prometheus_targets))
-#             end
-#         end
-#     end
+        blc.vm.provision "shell", path: "bootstrap_lc.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP]
+        blc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
+        blc.vm.network "public_network", ip: BOOTSTRAP_LC_PUBLIC_IP
+        for i in 0..1
+            blc.vm.network "forwarded_port", guest: 9520 + i, host: blc_prometheus_range_start + i
+        end
+        prometheus_targets.append( {"targets" => ["localhost:" + blc_prometheus_range_start.to_s], "labels" => { "job" => "bootstrap" }})
+        lc_targets.append("localhost:" + (blc_prometheus_range_start + 1).to_s)
+        File.write('targets.json', JSON.dump(prometheus_targets))
+        blc.vm.provider "virtualbox" do |v|
+            v.memory = "1024"
+            v.cpus="2"
+#             v.vmx["numvcpus"] = "2"
+        end
+    end
+
+#     Deploy fat clients
+    (1..FAT_CLIENT_VMS).each do |i|
+        config.vm.define "fat_clients_vm_#{i}" do |fc|
+            ip_address = "#{fat_client_ip_parts[0]}.#{fat_client_ip_parts[1]}.#{fat_client_ip_parts[2]}.#{fat_client_ip_parts[3].to_i+i}"
+            fc_prometheus_range_start = HOST_PROMETHEUS_PORT_RANGE_START + 100
+
+            fc.vm.provision "shell", path: "fat_client.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP, FAT_CLIENT_NUMBER_PER_VM, i, FAT_CLIENT_PARTITION_NUMBER]
+            fc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
+            fc.vm.network "public_network", ip: ip_address
+            for client_counter in 1..FAT_CLIENT_NUMBER_PER_VM
+                sequential_order_port_num = (i-1)*FAT_CLIENT_NUMBER_PER_VM + client_counter
+                fc.vm.network "forwarded_port", guest: 9520 + client_counter, host: fc_prometheus_range_start + sequential_order_port_num
+                fc_targets.append("localhost:" + (fc_prometheus_range_start + sequential_order_port_num).to_s)
+            end
+            fc.vm.provider "virtualbox" do |v|
+                v.memory = "1024"
+                v.cpus="2"
+#                 v.vmx["numvcpus"] = "6"
+            end
+            if i == FAT_CLIENT_VMS
+                prometheus_targets.append( {"targets" => fc_targets, "labels" => { "job" => "fat clients" }} )
+                File.write('targets.json', JSON.dump(prometheus_targets))
+            end
+        end
+    end
         
-    # Deploy regular LCs
-#     (1..LIGHT_CLIENT_VMS).each do |i|
-#         config.vm.define "light_client_vm_#{i}" do |lc|
-#             ip_address = "#{light_client_ip_parts[0]}.#{light_client_ip_parts[1]}.#{light_client_ip_parts[2]}.#{light_client_ip_parts[3].to_i+i}"
-#             lc_prometheus_range_start = HOST_PROMETHEUS_PORT_RANGE_START + 200
-#
-#             lc.vm.provision "shell", path: "light_client.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP, LIGHT_CLIENT_NUMBER_PER_VM]
-#             lc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
-#             lc.vm.network "public_network", ip: ip_address
-#             for client_counter in 1..LIGHT_CLIENT_NUMBER_PER_VM
-#                 sequential_order_port_num = (i-1)*LIGHT_CLIENT_NUMBER_PER_VM + client_counter
-#                 lc.vm.network "forwarded_port", guest: 9500 + client_counter, host: lc_prometheus_range_start + sequential_order_port_num
-#                 lc_targets.append("localhost:" + (lc_prometheus_range_start + sequential_order_port_num).to_s)
-#             end
-#             lc.vm.provider "vmware_desktop" do |v|
+#     Deploy regular LCs
+    (1..LIGHT_CLIENT_VMS).each do |i|
+        config.vm.define "light_client_vm_#{i}" do |lc|
+            ip_address = "#{light_client_ip_parts[0]}.#{light_client_ip_parts[1]}.#{light_client_ip_parts[2]}.#{light_client_ip_parts[3].to_i+i}"
+            lc_prometheus_range_start = HOST_PROMETHEUS_PORT_RANGE_START + 200
+
+            lc.vm.provision "shell", path: "light_client.sh", args: [FULL_NODE_PUBLIC_IP, BOOTSTRAP_LC_PUBLIC_IP, LIGHT_CLIENT_NUMBER_PER_VM]
+            lc.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
+            lc.vm.network "public_network", ip: ip_address
+            for client_counter in 1..LIGHT_CLIENT_NUMBER_PER_VM
+                sequential_order_port_num = (i-1)*LIGHT_CLIENT_NUMBER_PER_VM + client_counter
+                lc.vm.network "forwarded_port", guest: 9500 + client_counter, host: lc_prometheus_range_start + sequential_order_port_num
+                lc_targets.append("localhost:" + (lc_prometheus_range_start + sequential_order_port_num).to_s)
+            end
+            lc.vm.provider "virtualbox" do |v|
+                v.memory = "1024"
+                v.cpus="2"
 #                 v.vmx["memsize"] = "2048"
 #                 v.vmx["numvcpus"] = "4"
-#             end
-#             if i == LIGHT_CLIENT_VMS
-#                 prometheus_targets.append( {"targets" => lc_targets, "labels" => { "job" => "light clients" }} )
-#                 File.write('targets.json', JSON.dump(prometheus_targets))
-#             end
-#         end
-#     end
+            end
+            if i == LIGHT_CLIENT_VMS
+                prometheus_targets.append( {"targets" => lc_targets, "labels" => { "job" => "light clients" }} )
+                File.write('targets.json', JSON.dump(prometheus_targets))
+            end
+        end
+    end
 end

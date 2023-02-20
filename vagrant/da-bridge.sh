@@ -1,20 +1,18 @@
 #! /bin/bash
 
 if test -f .setup; then
-  echo "Setup already done."
+  echo "Installation already done."
 else
+  echo "Installing dependencies."
   echo "deb http://security.ubuntu.com/ubuntu focal-security main" | sudo tee /etc/apt/sources.list.d/nodesource.list
   sudo apt-get -y update
+  sudo apt-get install -y libssl1.1
   sudo apt install curl git
   curl https://sh.rustup.rs -sSf | sh -s -- -y
   curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
   sudo apt-get install -y gcc g++ make jq nodejs cargo rustc
-  sudo apt-get install -y libssl1.1
 
-  rustup update stable
-  source "$HOME/.cargo/env"
   cargo install --git https://github.com/foundry-rs/foundry --profile local --locked foundry-cli anvil
-
   mkdir /home/vagrant/hardhat && cd /home/vagrant/hardhat && npm install --save-dev hardhat
   cp /home/vagrant/sync_folder/da-bridge/hardhat.config.js /home/vagrant/hardhat/ || exit 1
 
@@ -26,7 +24,7 @@ AGENTS_HOME=/home/vagrant/agents
 AGENTS_SYNC=/home/vagrant/sync_folder/da-bridge/agents
 
 echo "Restarting hardhat"
-sudo lsof -n -i:8545 | grep LISTEN | awk '{ print $2 }' | uniq | xargs kill -9
+sudo killall hardhat
 cd /home/vagrant/hardhat && npx hardhat node &>/home/vagrant/hardhat/hardhat_logs.txt &
 
 echo "Deploy contracts to hardhat"
@@ -34,7 +32,7 @@ cd $MONOREPO_SOURCE/packages/contracts-da-bridge || exit 1
 export $(grep -v '^#' $MONOREPO_SOURCE/packages/contracts-da-bridge/.env | xargs)
 forge script contracts/script/DeployDemo.s.sol --rpc-url $GOERLI_RPC_URL --broadcast -vvvv --private-key $PRIVATE_KEY --slow
 
-echo "Move agents"
+echo "Update agents"
 rm -rf $AGENTS_HOME && mkdir -p $AGENTS_HOME
 cd $AGENTS_SYNC
 cp config_local.json .env_local $AGENTS_HOME
