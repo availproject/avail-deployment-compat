@@ -26,7 +26,8 @@ AGENTS_SYNC=/home/vagrant/sync_folder/da-bridge/agents
 
 echo "Restarting hardhat"
 sudo killall node
-cd /home/vagrant/hardhat && npx hardhat node &>/home/vagrant/hardhat/hardhat_logs.txt &
+rm /home/vagrant/hardhat/hardhat_logs.txt
+cd /home/vagrant/hardhat && npx hardhat node --hostname 0.0.0.0 &>/home/vagrant/hardhat/hardhat_logs.txt &
 
 echo "Deploy contracts to hardhat"
 cd $MONOREPO_SOURCE/packages/contracts-da-bridge || exit 1

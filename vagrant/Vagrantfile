@@ -1,5 +1,5 @@
-FULL_NODE_PUBLIC_IP = "192.168.40.101" 
-BRIDGE_NODE_PUBLIC_IP = "192.168.40.111"
+FULL_NODE_PUBLIC_IP = "192.168.1.101"
+BRIDGE_NODE_PUBLIC_IP = "192.168.1.111"
 BOOTSTRAP_LC_PUBLIC_IP = "192.168.40.121" # Range start for fat client IP allocation
 LIGHT_CLIENTS_IP_RANGE_START = "192.168.40.151" # Range start for light client IP allocation
 HOST_PROMETHEUS_PORT_RANGE_START = 12000 # Port range for exposing Prometheus metrics on instances
@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
         fn.vm.provision "shell", path: "full_node.sh"
         fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
         fn.vm.network "public_network", ip: FULL_NODE_PUBLIC_IP
-#         fn.vm.network "forwarded_port", guest: 9944, host: 9944
+        fn.vm.network "forwarded_port", guest: 9944, host: 9944
         fn.vm.provider "virtualbox" do |v|
                 v.memory = "1024"
                 v.cpus = 2
@@ -39,6 +39,8 @@ Vagrant.configure("2") do |config|
             fn.vm.provision "shell", path: "da-bridge.sh"
             fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder/"
             fn.vm.network "public_network", ip: BRIDGE_NODE_PUBLIC_IP
+            fn.vm.network "forwarded_port", guest: 8545, host: 8545
+
             fn.vm.provider "virtualbox" do |v|
                 v.memory = "4096"
                 v.cpus = 6
