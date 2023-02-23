@@ -58,10 +58,11 @@ jq ".core.goerli.home.proxy=$HOME" $AGENTS_HOME/config_local.json >$AGENTS_HOME/
 jq ".core.goerli.replicas.avail.proxy=$REPLICA" $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
 jq ".bridge.goerli.bridgeRouter.proxy=$BRIDGE" $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
 jq ".core.goerli.xAppConnectionManager=$MANAGER" $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
-jq '.rpcs.avail=["ws://$FULL_NODE_PUBLIC_IP:$FULL_NODE_PORT"]' $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
 
 # Update env based on the full node address
-cat cat $AGENTS_HOME/.env_local | sed 's/AVAIL_CONNECTION_URL=.*/AVAIL_CONNECTION_URL=ws:\/\/$FULL_NODE_PUBLIC_IP:$FULL_NODE_PORT' >$AGENTS_HOME/.env && mv $AGENTS_HOME/.env $AGENTS_HOME/.env_local
+CONNECTION_URL="${FULL_NODE_PUBLIC_IP}:${FULL_NODE_PORT}"
+jq ".rpcs.avail=[\"ws://$CONNECTION_URL\"]" $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
+cat $AGENTS_HOME/.env_local | sed "s/AVAIL_CONNECTION_URL=.*/AVAIL_CONNECTION_URL=ws:\/\/$CONNECTION_URL/" > $AGENTS_HOME/.env && mv $AGENTS_HOME/.env $AGENTS_HOME/.env_local
 
 echo "Start agents"
 cd $AGENTS_HOME || exit 1
