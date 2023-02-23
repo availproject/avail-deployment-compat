@@ -1,4 +1,5 @@
 FULL_NODE_PUBLIC_IP = "192.168.1.101"
+FULL_NODE_PORT = 9944
 BRIDGE_NODE_PUBLIC_IP = "192.168.1.111"
 BOOTSTRAP_LC_PUBLIC_IP = "192.168.40.121" # Range start for fat client IP allocation
 LIGHT_CLIENTS_IP_RANGE_START = "192.168.40.151" # Range start for light client IP allocation
@@ -28,7 +29,7 @@ Vagrant.configure("2") do |config|
         fn.vm.provision "shell", path: "full_node.sh"
         fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder"
         fn.vm.network "public_network", ip: FULL_NODE_PUBLIC_IP
-        fn.vm.network "forwarded_port", guest: 9944, host: 9944
+        fn.vm.network "forwarded_port", guest: FULL_NODE_PORT, host: FULL_NODE_PORT
         fn.vm.provider "virtualbox" do |v|
                 v.memory = "1024"
                 v.cpus = 2
@@ -36,7 +37,7 @@ Vagrant.configure("2") do |config|
     end
 
     config.vm.define "da_bridge_vm" do |fn|
-            fn.vm.provision "shell", path: "da_bridge.sh"
+            fn.vm.provision "shell", path: "da_bridge.sh", args: ["$FULL_NODE_PUBLIC_IP", "$FULL_NODE_PORT"]
             fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder/"
             fn.vm.network "public_network", ip: BRIDGE_NODE_PUBLIC_IP
             fn.vm.network "forwarded_port", guest: 8545, host: 8545

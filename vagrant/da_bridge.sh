@@ -1,5 +1,7 @@
 #! /bin/bash
 
+FULL_NODE_PUBLIC_IP=$1
+FULL_NODE_PORT=$2
 if test -f .setup; then
   echo "Installation already done."
 else
@@ -36,9 +38,8 @@ forge script contracts/script/DeployDemo.s.sol --rpc-url $GOERLI_RPC_URL --broad
 
 echo "Update agents"
 rm -rf $AGENTS_HOME && mkdir -p $AGENTS_HOME
-cd $AGENTS_SYNC
+cd $AGENTS_SYNC || exit 1
 cp config_local.json .env_local $AGENTS_HOME
-cd /home/vagrant
 mkdir -p $AGENTS_HOME/{updater,relayer,processor,watcher}
 cp -r $AGENTS_SYNC/updater $AGENTS_HOME/updater/
 cp -r $AGENTS_SYNC/relayer $AGENTS_HOME/relayer/
@@ -57,6 +58,10 @@ jq ".core.goerli.home.proxy=$HOME" $AGENTS_HOME/config_local.json >$AGENTS_HOME/
 jq ".core.goerli.replicas.avail.proxy=$REPLICA" $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
 jq ".bridge.goerli.bridgeRouter.proxy=$BRIDGE" $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
 jq ".core.goerli.xAppConnectionManager=$MANAGER" $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
+jq '.rpcs.avail=["ws://$FULL_NODE_PUBLIC_IP:$FULL_NODE_PORT"]' $AGENTS_HOME/config_local.json >$AGENTS_HOME/config.json && mv $AGENTS_HOME/config.json $AGENTS_HOME/config_local.json
+
+# Update env based on the full node address
+cat cat $AGENTS_HOME/.env_local | sed 's/AVAIL_CONNECTION_URL=.*/AVAIL_CONNECTION_URL=ws:\/\/$FULL_NODE_PUBLIC_IP:$FULL_NODE_PORT' >$AGENTS_HOME/.env && mv $AGENTS_HOME/.env $AGENTS_HOME/.env_local
 
 echo "Start agents"
 cd $AGENTS_HOME || exit 1
@@ -64,4 +69,3 @@ cd updater && env $(cat ../.env_local | xargs) ./updater &>./updater_logs.txt &
 cd relayer && env $(cat ../.env_local | xargs) ./relayer &>./relayer_logs.txt &
 cd processor && env $(cat ../.env_local | xargs) ./processor &>./processor_logs.txt &
 cd watcher && env $(cat ../.env_local | xargs) ./watcher &>./watcher_logs.txt &
-

@@ -200,7 +200,7 @@
   },
   "rpcs": {
     "goerli": ["http://localhost:8545"],
-    "avail": ["ws://192.168.1.101:9944"]
+    "avail": []
   },
   "s3": {
     "bucket": "nomadxyz-development-proofs",
