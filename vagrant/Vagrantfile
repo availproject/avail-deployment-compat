@@ -41,7 +41,7 @@ Vagrant.configure("2") do |config|
             fn.vm.synced_folder "sync_folder", "/home/vagrant/sync_folder/"
             fn.vm.network "public_network", ip: BRIDGE_NODE_PUBLIC_IP
             fn.vm.network "forwarded_port", guest: 8545, host: 8545
-            fn.vm.provider "virtualbox" do |v|
+            fn.vm.provider "vmware_desktop" do |v|
                 v.memory = "4096"
                 v.cpus = 6
         end
@@ -60,7 +60,7 @@ Vagrant.configure("2") do |config|
         prometheus_targets.append( {"targets" => ["localhost:" + blc_prometheus_range_start.to_s], "labels" => { "job" => "bootstrap" }})
         lc_targets.append("localhost:" + (blc_prometheus_range_start + 1).to_s)
         File.write('targets.json', JSON.dump(prometheus_targets))
-        blc.vm.provider "virtualbox" do |v|
+        blc.vm.provider "vmware_desktop" do |v|
             v.memory = "1024"
             v.cpus="2"
         end
@@ -80,7 +80,7 @@ Vagrant.configure("2") do |config|
                 fc.vm.network "forwarded_port", guest: 9520 + client_counter, host: fc_prometheus_range_start + sequential_order_port_num
                 fc_targets.append("localhost:" + (fc_prometheus_range_start + sequential_order_port_num).to_s)
             end
-            fc.vm.provider "virtualbox" do |v|
+            fc.vm.provider "vmware_desktop" do |v|
                 v.memory = "1024"
                 v.cpus="2"
             end
@@ -105,7 +105,7 @@ Vagrant.configure("2") do |config|
                 lc.vm.network "forwarded_port", guest: 9500 + client_counter, host: lc_prometheus_range_start + sequential_order_port_num
                 lc_targets.append("localhost:" + (lc_prometheus_range_start + sequential_order_port_num).to_s)
             end
-            lc.vm.provider "virtualbox" do |v|
+            lc.vm.provider "vmware_desktop" do |v|
                 v.memory = "1024"
                 v.cpus="2"
             end
