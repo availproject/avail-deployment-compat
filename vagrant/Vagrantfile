@@ -62,7 +62,6 @@ Vagrant.configure("2") do |config|
         blc.vm.provider "virtualbox" do |v|
             v.memory = "1024"
             v.cpus="2"
-#             v.vmx["numvcpus"] = "2"
         end
     end
 
@@ -83,7 +82,6 @@ Vagrant.configure("2") do |config|
             fc.vm.provider "virtualbox" do |v|
                 v.memory = "1024"
                 v.cpus="2"
-#                 v.vmx["numvcpus"] = "6"
             end
             if i == FAT_CLIENT_VMS
                 prometheus_targets.append( {"targets" => fc_targets, "labels" => { "job" => "fat clients" }} )
@@ -109,8 +107,6 @@ Vagrant.configure("2") do |config|
             lc.vm.provider "virtualbox" do |v|
                 v.memory = "1024"
                 v.cpus="2"
-#                 v.vmx["memsize"] = "2048"
-#                 v.vmx["numvcpus"] = "4"
             end
             if i == LIGHT_CLIENT_VMS
                 prometheus_targets.append( {"targets" => lc_targets, "labels" => { "job" => "light clients" }} )
