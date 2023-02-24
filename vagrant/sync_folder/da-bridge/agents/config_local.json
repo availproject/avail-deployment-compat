@@ -8,7 +8,7 @@
         "chat": {
           "type": "default"
         },
-        "enabled": true,
+        "enabled": false,
         "interval": 500
       },
       "logging": {
@@ -80,13 +80,8 @@
         "implementation": "0x0000000000000000000000000000000000000000",
         "proxy": "0x5563516EE5f6e1b4E9399FaB2Ec4e371552BD19d"
       },
-      "bridgeToken": {
-        "beacon": "0x0000000000000000000000000000000000000000",
-        "implementation": "0x0000000000000000000000000000000000000000",
-        "proxy": "0x0000000000000000000000000000000000000000"
-      },
       "customs": [],
-      "deployHeight": 6748625,
+      "deployHeight": 0,
       "ethHelper": "0x0000000000000000000000000000000000000000",
       "tokenRegistry": {
         "beacon": "0x0000000000000000000000000000000000000000",
@@ -95,13 +90,13 @@
       }
     },
     "avail": {
-      "deployHeight": 3
+      "deployHeight": 0
     }
   },
   "bridgeGui": {},
   "core": {
     "goerli": {
-      "deployHeight": 6748555,
+      "deployHeight": 0,
       "governanceRouter": {
         "beacon": "0x0000000000000000000000000000000000000000",
         "implementation": "0x0000000000000000000000000000000000000000",
@@ -124,7 +119,7 @@
       "xAppConnectionManager": "0xF66eA63C495316d8B38Df586F91AA9f604c0c75C"
     },
     "avail": {
-      "deployHeight": 3
+      "deployHeight": 0
     }
   },
   "environment": "development",
@@ -150,7 +145,7 @@
             "recoveryTimelock": 180
           },
           "maximumGas": 100000000,
-          "optimisticSeconds": 10,
+          "optimisticSeconds": 5,
           "processGas": 85000000,
           "reserveGas": 1500000,
           "updater": "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",

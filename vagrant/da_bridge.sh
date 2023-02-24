@@ -13,7 +13,6 @@ else
   curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
   sudo apt-get install -y gcc g++ make jq nodejs
   curl https://sh.rustup.rs -sSf | sh -s -- -y
-  rustup update stable
   source "$HOME/.cargo/env"
   cargo install --git https://github.com/foundry-rs/foundry --profile local --locked foundry-cli anvil
   mkdir /home/vagrant/hardhat && cd /home/vagrant/hardhat && npm install --save-dev hardhat
