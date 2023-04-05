@@ -5,7 +5,7 @@ services:
         context: ./images/da
         dockerfile: Dockerfile-dev
         args:
-          - BRANCH=main
+          - BRANCH=develop
           # - FEATURES=kate/maximum-block-size
     # ports:
     #   - 9944:9944

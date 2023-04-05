@@ -1,4 +1,4 @@
-FROM rust:1.64 AS chef 
+FROM rust:1.68.2 AS chef 
 # We only pay the installation cost once, 
 # it will be cached from the second build onwards
 RUN cargo install cargo-chef 
@@ -6,25 +6,25 @@ WORKDIR app
 
 FROM chef AS planner
 
-ARG BRANCH=main
-RUN git clone --depth 1 -b ${BRANCH} https://github.com/maticnetwork/avail.git && cd avail
+ARG BRANCH=develop
+RUN git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail.git && cd avail
 RUN cargo chef prepare --recipe-path /app/recipe.json
 
 FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang && \
+	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
 	rm -rf /var/lib/apt/lists 
 RUN rustup install nightly
 RUN rustup target add wasm32-unknown-unknown --toolchain nightly
-ARG BRANCH=main
+ARG BRANCH=develop
 ARG FEATURES=""
 # Build application
-RUN rm -rf avail && git clone --depth 1 -b ${BRANCH} https://github.com/maticnetwork/avail.git
+RUN rm -rf avail && git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail.git
 # Build dependencies - this is the caching Docker layer!
 RUN cd avail && cargo chef cook --release -p data-avail --features "${FEATURES}" --recipe-path /app/recipe.json
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
-ADD https://api.github.com/repos/maticnetwork/avail/commits/${BRANCH} last_commit.json
+ADD https://api.github.com/repos/availproject/avail/commits/${BRANCH} last_commit.json
 RUN cd avail && git fetch origin && git reset --hard origin/${BRANCH}
 RUN cd avail && cargo build --release -p data-avail --features "${FEATURES}"
 
@@ -33,7 +33,7 @@ FROM debian:bullseye-slim AS runtime
 RUN mkdir /da
 WORKDIR /da
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang 
+	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang
 RUN mkdir /da/bin
 COPY ./entrypoint.sh /da/bin/
 
