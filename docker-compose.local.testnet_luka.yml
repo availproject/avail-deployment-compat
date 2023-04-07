@@ -1,0 +1,285 @@
+## Setting up something that replicates the testnet environment
+# docker-compose -f docker-compose.local.testnet.yml up --abort-on-container-exit
+## reset full local state
+# find volume/testnet -type d -name 'state' -or -name 'keystore' | awk '{print "rm -rf ./" $0 "/*"}' | sh
+## remove stopped containers
+# docker-compose -f docker-compose.local.testnet.yml rm
+version: "3.3"
+services:
+  validator1:
+    environment:
+      - RUST_LOG=info
+    container_name: validator1
+    build:
+      context: ./images/da
+      dockerfile: Dockerfile-dev
+      args:
+        - BRANCH=develop
+    tmpfs: /tmp
+    entrypoint: /da/bin/data-avail
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./volume/testnet/genesis:/da/genesis:ro
+      - ./volume/testnet/validator1/state:/da/state
+      - ./volume/testnet/validator1/node.key:/da/node.key:ro
+      - ./volume/testnet/validator1/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/validator1/keystore:/da/keystore
+    ports:
+      - 30331:30331
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_1
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+      --rpc-cors all
+      --port 30331
+      --ws-port 9944
+      --rpc-port 9933
+      --rpc-methods unsafe
+      --unsafe-rpc-external
+      --unsafe-ws-external
+  validator2:
+    environment:
+      - RUST_LOG=info
+    container_name: validator2
+    build:
+      context: ./images/da
+      dockerfile: Dockerfile-dev
+      args:
+        - BRANCH=develop
+    depends_on:
+      - validator1
+    tmpfs: /tmp
+    entrypoint: /da/bin/data-avail
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./volume/testnet/genesis:/da/genesis:ro
+      - ./volume/testnet/validator2/state:/da/state
+      - ./volume/testnet/validator2/node.key:/da/node.key:ro
+      - ./volume/testnet/validator2/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/validator2/keystore:/da/keystore
+    ports:
+      - 30332:30332
+      - 9955:9944
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_2
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --bootnodes /dns/validator1/tcp/30331/p2p/12D3KooWCaYffneXUW1L4EgoCTyPPD6xUdjhgFjZeTopK8EcfxHH
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+      --port 30332
+      --rpc-cors all
+      --ws-port 9944
+      --rpc-port 9933
+      --rpc-methods unsafe
+      --unsafe-rpc-external
+      --unsafe-ws-external
+  validator3:
+    environment:
+      - RUST_LOG=info
+    container_name: validator3
+    build:
+      context: ./images/da
+      dockerfile: Dockerfile-dev
+      args:
+        - BRANCH=develop
+    depends_on:
+      - validator2
+      - validator1
+    tmpfs: /tmp
+    entrypoint: /da/bin/data-avail
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./volume/testnet/genesis:/da/genesis:ro
+      - ./volume/testnet/validator3/state:/da/state
+      - ./volume/testnet/validator3/node.key:/da/node.key:ro
+      - ./volume/testnet/validator3/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/validator3/keystore:/da/keystore
+    ports:
+      - 30333:30333
+      - 49944:9944
+      - 39933:9933
+      - 9966:9944
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_3
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --bootnodes /dns/validator1/tcp/30331/p2p/12D3KooWCaYffneXUW1L4EgoCTyPPD6xUdjhgFjZeTopK8EcfxHH
+      --bootnodes /dns/validator2/tcp/30332/p2p/12D3KooWMXEf3Bz3YdJ2J9T7GiQoACUYUPYPKCaPuTBtyGZco6Mw
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+      --port 30333
+      --rpc-cors all
+      --ws-port 9944
+      --rpc-port 9933
+      --unsafe-rpc-external
+      --unsafe-ws-external
+      --rpc-methods unsafe
+  full_node:
+    environment:
+      - RUST_LOG=info
+    container_name: full_node
+    build:
+      context: ./images/da
+      dockerfile: Dockerfile-dev
+      args:
+        - BRANCH=develop    
+    depends_on:
+      - validator3
+      - validator2
+      - validator1
+    entrypoint: /da/bin/data-avail
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./volume/testnet/genesis:/da/genesis:ro
+      - ./volume/testnet/full_node/state:/da/state
+      - ./volume/testnet/full_node/node.key:/da/node.key:ro
+      - ./volume/testnet/full_node/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/full_node/keystore:/da/keystore
+    ports:
+      - 30334:30334
+      - 9944:9944
+      - 9933:9933
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command:
+      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_FULL_NODE
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --bootnodes /dns/validator1/tcp/30331/p2p/12D3KooWCaYffneXUW1L4EgoCTyPPD6xUdjhgFjZeTopK8EcfxHH
+      --bootnodes /dns/validator2/tcp/30332/p2p/12D3KooWMXEf3Bz3YdJ2J9T7GiQoACUYUPYPKCaPuTBtyGZco6Mw
+      --bootnodes /dns/validator3/tcp/30333/p2p/12D3KooWLVxK1KYSXWZBWQNYdA2sHX4nw8adMNrmZcJ7eFAZWRQ5
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+      --port 30334
+      --rpc-cors all
+      --ws-port 9944
+      --rpc-port 9933
+      --unsafe-rpc-external
+      --unsafe-ws-external
+      --rpc-methods unsafe
+  validator_alyssa:
+    environment:
+      - RUST_LOG=info
+    container_name: validator_alyssa
+    build:
+      context: ./images/da
+      dockerfile: Dockerfile-dev
+      args:
+        - BRANCH=develop
+    depends_on:
+      - validator3
+      - validator2
+      - validator1
+    entrypoint: /da/bin/data-avail
+    volumes:
+      - ./volume/testnet/exec/:/da/exec:ro
+      - ./volume/testnet/genesis:/da/genesis:ro
+      - ./volume/testnet/validator_alyssa/state:/da/state
+      - ./volume/testnet/validator_alyssa/node.key:/da/node.key:ro
+      - ./volume/testnet/validator_alyssa/suri.txt:/da/suri.txt:ro
+      - ./volume/testnet/validator_alyssa/keystore:/da/keystore
+    ports:
+      - 30335:30335
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_ALYSSA
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --bootnodes /dns/validator1/tcp/30331/p2p/12D3KooWCaYffneXUW1L4EgoCTyPPD6xUdjhgFjZeTopK8EcfxHH
+      --bootnodes /dns/validator2/tcp/30332/p2p/12D3KooWMXEf3Bz3YdJ2J9T7GiQoACUYUPYPKCaPuTBtyGZco6Mw
+      --bootnodes /dns/validator3/tcp/30333/p2p/12D3KooWLVxK1KYSXWZBWQNYdA2sHX4nw8adMNrmZcJ7eFAZWRQ5
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+      --port 30335
+      --rpc-cors all
+      --ws-port 9944
+      --rpc-port 9933
+      --unsafe-rpc-external
+      --unsafe-ws-external
+      --rpc-methods unsafe
+  # dapp:
+  #   container_name: dapp
+  #   image: 0xpolygon/avail-apps:v1.0.0
+  #   environment:
+  #     - WS_URL=wss://localhost/ws
+  # lightclient:
+  #   build:  
+  #       context: ./images/client
+  #       dockerfile: Dockerfile-dev
+  #       args:
+  #         - BRANCH=main
+  #   depends_on:
+  #     - full_node
+  #   entrypoint: [
+  #     "wait-for-it",
+  #     "-t", "30",
+  #     "127.0.0.1:9944",
+  #     "--",
+  #     "/app/avail-light/start.sh"
+  #   ]
+  #   ports:
+  #     - 9000:7000
+  #     - 11000:11000
+  #   environment:
+  #     - HTTP_SERVER_HOST=0.0.0.0
+  #     - FULL_NODE_RPC=["http://full_node:9933"]
+  #     - FULL_NODE_WS=["ws://full_node:9944"]
+  #     - LOG_LEVEL="INFO"
+  redis:
+    container_name: redis
+    image:  redis:6-alpine
+    command: "redis-server --save 60 1"
+    volumes:
+      - ./volume/redis/data:/data
+  proxy:
+    container_name: proxy
+    image: kong:2.6.0-alpine
+    env_file: env/proxy.env
+    depends_on:
+      - full_node
+      # - dapp
+      - redis
+      # - lightclient
+    volumes:
+      - ./volume/proxy/kong.yml:/proxy/kong.yml:ro
+    ports:
+      - 443:8443
+      - 80:8000
+
+
+
