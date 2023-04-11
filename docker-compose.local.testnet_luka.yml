@@ -8,7 +8,7 @@ version: "3.3"
 services:
   validator1:
     environment:
-      - RUST_LOG=info
+      - RUST_LOG=debug
     container_name: validator1
     build:
       context: ./images/da
@@ -32,7 +32,7 @@ services:
         max_attempts: 3
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_1
       --node-key-file /da/node.key
@@ -76,7 +76,7 @@ services:
         max_attempts: 3
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_2
       --node-key-file /da/node.key
@@ -124,7 +124,7 @@ services:
         max_attempts: 3
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_3
       --node-key-file /da/node.key
@@ -171,7 +171,7 @@ services:
         condition: on-failure
         max_attempts: 3
     command:
-      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_FULL_NODE
       --node-key-file /da/node.key
@@ -214,7 +214,8 @@ services:
       - 30335:30335
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.raw.json
+      --force-authoring
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_ALYSSA
       --node-key-file /da/node.key
@@ -280,6 +281,3 @@ services:
     ports:
       - 443:8443
       - 80:8000
-
-
-
