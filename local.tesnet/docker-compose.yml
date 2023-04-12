@@ -1,0 +1,187 @@
+## Setting up something that replicates the testnet environment
+# docker-compose -f docker-compose.local.testnet.yml up --abort-on-container-exit
+## reset full local state
+# find volume/testnet -type d -name 'state' -or -name 'keystore' | awk '{print "rm -rf ./" $0 "/*"}' | sh
+## remove stopped containers
+# docker-compose -f docker-compose.local.testnet.yml rm
+version: "3.3"
+services:
+  validator1:
+    container_name: validator1
+    image: avail_dev:develop
+    build:
+      context: ../images/da
+      dockerfile: Dockerfile-dev
+      args:
+        - BRANCH=develop
+        - FEATURES=fast-runtime
+    tmpfs: /tmp
+    volumes:
+      - val_1_state:/da/state
+      - ../volume/testnet/exec/:/da/exec:ro
+      - ../volume/testnet/genesis:/da/genesis:ro
+      - ../volume/testnet/validator1/node.key:/da/node.key:ro
+      - ../volume/testnet/validator1/suri.txt:/da/suri.txt:ro
+      - ../volume/testnet/validator1/keystore:/da/keystore
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_1
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+  validator2:
+    container_name: validator2
+    image: avail_dev:develop
+    tmpfs: /tmp
+    volumes:
+      - val_2_state:/da/state
+      - ../volume/testnet/exec/:/da/exec:ro
+      - ../volume/testnet/genesis:/da/genesis:ro
+      - ../volume/testnet/validator2/node.key:/da/node.key:ro
+      - ../volume/testnet/validator2/suri.txt:/da/suri.txt:ro
+      - ../volume/testnet/validator2/keystore:/da/keystore
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_2
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+  validator3:
+    container_name: validator3
+    image: avail_dev:develop
+    tmpfs: /tmp
+    volumes:
+      - val_3_state:/da/state
+      - ../volume/testnet/exec/:/da/exec:ro
+      - ../volume/testnet/genesis:/da/genesis:ro
+      - ../volume/testnet/validator3/node.key:/da/node.key:ro
+      - ../volume/testnet/validator3/suri.txt:/da/suri.txt:ro
+      - ../volume/testnet/validator3/keystore:/da/keystore
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_3
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+  validator_alyssa:
+    container_name: validator_alyssa
+    image: avail_dev:develop
+    volumes:
+      - alyssa_state:/da/state
+      - ../volume/testnet/exec/:/da/exec:ro
+      - ../volume/testnet/genesis:/da/genesis:ro
+      - ../volume/testnet/validator_alyssa/node.key:/da/node.key:ro
+      - ../volume/testnet/validator_alyssa/suri.txt:/da/suri.txt:ro
+      - ../volume/testnet/validator_alyssa/keystore:/da/keystore
+    command:
+      --validator
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
+      --base-path /da/state
+      --name MATIC_VALIDATOR_ALYSSA
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+
+# Sentry Node for Access
+  sentry_node:
+    container_name: sentry_node
+    image: avail_dev:develop
+    volumes:
+      - sentry_node_state:/da/state
+      - ../volume/testnet/exec/:/da/exec:ro
+      - ../volume/testnet/genesis:/da/genesis:ro
+      - ../volume/testnet/full_node/node.key:/da/node.key:ro
+      - ../volume/testnet/full_node/suri.txt:/da/suri.txt:ro
+      - ../volume/testnet/full_node/keystore:/da/keystore
+    ports:
+      - 30330:30330
+      - 9944:9944
+      - 9933:9933
+    command:
+      --chain /da/genesis/testnet-v2-local.chain.spec.json
+      --base-path /da/state
+      --name MATIC_SENTRY_NODE
+      --node-key-file /da/node.key
+      --keystore-path /da/keystore
+      --execution native-else-wasm
+      --in-peers 10
+      --out-peers 10
+      --port 30330
+      --rpc-cors all
+      --ws-port 9944
+      --rpc-port 9933
+      --unsafe-rpc-external
+      --unsafe-ws-external
+      --rpc-methods unsafe
+  # dapp:
+  #   container_name: dapp
+  #   image: 0xpolygon/avail-apps:v1.0.0
+  #   environment:
+  #     - WS_URL=wss://localhost/ws
+  # lightclient:
+  #   build:  
+  #       context: ../images/client
+  #       dockerfile: Dockerfile-dev
+  #       args:
+  #         - BRANCH=main
+  #   depends_on:
+  #     - full_node
+  #   entrypoint: [
+  #     "wait-for-it",
+  #     "-t", "30",
+  #     "127.0.0.1:9944",
+  #     "--",
+  #     "/app/avail-light/start.sh"
+  #   ]
+  #   ports:
+  #     - 9000:7000
+  #     - 11000:11000
+  #   environment:
+  #     - HTTP_SERVER_HOST=0.0.0.0
+  #     - FULL_NODE_RPC=["http://full_node:9933"]
+  #     - FULL_NODE_WS=["ws://full_node:9944"]
+  #     - LOG_LEVEL="INFO"
+  # redis:
+  #  container_name: redis
+  #  image:  redis:6-alpine
+  #  command: "redis-server --save 60 1"
+  #  volumes:
+  #    - redis_data:/data
+  # proxy:
+  #  container_name: proxy
+  #  image: kong:2.6.0-alpine
+  #  env_file: ../env/proxy.env
+  #  depends_on:
+  #    - full_node
+      # - dapp
+  #    - redis
+      # - lightclient
+  #  volumes:
+  #    - ../volume/proxy/kong.yml:/proxy/kong.yml:ro
+  #  ports:
+  #    - 443:8443
+  #    - 80:8000
+
+volumes:
+  val_1_state:
+  val_2_state:
+  val_3_state:
+  sentry_node_state:
+  alyssa_state:
+  redis_data:
+
+# vim: et:ts=2:sw=2
