@@ -33,6 +33,8 @@ services:
       --execution native-else-wasm
       --in-peers 10
       --out-peers 10
+    networks:
+      - net1
   validator2:
     container_name: validator2
     image: avail_dev:develop
@@ -54,6 +56,8 @@ services:
       --execution native-else-wasm
       --in-peers 10
       --out-peers 10
+    networks:
+      - net1
   validator3:
     container_name: validator3
     image: avail_dev:develop
@@ -75,6 +79,8 @@ services:
       --execution native-else-wasm
       --in-peers 10
       --out-peers 10
+    networks:
+      - net1
   validator_alyssa:
     container_name: validator_alyssa
     image: avail_dev:develop
@@ -95,7 +101,8 @@ services:
       --execution native-else-wasm
       --in-peers 10
       --out-peers 10
-
+    networks:
+      - net1
 # Sentry Node for Access
   sentry_node:
     container_name: sentry_node
@@ -127,6 +134,9 @@ services:
       --unsafe-rpc-external
       --unsafe-ws-external
       --rpc-methods unsafe
+      --state-pruning archive
+    networks:
+      - net1
   # dapp:
   #   container_name: dapp
   #   image: 0xpolygon/avail-apps:v1.0.0
@@ -183,5 +193,8 @@ volumes:
   sentry_node_state:
   alyssa_state:
   redis_data:
+
+networks:
+  net1:
 
 # vim: et:ts=2:sw=2

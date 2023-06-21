@@ -3,7 +3,7 @@
   "id": "Dev",
   "chainType": "Development",
   "bootNodes": [],
-  "protocolId": "da1",
+  "protocolId": "Avail",
   "properties": {
     "tokenDecimals": 18,
     "tokenSymbol": "AVL"
@@ -45,19 +45,19 @@
         "balances": [
           [
             "5DVFgQ8BNrPeBCFoJR2DmGo64YdbM2KhkzAVXZeMLtzx5NnW",
-            1000000000000000000000000
+            10000000000000000000000000
           ],
           [
             "5EHnHosVpPM5zCt2RP8GWzY3Gz25oNGj5xd18aUKdSY2FHTL",
-            1000000000000000000000000
+            10000000000000000000000000
           ],
           [
             "5EThWZyNHqWJPETJWLDYf62jao2DSXeP4DcCvJuHYY5hC43c",
-            1000000000000000000000000
+            10000000000000000000000000
           ],
           [
             "5Ef7aUKrH6SXfQpVXmonpW258VFc5Kx1VgAiJKAnvZ5WoSnn",
-            1000000000000000000000000
+            10000000000000000000000000
           ],
           [
             "5Fvb5iKaHQBZw4ZQ3x2a6JzxfdHsCJ81ayhD1qmhMvEL4Ji3",
@@ -72,7 +72,7 @@
         "validatorCount": 3,
         "minimumValidatorCount": 3,
         "invulnerables": [],
-        "forceEra": "NotForcing",
+        "forceEra": "ForceAlways",
         "slashRewardFraction": 100000000,
         "canceledPayout": 0,
         "stakers": [
@@ -227,17 +227,17 @@
           ]
         ]
       },
-      "updaterManager": {
-        "updater": "0x1563915e194d8cfba1943570603f7606a3115508",
+      "nomadUpdaterManager": {
+        "updater": "0x695dfcfc604f9b2992642bdc5b173d1a1ed60b03",
         "phantom": null
       },
       "nomadHome": {
         "localDomain": 2000,
         "committedRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "updater": "0x1563915e194d8cfba1943570603f7606a3115508",
+        "updater": "0x695dfcfc604f9b2992642bdc5b173d1a1ed60b03",
         "phantom": null
       },
-      "daBridge": {},
+      "nomadDaBridge": {},
       "nominationPools": {
         "minJoinBond": 1000000000000000000,
         "minCreateBond": 10000000000000000000,
