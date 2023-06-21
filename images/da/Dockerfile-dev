@@ -7,11 +7,12 @@ WORKDIR app
 FROM chef AS planner
 
 ARG BRANCH=develop
-RUN git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail.git && cd avail
-RUN cargo chef prepare --recipe-path /app/recipe.json
+RUN git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail.git
+WORKDIR /app/avail
+RUN cargo chef prepare --recipe-path /app/avail/recipe.json
 
 FROM chef AS builder
-COPY --from=planner /app/recipe.json recipe.json
+COPY --from=planner /app/avail/recipe.json recipe.json
 RUN apt-get update && \
 	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
 	rm -rf /var/lib/apt/lists 
