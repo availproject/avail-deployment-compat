@@ -8,13 +8,13 @@ version: "3.3"
 services:
   validator1:
     container_name: validator1
-    image: avail_dev:develop
+    image: avail_dev:develop1
     build:
       context: ../images/da
       dockerfile: Dockerfile-dev
       args:
-        - BRANCH=develop
-        - FEATURES=fast-runtime
+        - BRANCH=pera
+        - FEATURES=
     tmpfs: /tmp
     volumes:
       - val_1_state:/da/state
@@ -37,7 +37,7 @@ services:
       - net1
   validator2:
     container_name: validator2
-    image: avail_dev:develop
+    image: avail_dev:develop1
     tmpfs: /tmp
     volumes:
       - val_2_state:/da/state
@@ -60,7 +60,7 @@ services:
       - net1
   validator3:
     container_name: validator3
-    image: avail_dev:develop
+    image: avail_dev:develop1
     tmpfs: /tmp
     volumes:
       - val_3_state:/da/state
@@ -83,7 +83,7 @@ services:
       - net1
   validator_alyssa:
     container_name: validator_alyssa
-    image: avail_dev:develop
+    image: avail_dev:develop1
     volumes:
       - alyssa_state:/da/state
       - ../volume/testnet/exec/:/da/exec:ro
@@ -106,7 +106,7 @@ services:
 # Sentry Node for Access
   sentry_node:
     container_name: sentry_node
-    image: avail_dev:develop
+    image: avail_dev:develop1
     volumes:
       - sentry_node_state:/da/state
       - ../volume/testnet/exec/:/da/exec:ro
@@ -142,29 +142,28 @@ services:
   #   image: 0xpolygon/avail-apps:v1.0.0
   #   environment:
   #     - WS_URL=wss://localhost/ws
-  # lightclient:
-  #   build:  
-  #       context: ../images/client
-  #       dockerfile: Dockerfile-dev
-  #       args:
-  #         - BRANCH=main
-  #   depends_on:
-  #     - full_node
-  #   entrypoint: [
-  #     "wait-for-it",
-  #     "-t", "30",
-  #     "127.0.0.1:9944",
-  #     "--",
-  #     "/app/avail-light/start.sh"
-  #   ]
-  #   ports:
-  #     - 9000:7000
-  #     - 11000:11000
-  #   environment:
-  #     - HTTP_SERVER_HOST=0.0.0.0
-  #     - FULL_NODE_RPC=["http://full_node:9933"]
-  #     - FULL_NODE_WS=["ws://full_node:9944"]
-  #     - LOG_LEVEL="INFO"
+  lightclient:
+    build:  
+        context: ../images/client
+        dockerfile: Dockerfile-dev
+        args:
+          - LC_BRANCH=mirko
+    depends_on:
+      - sentry_node
+    entrypoint: [
+      "wait-for-it",
+      "-t", "30",
+      "127.0.0.1:9944",
+      "--",
+      "/app/avail-light/start.sh"
+    ]
+    ports:
+      - 9000:7000
+      - 11000:11000
+    environment:
+      - HTTP_SERVER_HOST=0.0.0.0
+      - FULL_NODE_WS=["ws://full_node:9944"]
+      - LOG_LEVEL="INFO"
   # redis:
   #  container_name: redis
   #  image:  redis:6-alpine

@@ -1,30 +1,34 @@
-FROM rust:1.68.2 AS chef 
+FROM rust:1.70.0 AS chef
 # We only pay the installation cost once, 
 # it will be cached from the second build onwards
-RUN cargo install cargo-chef 
+RUN cargo install cargo-chef --version 0.1.62
 WORKDIR app
 
 FROM chef AS planner
 
-ARG BRANCH=main
-RUN git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail-light.git && cd avail-light
-RUN cargo chef prepare  --recipe-path /app/recipe.json
+ARG LC_BRANCH=doesnt_exist
+RUN git clone --depth 1 -b ${LC_BRANCH} https://github.com/availproject/avail-light.git && cd avail-light
+WORKDIR /app/avail-light
+RUN cargo chef prepare --recipe-path /app/avail-light/recipe.json
 
 FROM chef AS builder
-COPY --from=planner /app/recipe.json recipe.json
+WORKDIR app
+COPY --from=planner /app/avail-light/recipe.json recipe.json
 RUN apt-get update && \
 	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
 	rm -rf /var/lib/apt/lists 
 
-ARG BRANCH=main
+ARG LC_BRANCH=doesnt_exist
 # Build application
-RUN rm -rf avail-light && git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail-light.git
+RUN rm -rf avail-light && git clone --depth 1 -b ${LC_BRANCH} https://github.com/availproject/avail-light.git
+RUN cp recipe.json /app/avail-light
 # Build dependencies - this is the caching Docker layer!
-RUN cd avail-light && cargo chef cook --release --recipe-path /app/recipe.json
+RUN cd avail-light && cargo chef cook --release --recipe-path /app/avail-light
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
-ADD https://api.github.com/repos/availproject/avail-light/commits/${BRANCH} last_commit.json
-RUN cd avail-light && git fetch origin && git reset --hard origin/${BRANCH}
+ADD https://api.github.com/repos/availproject/avail-light/commits/${LC_BRANCH} last_commit.json
+RUN cd avail-light && git fetch origin && git reset --hard origin/${LC_BRANCH}
 RUN cd avail-light && cargo build --release
+RUN cd avail-light/target/release && pwd
 
 # We do not need the Rust toolchain to run the binary!
 FROM debian:bullseye-slim AS runtime
@@ -54,5 +58,5 @@ ENV \
 	QUERY_PROOF_RPC_PARALLEL_TASKS=10
 
 WORKDIR /app/avail-light
-COPY --from=builder /app/avail-light/target/release/avail-light /app/avail-light/avail-light
+COPY --from=builder /app/app/avail-light/target/release/avail-light /app/avail-light
 ENTRYPOINT ["/app/avail-light/start.sh"]

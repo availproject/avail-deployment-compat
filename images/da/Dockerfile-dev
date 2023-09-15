@@ -1,12 +1,12 @@
 FROM rust:1.70.0 AS chef 
 # We only pay the installation cost once, 
 # it will be cached from the second build onwards
-RUN cargo install cargo-chef 
+RUN cargo install cargo-chef --version 0.1.31
 WORKDIR app
 
 FROM chef AS planner
 
-ARG BRANCH=develop
+ARG BRANCH=doesnt_exist
 RUN git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail.git
 WORKDIR /app/avail
 RUN cargo chef prepare --recipe-path /app/avail/recipe.json
@@ -14,23 +14,24 @@ RUN cargo chef prepare --recipe-path /app/avail/recipe.json
 FROM chef AS builder
 COPY --from=planner /app/avail/recipe.json recipe.json
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
+	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang protobuf-compiler jq && \
 	rm -rf /var/lib/apt/lists 
 RUN rustup install nightly
 RUN rustup target add wasm32-unknown-unknown --toolchain nightly
 
-ARG BRANCH=develop
+ARG BRANCH=doesnt_exist
 ARG FEATURES=""
 
 # Build application
 RUN rm -rf avail && git clone --depth 1 -b ${BRANCH} https://github.com/availproject/avail.git
-
+RUN cat /app/recipe.json | jq
 # Build dependencies - this is the caching Docker layer!
 #RUN cd avail && cargo chef cook --release -p data-avail --features "${FEATURES}" --recipe-path /app/recipe.json
 
+
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail/commits/${BRANCH} last_commit.json
-RUN cd avail && git fetch origin && git reset --hard origin/${BRANCH}
+RUN cd avail && git fetch origin && git reset --hard ${BRANCH}
 RUN cd avail && cargo build --release -p data-avail --features "${FEATURES}"
 
 # We do not need the Rust toolchain to run the binary!
