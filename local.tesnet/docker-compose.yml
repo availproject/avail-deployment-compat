@@ -117,7 +117,6 @@ services:
     ports:
       - 30330:30330
       - 9944:9944
-      - 9933:9933
     command:
       --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
@@ -130,7 +129,6 @@ services:
       --port 30330
       --rpc-cors all
       --ws-port 9944
-      --rpc-port 9933
       --unsafe-rpc-external
       --unsafe-ws-external
       --rpc-methods unsafe
@@ -150,10 +148,11 @@ services:
           - LC_BRANCH=mirko
     depends_on:
       - sentry_node
+      - bootstraplc
     entrypoint: [
       "wait-for-it",
       "-t", "30",
-      "127.0.0.1:9944",
+      "sentry_node:9944",
       "--",
       "/app/avail-light/start.sh"
     ]
@@ -162,8 +161,21 @@ services:
       - 11000:11000
     environment:
       - HTTP_SERVER_HOST=0.0.0.0
-      - FULL_NODE_WS=["ws://full_node:9944"]
+      - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
+    networks:
+      - net1
+
+  bootstraplc:
+    build:  
+        context: ../images/bootstrap
+        dockerfile: Dockerfile-dev
+        args:
+          - BOOTSTRAPLC_BRANCH=mirko
+    ports:
+      - 5369:5369
+    networks:
+      - net1
   # redis:
   #  container_name: redis
   #  image:  redis:6-alpine

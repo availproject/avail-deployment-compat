@@ -26,7 +26,7 @@ RUN cp recipe.json /app/avail-light
 RUN cd avail-light && cargo chef cook --release --recipe-path /app/avail-light
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail-light/commits/${LC_BRANCH} last_commit.json
-RUN cd avail-light && git fetch origin && git reset --hard origin/${LC_BRANCH}
+RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH}
 RUN cd avail-light && cargo build --release
 RUN cd avail-light/target/release && pwd
 
@@ -42,12 +42,11 @@ ENV \
 	IPFS_SEED=1 \
 	IPFS_PORT=37000 \
 	IPFS_PATH="avail_ipfs_store" \
-	FULL_NODE_RPC="http://host.docker.internal:9933" \
 	FULL_NODE_WS="ws://host.docker.internal:9944" \
 	APP_ID=0 \
 	CONFIDENCE=92.0 \
 	AVAIL_PATH="avail_path" \
-	BOOTSTRAPS=[] \
+	BOOTSTRAPS="[[\"12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie\",\"/ip4/127.0.0.1/udp/5369/quic-v1\"]]" \
 	LOG_LEVEL="INFO" \
 	PARALLEL_TASKS=8 \
 	IPFS_SEED_RANDOM=false \
