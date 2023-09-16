@@ -26,7 +26,7 @@ RUN cp recipe.json /app/avail-light
 RUN cd avail-light && cargo chef cook --release --recipe-path /app/avail-light
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail-light/commits/${LC_BRANCH} last_commit.json
-RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH}
+RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH} && git pull
 RUN cd avail-light && cargo build --release
 RUN cd avail-light/target/release && pwd
 
