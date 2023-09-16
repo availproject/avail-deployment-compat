@@ -13,8 +13,9 @@ services:
       context: ../images/da
       dockerfile: Dockerfile-dev
       args:
-        - BRANCH=pera
+        - BRANCH=dont_exist
         - FEATURES=
+        - RUNTIME_BRANCH=dont_exist
     tmpfs: /tmp
     volumes:
       - val_1_state:/da/state
@@ -25,7 +26,6 @@ services:
       - ../volume/testnet/validator1/keystore:/da/keystore
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_1
       --node-key-file /da/node.key
@@ -48,7 +48,6 @@ services:
       - ../volume/testnet/validator2/keystore:/da/keystore
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_2
       --node-key-file /da/node.key
@@ -71,7 +70,6 @@ services:
       - ../volume/testnet/validator3/keystore:/da/keystore
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_3
       --node-key-file /da/node.key
@@ -93,7 +91,6 @@ services:
       - ../volume/testnet/validator_alyssa/keystore:/da/keystore
     command:
       --validator
-      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_VALIDATOR_ALYSSA
       --node-key-file /da/node.key
@@ -118,7 +115,6 @@ services:
       - 30330:30330
       - 9944:9944
     command:
-      --chain /da/genesis/testnet-v2-local.chain.spec.json
       --base-path /da/state
       --name MATIC_SENTRY_NODE
       --node-key-file /da/node.key
@@ -157,7 +153,7 @@ services:
       "/app/avail-light/start.sh"
     ]
     ports:
-      - 9000:7000
+      - 7000:7000
       - 11000:11000
     environment:
       - HTTP_SERVER_HOST=0.0.0.0

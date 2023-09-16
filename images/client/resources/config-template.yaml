@@ -16,3 +16,4 @@ block_processing_delay = ${BLOCK_PROCESSING_DELAY}
 block_matrix_partition = ${BLOCK_MATRIX_PARTITION}
 disable_proof_verification = ${DISABLE_PROOF_VERIFICATION}
 query_proof_rpc_parallel_tasks = ${QUERY_PROOF_RPC_PARALLEL_TASKS}
+sync_start_block = 1

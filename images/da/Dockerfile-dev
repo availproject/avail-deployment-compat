@@ -20,6 +20,7 @@ RUN rustup install nightly
 RUN rustup target add wasm32-unknown-unknown --toolchain nightly
 
 ARG BRANCH=doesnt_exist
+ARG RUNTIME_BRANCH=doesnt_exist
 ARG FEATURES=""
 
 # Build application
@@ -32,18 +33,31 @@ RUN cat /app/recipe.json | jq
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail/commits/${BRANCH} last_commit.json
 RUN cd avail && git fetch origin && git reset --hard ${BRANCH}
-RUN cd avail && cargo build --release -p data-avail --features "${FEATURES}"
+RUN cd avail && cargo build --release -p data-avail --features "${FEATURES}" && cp /app/avail/target/release/data-avail /app
+# Now build runtime
+RUN cd avail && git fetch origin && git reset --hard ${RUNTIME_BRANCH}
+RUN cd avail && cargo build --release -p da-runtime --features "${FEATURES}" && cp /app/avail/target/release/wbuild/da-runtime/da_runtime.compact.compressed.wasm /app/runtime.wasm
 
 # We do not need the Rust toolchain to run the binary!
 FROM debian:bullseye-slim AS runtime
 
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates && \
+	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates xxd && \
 	rm -rf /var/lib/apt/lists && \
 	mkdir -p /da/bin
 
-COPY --from=builder /app/avail/target/release/data-avail /da/bin/
+COPY --from=builder /app/data-avail /da/bin/
+COPY --from=builder /app/runtime.wasm /da/bin/
+COPY ./resources/* /da/bin/
+RUN xxd -p /da/bin/runtime.wasm | tr -d '\n' > wasm.hex
+
+# RUN sed -i 's/WASM_BINARY/\nWASM_BINARY\n/g' /da/bin/chainspec_template.json
+# RUN csplit /da/bin/chainspec_template.json '/WASM_BINARY/' '{*}' && sed -i '/WASM_BINARY/d' xx*
+# RUN truncate -s -1 xx00
+# RUN cat xx00 wasm.hex xx01 > /da/bin/chainspec.json
+
+RUN chmod +x /da/bin/substitute_keyword.sh && /da/bin/substitute_keyword.sh WASM_BINARY /da/bin/chainspec_template.json wasm.hex /da/bin/chainspec.json
 
 WORKDIR /da
 VOLUME ["/tmp", "/da/state", "/da/keystore"]
-ENTRYPOINT ["/da/bin/data-avail"]
+ENTRYPOINT ["/da/bin/data-avail", "--chain", "/da/bin/chainspec.json"]
