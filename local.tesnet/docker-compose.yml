@@ -125,7 +125,6 @@ services:
       --port 30330
       --rpc-cors all
       --ws-port 9944
-      --unsafe-rpc-external
       --unsafe-ws-external
       --rpc-methods unsafe
       --state-pruning archive
