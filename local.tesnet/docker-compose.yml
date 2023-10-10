@@ -25,10 +25,9 @@ services:
       - ../volume/testnet/validator1/suri.txt:/da/suri.txt:ro
       - ../volume/testnet/validator1/keystore:/da/keystore
     command:
-      --validator
+      --alice
       --base-path /da/state
       --name MATIC_VALIDATOR_1
-      --node-key-file /da/node.key
       --keystore-path /da/keystore
       --execution native-else-wasm
       --in-peers 10
@@ -47,10 +46,9 @@ services:
       - ../volume/testnet/validator2/suri.txt:/da/suri.txt:ro
       - ../volume/testnet/validator2/keystore:/da/keystore
     command:
-      --validator
+      --bob
       --base-path /da/state
       --name MATIC_VALIDATOR_2
-      --node-key-file /da/node.key
       --keystore-path /da/keystore
       --execution native-else-wasm
       --in-peers 10
@@ -124,8 +122,8 @@ services:
       --out-peers 10
       --port 30330
       --rpc-cors all
-      --ws-port 9944
-      --unsafe-ws-external
+      --rpc-port 9944
+      --unsafe-rpc-external
       --rpc-methods unsafe
       --state-pruning archive
     networks:
