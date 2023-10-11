@@ -8,7 +8,7 @@ version: "3.3"
 services:
   validator1:
     container_name: validator1
-    image: avail_dev:develop1
+    image: avail_dev:1.6
     build:
       context: ../images/da
       dockerfile: Dockerfile-dev
@@ -36,7 +36,7 @@ services:
       - net1
   validator2:
     container_name: validator2
-    image: avail_dev:develop1
+    image: avail_dev:1.6
     tmpfs: /tmp
     volumes:
       - val_2_state:/da/state
@@ -57,7 +57,7 @@ services:
       - net1
   validator3:
     container_name: validator3
-    image: avail_dev:develop1
+    image: avail_dev:1.6
     tmpfs: /tmp
     volumes:
       - val_3_state:/da/state
@@ -79,7 +79,7 @@ services:
       - net1
   validator_alyssa:
     container_name: validator_alyssa
-    image: avail_dev:develop1
+    image: avail_dev:1.6
     volumes:
       - alyssa_state:/da/state
       - ../volume/testnet/exec/:/da/exec:ro
@@ -101,7 +101,7 @@ services:
 # Sentry Node for Access
   sentry_node:
     container_name: sentry_node
-    image: avail_dev:develop1
+    image: avail_dev:1.6
     volumes:
       - sentry_node_state:/da/state
       - ../volume/testnet/exec/:/da/exec:ro
@@ -122,8 +122,8 @@ services:
       --out-peers 10
       --port 30330
       --rpc-cors all
-      --rpc-port 9944
-      --unsafe-rpc-external
+      --ws-port 9944
+      --unsafe-ws-external
       --rpc-methods unsafe
       --state-pruning archive
     networks:
