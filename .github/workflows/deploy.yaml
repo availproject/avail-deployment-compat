@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    branches:
+      - vcastellm/deploy
+    inputs:
+      host:
+        required: true
+        description: "The host to deploy to"
+      version:
+        required: true
+        description: "The version to deploy"
+        type: choice
+        options:
+          - "v1.0.0"
+          - "v1.1.0"
+
+jobs:
+  deployAnsible:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ./.github/actions/ansible
+        with:
+          host: ${{ github.event.inputs.host }}
+          version: ${{ github.event.inputs.version }}

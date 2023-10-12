@@ -1,0 +1,57 @@
+# ------------------------------------------------------------------------------
+# This is an example file to get you started with using
+# declarative configuration in Kong.
+# ------------------------------------------------------------------------------
+
+# Metadata fields start with an underscore (_)
+# Fields that do not start with an underscore represent Kong entities and attributes
+
+# _format_version is mandatory,
+# it specifies the minimum version of Kong that supports the format
+
+_format_version: "2.1"
+
+services:
+ - name: full_node_ws 
+   url: http://full_node:9944
+   tags: ["da"]
+   routes:
+   - name: ws_route
+     protocols: ["https", "http"]
+     paths: ["/ws"]
+     request_buffering: false
+     response_buffering: false
+     strip_path: true
+     # preserve_host: true
+ 
+ - name: dapp 
+   url: http://dapp
+   tags: ["da"]
+   routes:
+   - name: web_root_route
+     protocols: ["https", "http"]
+     paths: ["/"]
+     request_buffering: false
+     response_buffering: false
+     strip_path: true
+     # preserve_host: true
+
+ - name: acme-dummy
+   url: http://127.0.0.1:65535
+   routes:
+   - name: acme-dummy
+     protocols: ["http"]
+     paths: ["/.well-known/acme-challenge"]
+
+
+plugins:
+  - name: acme
+    config:
+      account_email: miguel@polygon.technology
+      domains: ["polygon-da-explorer.matic.today"]
+      tos_accepted: true
+      # api_uri: https://acme-staging-v02.api.letsencrypt.org/directory
+      storage: "redis"
+      storage_config:
+        redis:
+          host: redis

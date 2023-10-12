@@ -1,0 +1,34 @@
+_format_version: "2.1"
+
+services:
+ - name: light_client 
+   url: http://light_client:7000
+   tags: ["lc"]
+   routes:
+   - name: lc_route
+     protocols: ["https", "http"]
+     paths: ["/"]
+     request_buffering: false
+     response_buffering: false
+     strip_path: true
+     # preserve_host: true
+
+ - name: acme-dummy
+   url: http://127.0.0.1:65535
+   routes:
+   - name: acme-dummy
+     protocols: ["http"]
+     paths: ["/.well-known/acme-challenge"]
+
+
+plugins:
+  - name: acme
+    config:
+      account_email: miguel@polygon.technology
+      domains: ["polygon-da-light.matic.today"]
+      tos_accepted: true
+      # api_uri: https://acme-staging-v02.api.letsencrypt.org/directory
+      storage: "redis"
+      storage_config:
+        redis:
+          host: redis

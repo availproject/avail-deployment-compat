@@ -1,0 +1,16 @@
+name: 'Ansible'
+description: 'Runs an Ansible playbook'
+inputs:
+  host:
+    required: true
+    description: 'The host to deploy to'
+  version:
+    required: true
+    description: 'The version to deploy'
+    
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.host }}
+    - ${{ inputs.version }}
