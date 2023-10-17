@@ -23,5 +23,5 @@ if [ $? -eq 0 ]; then
     mv target/release/avail-light-linux-amd64 target/release/avail-light 
 else
     echo "Building from source!"
-    cargo build --release
+    cargo build --release --jobs 2
 fi
