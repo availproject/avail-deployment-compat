@@ -1,19 +1,6 @@
 FROM rust:1.70.0 AS chef
-# We only pay the installation cost once, 
-# it will be cached from the second build onwards
-RUN cargo install cargo-chef --version 0.1.62
-WORKDIR app
-
-FROM chef AS planner
-
-ARG BOOTSTRAPLC_BRANCH=doesnt_exist
-RUN git clone --depth 1 -b ${BOOTSTRAPLC_BRANCH} https://github.com/availproject/avail-light-bootstrap.git && cd avail-light-bootstrap
-WORKDIR /app/avail-light-bootstrap
-RUN cargo chef prepare --recipe-path /app/avail-light-bootstrap/recipe.json
-
 FROM chef AS builder
 WORKDIR app
-COPY --from=planner /app/avail-light-bootstrap/recipe.json recipe.json
 RUN apt-get update && \
 	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
 	rm -rf /var/lib/apt/lists 
@@ -21,21 +8,22 @@ RUN apt-get update && \
 ARG BOOTSTRAPLC_BRANCH=doesnt_exist
 # Build application
 RUN rm -rf avail-light-bootstrap && git clone --depth 1 -b ${BOOTSTRAPLC_BRANCH} https://github.com/availproject/avail-light-bootstrap.git
-RUN cp recipe.json /app/avail-light-bootstrap
-# Build dependencies - this is the caching Docker layer!
-RUN cd avail-light-bootstrap && cargo chef cook --release --recipe-path /app/avail-light-bootstrap
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail-light-bootstrap/commits/${BOOTSTRAPLC_BRANCH} last_commit.json
 RUN cd avail-light-bootstrap && git fetch origin && git reset --hard ${BOOTSTRAPLC_BRANCH}
-RUN cd avail-light-bootstrap && cargo build --release
+
+COPY ./resources/download_or_build.sh /app/avail-light-bootstrap/
+RUN chmod +x /app/avail-light-bootstrap/download_or_build.sh
+RUN cd avail-light-bootstrap && ./download_or_build.sh ${BOOTSTRAPLC_BRANCH}
+# RUN cd avail-light-bootstrap && cargo build --release
 
 # We do not need the Rust toolchain to run the binary!
-FROM debian:bullseye-slim AS runtime
+FROM debian:bookworm-slim AS runtime
 WORKDIR app
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang
+	apt-get install -y gettext-base wait-for-it ca-certificates clang
 COPY ./resources/* /app/avail-light-bootstrap/
 
 WORKDIR /app/avail-light-bootstrap
-COPY --from=builder /app/app/avail-light-bootstrap/target/release/avail-light-bootstrap /app/avail-light-bootstrap
+COPY --from=builder /app/avail-light-bootstrap/target/release/avail-light-bootstrap /app/avail-light-bootstrap
 ENTRYPOINT ["/app/avail-light-bootstrap/avail-light-bootstrap"]

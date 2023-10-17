@@ -29,21 +29,25 @@ RUN cat /app/recipe.json | jq
 # Build dependencies - this is the caching Docker layer!
 #RUN cd avail && cargo chef cook --release -p data-avail --features "${FEATURES}" --recipe-path /app/recipe.json
 
-
+COPY ./resources/download_or_build.sh avail
+COPY ./resources/download_or_build_runtime.sh avail
+RUN chmod +x avail/download_or_build.sh && chmod +x avail/download_or_build_runtime.sh
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail/commits/${BRANCH} last_commit.json
 RUN cd avail && git fetch origin && git reset --hard ${BRANCH} && git pull
-RUN cd avail && cargo build --release -p data-avail --features "${FEATURES}" && cp /app/avail/target/release/data-avail /app
+RUN cd avail && ./download_or_build.sh "${BRANCH}" "${FEATURES}" && cp /app/avail/target/release/data-avail /app
+#RUN cd avail && cargo build --release -p data-avail --features "${FEATURES}" && cp /app/avail/target/release/data-avail /app
 # Now build runtime
 ADD https://api.github.com/repos/availproject/avail/commits/${RUNTIME_BRANCH} last_commit2.json
 RUN cd avail && git fetch origin && git reset --hard ${RUNTIME_BRANCH} && git pull
-RUN cd avail && cargo build --release -p da-runtime --features "${FEATURES}" && cp /app/avail/target/release/wbuild/da-runtime/da_runtime.compact.compressed.wasm /app/runtime.wasm
+RUN cd avail && ./download_or_build_runtime.sh "${RUNTIME_BRANCH}" "${FEATURES}" && cp /app/avail/target/release/wbuild/da-runtime/da_runtime.compact.compressed.wasm /app/runtime.wasm
+# RUN cd avail && cargo build --release -p da-runtime --features "${FEATURES}" && cp /app/avail/target/release/wbuild/da-runtime/da_runtime.compact.compressed.wasm /app/runtime.wasm
 
 # We do not need the Rust toolchain to run the binary!
-FROM debian:bullseye-slim AS runtime
+FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates xxd && \
+	apt-get install -y gettext-base wait-for-it ca-certificates xxd && \
 	rm -rf /var/lib/apt/lists && \
 	mkdir -p /da/bin
 

@@ -12,14 +12,17 @@ RUN cd avail-light && cargo build --release
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail-light/commits/${LC_BRANCH} last_commit.json
 RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH} && git pull
-RUN cd avail-light && cargo build --release
+
+COPY ./resources/download_or_build.sh /app/avail-light/
+RUN chmod +x /app/avail-light/download_or_build.sh
+RUN cd avail-light && ./download_or_build.sh ${LC_BRANCH}
 RUN cd avail-light/target/release && pwd
 
 # We do not need the Rust toolchain to run the binary!
-FROM debian:bullseye-slim AS runtime
+FROM debian:bookworm-slim AS runtime
 WORKDIR app
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang
+	apt-get install -y gettext-base wait-for-it ca-certificates clang
 COPY ./resources/* /app/avail-light/
 ENV \
 	HTTP_SERVER_HOST="127.0.0.1" \
