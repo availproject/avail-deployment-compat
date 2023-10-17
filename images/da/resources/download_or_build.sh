@@ -8,7 +8,7 @@ fi
 
 
 binary_version="$1"
-binary_url="https://github.com/availproject/avail/releases/download/$binary_version/data-avail-linux-amd64.tar.gz"
+binary_url="https://github.com/availproject/avail/releases/download/$binary_version/amd64-debian-12-data-avail.tar.gz"
 
 
 binary_file="release.tar.gz"
@@ -21,7 +21,7 @@ if [ $? -eq 0 ]; then
     echo "Binary ($binary_version) successfully fetched."
     mkdir -p target/release
     tar -xzf "$binary_file" -C target/release
-    mv target/release/data-avail-linux-amd64 target/release/data-avail
+    mv target/release/amd64-debian-12-data-avail target/release/data-avail
 else
     echo "Building from source!"
     cargo build --release -p data-avail --features "$2"
