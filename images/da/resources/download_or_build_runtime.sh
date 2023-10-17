@@ -23,5 +23,6 @@ if [ $? -eq 0 ]; then
     mv runtime.wasm target/release/wbuild/da-runtime/da_runtime.compact.compressed.wasm 
 else
     echo "Building from source!"
-    cargo build --release -p data-avail --features "$2" --jobs 2
+    
+    cargo build --release -p da-runtime --features "$2" --jobs 2
 fi
