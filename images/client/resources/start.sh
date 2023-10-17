@@ -17,4 +17,4 @@ echo "Avail-light version: $(./avail-light --version)"
 # Run the light-client
 echo "## Run light-client"
 sleep 60
-./avail-light
+./avail-light --config config.yaml

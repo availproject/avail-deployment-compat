@@ -1,4 +1,4 @@
 log_level = 'DEBUG'
-p2p_port = 5369
+port = 5369
 
 secret_key = { seed = "536870913" }

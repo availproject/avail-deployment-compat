@@ -156,6 +156,7 @@ services:
       - HTTP_SERVER_HOST=0.0.0.0
       - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
+      - BOOTSTRAPS=[["12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie", "/ip4/127.0.0.1/udp/37000/quic-v1/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]]
     networks:
       - net1
 
