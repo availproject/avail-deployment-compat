@@ -24,5 +24,5 @@ if [ $? -eq 0 ]; then
 else
     echo "Building from source!"
     
-    cargo build --release -p da-runtime --features "$2" --jobs 2
+    cargo build --release -p da-runtime --features "$2"
 fi
