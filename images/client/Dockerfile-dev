@@ -36,6 +36,7 @@ ENV \
 	AVAIL_PATH="avail_path" \
 	BOOTSTRAPS="[[\"12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie\",\"/ip4/127.0.0.1/udp/5369/quic-v1\"]]" \
 	LOG_LEVEL="INFO" \
+	RUST_LOG_STYLE=never \
 	PARALLEL_TASKS=8 \
 	IPFS_SEED_RANDOM=false \
 	DISABLE_RPC=false \
