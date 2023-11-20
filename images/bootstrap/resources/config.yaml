@@ -1,4 +1,4 @@
-log_level = 'DEBUG'
+log_level = 'INFO'
 port = 5369
 
 secret_key = { seed = "536870913" }
