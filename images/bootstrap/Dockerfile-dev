@@ -1,8 +1,8 @@
-FROM rust:1.70.0 AS chef
+FROM rust:1.73.0 AS chef
 FROM chef AS builder
 WORKDIR app
 RUN apt-get update && \
-	apt-get install -y libssl1.1 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
+	apt-get install -y libssl3 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
 	rm -rf /var/lib/apt/lists 
 
 ARG BOOTSTRAPLC_BRANCH=doesnt_exist
