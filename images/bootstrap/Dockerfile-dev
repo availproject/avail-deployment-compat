@@ -26,4 +26,4 @@ COPY ./resources/* /app/avail-light-bootstrap/
 
 WORKDIR /app/avail-light-bootstrap
 COPY --from=builder /app/avail-light-bootstrap/target/release/avail-light-bootstrap /app/avail-light-bootstrap
-ENTRYPOINT ["/app/avail-light-bootstrap/avail-light-bootstrap"]
+ENTRYPOINT ["/app/avail-light-bootstrap/avail-light-bootstrap", "-c", "/app/avail-light-bootstrap/config.yaml"]

@@ -12,6 +12,11 @@ echo "##############################"
 cat < ./config.yaml
 echo ""
 
+if [ -n "$ROUTER" ]; then
+    echo "Adding route"
+    ip route add $SUBNET via $ROUTER dev eth0
+fi
+
 echo "Avail-light version: $(./avail-light --version)"
 
 # Run the light-client

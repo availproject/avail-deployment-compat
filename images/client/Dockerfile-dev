@@ -22,7 +22,7 @@ RUN cd avail-light/target/release && pwd
 FROM debian:bookworm-slim AS runtime
 WORKDIR app
 RUN apt-get update && \
-	apt-get install -y gettext-base wait-for-it ca-certificates clang libpcap-dev
+	apt-get install -y gettext-base wait-for-it ca-certificates clang libpcap-dev iproute2 iptables iputils-ping
 COPY ./resources/* /app/avail-light/
 ENV \
 	HTTP_SERVER_HOST="127.0.0.1" \
@@ -34,11 +34,13 @@ ENV \
 	APP_ID=1 \
 	CONFIDENCE=92.0 \
 	AVAIL_PATH="avail_path" \
-	BOOTSTRAPS="[[\"12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie\",\"/ip4/127.0.0.1/udp/5369/quic-v1\"]]" \
+	BOOTSTRAPS="[]" \
+	RELAYS="[]" \
 	LOG_LEVEL="INFO" \
 	RUST_LOG_STYLE=never \
 	PARALLEL_TASKS=8 \
 	IPFS_SEED_RANDOM=false \
+	P2P_SEED=1 \
 	DISABLE_RPC=false \
 	BLOCK_PROCESSING_DELAY=0 \
 	DISABLE_PROOF_VERIFICATION=false \

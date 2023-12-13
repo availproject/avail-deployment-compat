@@ -1,0 +1,29 @@
+FROM rust:1.73.0 AS chef
+FROM chef AS builder
+WORKDIR app
+RUN apt-get update && \
+	apt-get install -y libssl3 gettext-base wait-for-it ca-certificates clang protobuf-compiler && \
+	rm -rf /var/lib/apt/lists 
+
+ARG RELAY_BRANCH=doesnt_exist
+# Build application
+RUN rm -rf avail-light-relay && git clone --depth 1 -b ${RELAY_BRANCH} https://github.com/availproject/avail-light-relay.git
+# This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
+ADD https://api.github.com/repos/availproject/avail-light-relay/commits/${RELAY_BRANCH} last_commit.json
+RUN cd avail-light-relay && git fetch origin && git reset --hard ${RELAY_BRANCH}
+
+COPY ./resources/download_or_build.sh /app/avail-light-relay/
+RUN chmod +x /app/avail-light-relay/download_or_build.sh
+RUN cd avail-light-relay && ./download_or_build.sh ${RELAY_BRANCH}
+# RUN cd avail-light-relay && cargo build --release
+
+# We do not need the Rust toolchain to run the binary!
+FROM debian:bookworm-slim AS runtime
+WORKDIR app
+RUN apt-get update && \
+	apt-get install -y gettext-base wait-for-it ca-certificates clang
+COPY ./resources/* /app/avail-light-relay/
+
+WORKDIR /app/avail-light-relay
+COPY --from=builder /app/avail-light-relay/target/release/avail-light-relay /app/avail-light-relay
+ENTRYPOINT ["/app/avail-light-relay/avail-light-relay"]
