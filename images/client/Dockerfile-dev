@@ -31,7 +31,7 @@ ENV \
 	IPFS_PORT=37000 \
 	IPFS_PATH="avail_ipfs_store" \
 	FULL_NODE_WS="ws://host.docker.internal:9944" \
-	APP_ID=1 \
+	APP_ID=0 \
 	CONFIDENCE=92.0 \
 	AVAIL_PATH="avail_path" \
 	BOOTSTRAPS="[]" \
