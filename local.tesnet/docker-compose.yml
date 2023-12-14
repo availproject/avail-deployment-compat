@@ -156,7 +156,8 @@ services:
       - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
       - BOOTSTRAPS=["/ip4/17.0.0.101/udp/5369/quic-v1/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
-      - BLOCK_PROCESSING_DELAY=5
+      - BLOCK_PROCESSING_DELAY=0
+      - APP_ID=1
       - RELAYS=["/ip4/17.0.0.102/udp/38000/quic-v1/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - ROUTER=192.168.0.42
       - SUBNET=17.0.0.0/16
@@ -180,10 +181,6 @@ services:
       - sentry_node
       - bootstraplc
     entrypoint: [
-      "wait-for-it",
-      "-t", "30",
-      "sentry_node:9944",
-      "--",
       "/app/avail-light/start.sh"
     ]
     ports:
