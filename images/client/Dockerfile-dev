@@ -22,7 +22,7 @@ RUN cd avail-light/target/release && pwd
 FROM debian:bookworm-slim AS runtime
 WORKDIR app
 RUN apt-get update && \
-	apt-get install -y gettext-base wait-for-it ca-certificates clang libpcap-dev iproute2 iptables iputils-ping
+	apt-get install -y gettext-base wait-for-it ca-certificates clang libpcap-dev iproute2 iptables iputils-ping curl
 COPY ./resources/* /app/avail-light/
 ENV \
 	HTTP_SERVER_HOST="127.0.0.1" \
