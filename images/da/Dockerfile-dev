@@ -34,12 +34,12 @@ COPY ./resources/download_or_build_runtime.sh avail
 RUN chmod +x avail/download_or_build.sh && chmod +x avail/download_or_build_runtime.sh
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail/commits/${BRANCH} last_commit.json
-RUN cd avail && git fetch origin && git reset --hard ${BRANCH} && git pull
+RUN cd avail && git fetch origin --tags --force && git reset --hard ${BRANCH} -- && git pull
 RUN cd avail && ./download_or_build.sh "${BRANCH}" "${FEATURES}" && cp /app/avail/target/release/data-avail /app
 #RUN cd avail && cargo build --release -p data-avail --features "${FEATURES}" && cp /app/avail/target/release/data-avail /app
 # Now build runtime
 ADD https://api.github.com/repos/availproject/avail/commits/${RUNTIME_BRANCH} last_commit2.json
-RUN cd avail && git fetch origin && git reset --hard ${RUNTIME_BRANCH} && git pull
+RUN cd avail && git fetch origin --tags --force && git checkout ${RUNTIME_BRANCH} && git reset --hard ${RUNTIME_BRANCH} --
 RUN cd avail && ./download_or_build_runtime.sh "${RUNTIME_BRANCH}" "${FEATURES}" && cp /app/avail/target/release/wbuild/da-runtime/da_runtime.compact.compressed.wasm /app/runtime.wasm
 # RUN cd avail && cargo build --release -p da-runtime --features "${FEATURES}" && cp /app/avail/target/release/wbuild/da-runtime/da_runtime.compact.compressed.wasm /app/runtime.wasm
 
