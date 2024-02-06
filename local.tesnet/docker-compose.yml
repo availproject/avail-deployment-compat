@@ -126,6 +126,7 @@ services:
       --unsafe-rpc-external
       --rpc-methods unsafe
       --state-pruning archive
+      --enable-kate-rpc
     networks:
       beyondnat:
         ipv4_address: 17.0.0.100
