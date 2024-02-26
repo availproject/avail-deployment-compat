@@ -9,7 +9,7 @@ cleanup()
   exit 1
 }
 
-/da/bin/data-avail \
+/da/bin/avail-node \
 	--validator \
 	--base-path /da/state \
 	--keystore-path /da/keystore \

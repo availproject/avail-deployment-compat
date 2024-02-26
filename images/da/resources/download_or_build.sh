@@ -21,8 +21,8 @@ if [ $? -eq 0 ]; then
     echo "Binary ($binary_version) successfully fetched."
     mkdir -p target/release
     tar -xzf "$binary_file" -C target/release
-    mv target/release/amd64-debian-12-data-avail target/release/data-avail
+    mv target/release/amd64-debian-12-data-avail target/release/avail-node
 else
     echo "Building from source!"
-    cargo build --release -p data-avail --features "$2"
+    cargo build --release -p avail-node --features "$2"
 fi
