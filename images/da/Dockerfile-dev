@@ -67,7 +67,7 @@ ADD https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64 .
 RUN chmod +x jq-linux-amd64
 RUN ./jq-linux-amd64 --rawfile a wasm.hex '.genesis.runtimeGenesis.code=$a' chainspec_template.json > /da/bin/chainspec.json
 
-RUN cat /da/bin/chainspec.json | ./jq-linux-amd64
+# RUN cat /da/bin/chainspec.json | ./jq-linux-amd64
 
 # RUN chmod +x /da/bin/substitute_keyword.sh && /da/bin/substitute_keyword.sh WASM_BINARY /da/bin/chainspec_template.json wasm.hex /da/bin/chainspec.json
 
