@@ -11,7 +11,7 @@ RUN rm -rf avail-light && git clone --depth 1 -b ${LC_BRANCH} https://github.com
 RUN cd avail-light && cargo build --release
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
 ADD https://api.github.com/repos/availproject/avail-light/commits/${LC_BRANCH} last_commit.json
-RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH} && git pull
+RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH} -- && git pull --rebase
 
 COPY ./resources/download_or_build.sh /app/avail-light/
 RUN chmod +x /app/avail-light/download_or_build.sh
