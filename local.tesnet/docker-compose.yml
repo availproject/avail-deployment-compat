@@ -226,6 +226,15 @@ services:
       beyondnat:
         ipv4_address: 17.0.0.102
 
+  monitor:
+    image: availj/monitor:latest
+    container_name: monitor
+    command: generate-network-report
+    networks:
+      beyondnat:
+        ipv4_address: 17.0.0.103
+    restart: on-failure
+
   router:
     build:
         context: ../images/router
