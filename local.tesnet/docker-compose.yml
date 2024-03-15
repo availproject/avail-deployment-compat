@@ -228,8 +228,7 @@ services:
 
   monitor:
     image: availj/monitor:latest
-    container_name: monitor
-    command: generate-network-report
+    container_name: p2p_monitor
     networks:
       beyondnat:
         ipv4_address: 17.0.0.103
