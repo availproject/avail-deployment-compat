@@ -227,7 +227,7 @@ services:
         ipv4_address: 17.0.0.102
 
   monitor:
-    image: availj/monitor:latest
+    image: availj/monitor:v1.0.0
     container_name: p2p_monitor
     networks:
       beyondnat:
