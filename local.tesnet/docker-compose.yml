@@ -227,8 +227,8 @@ services:
         ipv4_address: 17.0.0.102
 
   monitor:
-    image: availj/monitor:v1.0.4
-    container_name: p2p_monitor
+    image: availj/monitor:v1.0.5
+    container_name: monitor
     depends_on:
       - relaylc
       - bootstraplc
