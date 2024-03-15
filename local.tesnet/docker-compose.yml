@@ -159,7 +159,7 @@ services:
       - BOOTSTRAPS=["/ip4/17.0.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - BLOCK_PROCESSING_DELAY=0
       - APP_ID=1
-      - RELAYS=["/ip4/17.0.0.102/tcp/38000/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
+      - RELAYS=["/ip4/17.0.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - ROUTER=192.168.0.42
       - SUBNET=17.0.0.0/16
     extra_hosts:
@@ -194,7 +194,7 @@ services:
       - LOG_LEVEL="INFO"
       - P2P_SEED=2
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
-      - RELAYS=["/dns4/relaylc/tcp/38000/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
+      - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
       - beyondnat
 
