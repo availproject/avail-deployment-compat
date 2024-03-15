@@ -229,6 +229,9 @@ services:
   monitor:
     image: availj/monitor:v1.0.0
     container_name: p2p_monitor
+    depends_on:
+      - relaylc
+      - bootstraplc
     networks:
       beyondnat:
         ipv4_address: 17.0.0.103
