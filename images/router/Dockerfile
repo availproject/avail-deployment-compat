@@ -1,11 +1,11 @@
-FROM ubuntu:jammy
+FROM debian:12-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get -y install iproute2 iptables ulogd2 
-RUN apt-get install -y tcpdump iputils-ping
+RUN --mount=type=cache,target=/var/cache/apt apt-get update && apt-get -y install iproute2 nftables jq tcpdump
 
 COPY *.sh /scripts/
 RUN chmod +x /scripts/*.sh
-COPY ulogd.conf /etc/ulogd.conf
+
+HEALTHCHECK CMD [ "sh", "-c", "test $(cat /tmp/setup_done) = 1" ]
 
 ENTRYPOINT ["./scripts/run.sh"]
