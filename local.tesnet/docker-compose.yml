@@ -171,6 +171,46 @@ services:
         ipv4_address: 192.168.0.100
     cap_add: 
       - NET_ADMIN # needed to set the iptables rule
+  
+  lightclient-1: # client with RPC disabled
+    build:  
+      context: ../images/client
+      dockerfile: Dockerfile-dev
+      args:
+        - LC_BRANCH=nonexisting_branch    
+    depends_on:
+        - sentry_node
+        - bootstraplc
+    entrypoint: [
+      "wait-for-it",
+      "-t", "30",
+      "sentry_node:9944",
+      "--",
+      "/app/avail-light/start.sh"
+    ]
+    ports:
+      - 7003:7000
+    environment:
+      - HTTP_SERVER_HOST=0.0.0.0
+      - HTTP_SERVER_PORT=7000
+      - BLOCK_MATRIX_PARTITION="None"
+      - FULL_NODE_WS=["ws://sentry_node:9944"]
+      - LOG_LEVEL="INFO"
+      - BOOTSTRAPS=["/ip4/17.0.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
+      - BLOCK_PROCESSING_DELAY=0
+      - APP_ID=2
+      - DISABLE_RPC=true
+      - RELAYS=["/ip4/17.0.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
+      - ROUTER=192.168.0.42
+      - SUBNET=17.0.0.0/16
+    extra_hosts:
+      - "sentry_node:17.0.0.100"
+      - "relaylc:17.0.0.102"
+    networks:
+      behindnat:
+        ipv4_address: 192.168.0.110
+    cap_add: 
+      - NET_ADMIN # needed to set the iptables rule
 
   fatclient:
     build:  
