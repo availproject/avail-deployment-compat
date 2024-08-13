@@ -17,9 +17,9 @@ if [ -n "$ROUTER" ]; then
     ip route add $SUBNET via $ROUTER dev eth0
 fi
 
-echo "Avail-light version: $(./avail-light --version)"
+echo "Avail-light version: $(./avail-light-client --version)"
 
 # Run the light-client
 echo "## Run light-client"
 sleep 60
-./avail-light --config config.yaml
+./avail-light-client --config config.yaml

@@ -20,7 +20,7 @@ if [ $? -eq 0 ]; then
     echo "Binary ($binary_version) successfully fetched."
     mkdir -p target/release
     tar -xzf "$binary_file" -C target/release
-    mv target/release/avail-light-linux-amd64 target/release/avail-light 
+    mv target/release/avail-light-linux-amd64 target/release/avail-light-client
 else
     echo "Building from source!"
     cargo build --release
