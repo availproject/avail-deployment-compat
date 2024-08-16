@@ -23,5 +23,5 @@ if [ $? -eq 0 ]; then
     mv target/release/avail-light-relay-linux-amd64 target/release/avail-light-relay
 else
     echo "Building from source!"
-    cargo build --release
+    cargo build --release -p  avail-light-relay
 fi

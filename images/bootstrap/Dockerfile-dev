@@ -21,8 +21,8 @@ FROM debian:bookworm-slim AS runtime
 WORKDIR app
 RUN apt-get update && \
 	apt-get install -y gettext-base wait-for-it ca-certificates clang
-COPY ./resources/* /app/avail-light/
+COPY ./resources/* /app/avail-light-bootstrap/
 
-WORKDIR /app/avail-light
+WORKDIR /app/avail-light-bootstrap
 COPY --from=builder /app/avail-light/target/release/avail-light-bootstrap /app/avail-light-bootstrap
 ENTRYPOINT ["/app/avail-light-bootstrap/avail-light-bootstrap", "-c", "/app/avail-light-bootstrap/config.yaml"]
