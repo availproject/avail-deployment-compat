@@ -1,4 +1,4 @@
-FROM rust:1.73.0 AS chef
+FROM rust:latest AS chef
 FROM chef AS builder
 WORKDIR app
 RUN apt-get update && \
@@ -7,23 +7,22 @@ RUN apt-get update && \
 
 ARG BOOTSTRAPLC_BRANCH=doesnt_exist
 # Build application
-RUN rm -rf avail-light-bootstrap && git clone --depth 1 -b ${BOOTSTRAPLC_BRANCH} https://github.com/availproject/avail-light-bootstrap.git
+RUN rm -rf avail-light-bootstrap && git clone --depth 1 -b ${BOOTSTRAPLC_BRANCH} https://github.com/availproject/avail-light.git
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
-ADD https://api.github.com/repos/availproject/avail-light-bootstrap/commits/${BOOTSTRAPLC_BRANCH} last_commit.json
-RUN cd avail-light-bootstrap && git fetch origin && git reset --hard ${BOOTSTRAPLC_BRANCH}
+ADD https://api.github.com/repos/availproject/avail-light/commits/${BOOTSTRAPLC_BRANCH} last_commit.json
+RUN cd avail-light && git fetch origin && git reset --hard ${BOOTSTRAPLC_BRANCH}
 
-COPY ./resources/download_or_build.sh /app/avail-light-bootstrap/
-RUN chmod +x /app/avail-light-bootstrap/download_or_build.sh
-RUN cd avail-light-bootstrap && ./download_or_build.sh ${BOOTSTRAPLC_BRANCH}
-# RUN cd avail-light-bootstrap && cargo build --release
+COPY ./resources/download_or_build.sh /app/avail-light/
+RUN chmod +x /app/avail-light/download_or_build.sh
+RUN cd /app/avail-light && ./download_or_build.sh ${BOOTSTRAPLC_BRANCH}
 
 # We do not need the Rust toolchain to run the binary!
 FROM debian:bookworm-slim AS runtime
 WORKDIR app
 RUN apt-get update && \
 	apt-get install -y gettext-base wait-for-it ca-certificates clang
-COPY ./resources/* /app/avail-light-bootstrap/
+COPY ./resources/* /app/avail-light/
 
-WORKDIR /app/avail-light-bootstrap
-COPY --from=builder /app/avail-light-bootstrap/target/release/avail-light-bootstrap /app/avail-light-bootstrap
+WORKDIR /app/avail-light
+COPY --from=builder /app/avail-light/target/release/avail-light-bootstrap /app/avail-light-bootstrap
 ENTRYPOINT ["/app/avail-light-bootstrap/avail-light-bootstrap", "-c", "/app/avail-light-bootstrap/config.yaml"]
