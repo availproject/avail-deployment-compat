@@ -23,7 +23,5 @@ if [ $? -eq 0 ]; then
     mv target/release/avail-light-bootstrap-linux-amd64 target/release/avail-light-bootstrap
 else
     echo "Building from source!"
-    ls
     cargo build --release -p  avail-light-bootstrap
-
 fi
