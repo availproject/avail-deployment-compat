@@ -6,6 +6,7 @@ RUN apt-get update && \
 
 ARG LC_BRANCH=doesnt_exist
 # Build application
+RUN git clone --depth 1 -b https://github.com/availproject/gas-relay-service.git
 RUN rm -rf avail-light && git clone --depth 1 -b ${LC_BRANCH} https://github.com/availproject/avail-light.git
 # Build dependencies - this is the caching Docker layer!
 RUN cd avail-light && cargo build --release
