@@ -24,8 +24,7 @@ services:
       - ../volume/testnet/validator1/node.key:/da/node.key:ro
       - ../volume/testnet/validator1/suri.txt:/da/suri.txt:ro
       - ../volume/testnet/validator1/keystore:/da/keystore
-    command:
-      --alice
+    command: --alice
       --base-path /da/state
       --name MATIC_VALIDATOR_1
       --keystore-path /da/keystore
@@ -45,8 +44,7 @@ services:
       - ../volume/testnet/validator2/node.key:/da/node.key:ro
       - ../volume/testnet/validator2/suri.txt:/da/suri.txt:ro
       - ../volume/testnet/validator2/keystore:/da/keystore
-    command:
-      --bob
+    command: --bob
       --base-path /da/state
       --name MATIC_VALIDATOR_2
       --keystore-path /da/keystore
@@ -66,8 +64,7 @@ services:
       - ../volume/testnet/validator3/node.key:/da/node.key:ro
       - ../volume/testnet/validator3/suri.txt:/da/suri.txt:ro
       - ../volume/testnet/validator3/keystore:/da/keystore
-    command:
-      --validator
+    command: --validator
       --base-path /da/state
       --name MATIC_VALIDATOR_3
       --node-key-file /da/node.key
@@ -87,8 +84,7 @@ services:
       - ../volume/testnet/validator_alyssa/node.key:/da/node.key:ro
       - ../volume/testnet/validator_alyssa/suri.txt:/da/suri.txt:ro
       - ../volume/testnet/validator_alyssa/keystore:/da/keystore
-    command:
-      --validator
+    command: --validator
       --base-path /da/state
       --name MATIC_VALIDATOR_ALYSSA
       --node-key-file /da/node.key
@@ -98,7 +94,7 @@ services:
       --out-peers 10
     networks:
       - beyondnat
-# Sentry Node for Access
+  # Sentry Node for Access
   sentry_node:
     container_name: sentry_node
     image: avail_dev:develop1
@@ -112,8 +108,7 @@ services:
     ports:
       - 30330:30330
       - 9944:9944
-    command:
-      --base-path /da/state
+    command: --base-path /da/state
       --name MATIC_SENTRY_NODE
       --node-key-file /da/node.key
       --keystore-path /da/keystore
@@ -132,21 +127,23 @@ services:
         ipv4_address: 17.0.0.100
 
   lightclient:
-    build:  
-        context: ../images/client
-        dockerfile: Dockerfile-dev
-        args:
-          - LC_BRANCH=nonexisting_branch
+    build:
+      context: ../images/client
+      dockerfile: Dockerfile-dev
+      args:
+        - LC_BRANCH=nonexisting_branch
     depends_on:
       - sentry_node
       - bootstraplc
-    entrypoint: [
-      "wait-for-it",
-      "-t", "30",
-      "sentry_node:9944",
-      "--",
-      "/app/avail-light/start.sh"
-    ]
+    entrypoint:
+      [
+        "wait-for-it",
+        "-t",
+        "30",
+        "sentry_node:9944",
+        "--",
+        "/app/avail-light/start.sh",
+      ]
     ports:
       - 7000:7000
       - 7001:7001
@@ -169,25 +166,27 @@ services:
     networks:
       behindnat:
         ipv4_address: 192.168.0.100
-    cap_add: 
+    cap_add:
       - NET_ADMIN # needed to set the iptables rule
-  
+
   lightclient-1: # client with RPC disabled
-    build:  
+    build:
       context: ../images/client
       dockerfile: Dockerfile-dev
       args:
-        - LC_BRANCH=nonexisting_branch    
+        - LC_BRANCH=nonexisting_branch
     depends_on:
-        - sentry_node
-        - bootstraplc
-    entrypoint: [
-      "wait-for-it",
-      "-t", "30",
-      "sentry_node:9944",
-      "--",
-      "/app/avail-light/start.sh"
-    ]
+      - sentry_node
+      - bootstraplc
+    entrypoint:
+      [
+        "wait-for-it",
+        "-t",
+        "30",
+        "sentry_node:9944",
+        "--",
+        "/app/avail-light/start.sh",
+      ]
     ports:
       - 7003:7000
     environment:
@@ -209,21 +208,19 @@ services:
     networks:
       behindnat:
         ipv4_address: 192.168.0.110
-    cap_add: 
+    cap_add:
       - NET_ADMIN # needed to set the iptables rule
 
   fatclient:
-    build:  
-        context: ../images/client
-        dockerfile: Dockerfile-dev
-        args:
-          - LC_BRANCH=nonexisting_branch
+    build:
+      context: ../images/client
+      dockerfile: Dockerfile-dev
+      args:
+        - LC_BRANCH=nonexisting_branch
     depends_on:
       - sentry_node
       - bootstraplc
-    entrypoint: [
-      "/app/avail-light/start.sh"
-    ]
+    entrypoint: ["/app/avail-light/start.sh"]
     ports:
       - 9000:9000
     environment:
@@ -240,11 +237,11 @@ services:
 
   bootstraplc:
     container_name: bootstraplc
-    build:  
-        context: ../images/bootstrap
-        dockerfile: Dockerfile-dev
-        args:
-          - BOOTSTRAPLC_BRANCH=nonexisting_branch
+    build:
+      context: ../images/bootstrap
+      dockerfile: Dockerfile-dev
+      args:
+        - BOOTSTRAPLC_BRANCH=nonexisting_branch
     ports:
       - 5369:5369
       - 5370:5370
@@ -255,10 +252,10 @@ services:
   relaylc:
     container_name: relaylc
     build:
-        context: ../images/relay
-        dockerfile: Dockerfile-dev
-        args:
-          - RELAY_BRANCH=nonexisting_branch
+      context: ../images/relay
+      dockerfile: Dockerfile-dev
+      args:
+        - RELAY_BRANCH=nonexisting_branch
     ports:
       - 38000:38000
       - 38001:38001
@@ -276,7 +273,7 @@ services:
       beyondnat:
         ipv4_address: 17.0.0.103
     restart: on-failure
-  
+
   rogue-client:
     image: availj/monitor:test
     container_name: poison
@@ -290,8 +287,8 @@ services:
 
   router:
     build:
-        context: ../images/router
-        dockerfile: Dockerfile
+      context: ../images/router
+      dockerfile: Dockerfile
     environment:
       IPTABLES: "iptables-legacy"
       SUBNET_INTERNAL: "192.168.0.0/16" # must be the same as configured in the networks section
@@ -301,9 +298,74 @@ services:
         ipv4_address: 192.168.0.42
       beyondnat:
         ipv4_address: 17.0.0.42
-    cap_add: 
+    cap_add:
       - NET_ADMIN # needed to set the iptables rule
-      
+  grs:
+    build:
+      context: ../images/grs
+      dockerfile: Dockerfile-dev
+    restart: always
+    ports:
+      - 8080:8080
+      - 8000:8000
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:relayservice@db:5432?sslmode=disable
+      - AVAIL_RPC_ENDPOINT_1=wss://hex-rpc.avail.tools/ws
+      - AVAIL_RPC_ENDPOINT_2=wss://rpc-hex-devnet.avail.tools/ws
+      - AVAIL_RPC_ENDPOINT_3=wss://rpc-hex-devnet.avail.tools/ws
+      - PRIVATE_KEY_1=023fa10f0271dd004379deb5f1f32f9d51c483cb3cc700d46ce0b41be16309d3
+      - PRIVATE_KEY_2=3f7701fad16f6441849e0977afcdb898f8afdc3c7e76c2782f635628b215cf15
+      - PRIVATE_KEY_3=36080e283a46d3d19f77d29430fab5d26c1335a8e4bd96c26f8e9e27e56757e7
+      - PRIVATE_KEY_0=6a32eb73a647ac868f3994288eeb2dc0369861fe799b4302a8c91d6c1e32dbf1
+      - PRIVATE_KEY_4=3c7112abaa388649df1e04d2cb5dde98ec7922965308ce843555a82fbcaf361e
+      - PRIVATE_KEY_5=ca5e43835fd6522d814b8e28edfbb0c85446e86ef51f9b62a50662651736e3fe
+      - PRIVATE_KEY_6=533010cbc3b8eaa7052250fe294748fea7b88eee3d8749c6b582fefc7ba154a2
+      - PRIVATE_KEY_7=c0045664f64c6aa6861bf6786635d9708020981dab65515103719168a3726457
+      - NUMBER_OF_THREADS=3
+      - MAX_POOL_SIZE=8
+      - TOTAL_USERS_QUERY_LIMIT=2
+      - FAILURE_PRIVATE_KEY_NUMBER=5
+      - COINGECKO_API_URL=https://pro-api.coingecko.com/api/v3/simple/price
+      - COINGECKO_API_KEY=CG-1S4ELp3ggX3U3rqLHG4gtt6U
+      - BROADCAST_CHANNEL_SIZE=20
+      - PAYLOAD_SIZE=1048576
+      - ASSIGNED_WALLET=0x53Ba580C12745FdFb6b5Ad5f32F33C1bbf26F112
+
+    networks:
+      gas_relay_network:
+        ipv4_address: 172.28.0.2
+  db:
+    container_name: db
+    restart: always
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: relayservice
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      gas_relay_network:
+        ipv4_address: 172.28.0.3
+  pgweb:
+    container_name: pgweb
+    restart: always
+    image: sosedoff/pgweb
+    ports:
+      - 8081:8081
+    environment:
+      - DATABASE_URL=postgres://postgres:relayservice@db:5432?sslmode=disable
+    depends_on:
+      - db
+    networks:
+      gas_relay_network:
+        ipv4_address: 172.28.0.4
+
 volumes:
   val_1_state:
   val_2_state:
@@ -320,3 +382,8 @@ networks:
     ipam:
       config:
         - subnet: 17.0.0.0/16
+  gas_relay_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
