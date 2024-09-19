@@ -6,7 +6,7 @@ RUN apt-get update && \
 
 ARG GRS_BRANCH=main
 # Build application
-RUN rm -rf avail-light && git clone --depth 1 -b ${LC_BRANCH} https://github.com/availproject/gas-relay-service.git
+RUN rm -rf avail-light && git clone --depth 1 -b ${GRS_BRANCH} https://github.com/availproject/gas-relay-service.git
 # Build dependencies - this is the caching Docker layer!
 FROM docker.io/library/rust:1.78.0-bookworm AS base
 
