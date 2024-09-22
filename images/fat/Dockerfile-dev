@@ -1,0 +1,50 @@
+FROM rust:1.76.0 AS builder
+WORKDIR app
+RUN apt-get update && \
+	apt-get install -y libssl3 gettext-base wait-for-it ca-certificates clang protobuf-compiler libpcap-dev && \
+	rm -rf /var/lib/apt/lists 
+
+ARG LC_BRANCH=doesnt_exist
+# Build application
+RUN rm -rf avail-light && git clone --depth 1 -b ${LC_BRANCH} https://github.com/availproject/avail-light.git
+# This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
+ADD https://api.github.com/repos/availproject/avail-light/commits/${LC_BRANCH} last_commit.json
+RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH} -- && git pull --rebase
+
+COPY ./resources/download_or_build.sh /app/avail-light/
+RUN chmod +x /app/avail-light/download_or_build.sh
+RUN cd avail-light && ./download_or_build.sh ${LC_BRANCH}
+RUN cd avail-light/target/release && pwd
+
+# We do not need the Rust toolchain to run the binary!
+FROM debian:bookworm-slim AS runtime
+WORKDIR app
+RUN apt-get update && \
+	apt-get install -y gettext-base wait-for-it ca-certificates clang libpcap-dev iproute2 iptables iputils-ping curl
+COPY ./resources/* /app/avail-light/
+ENV \
+	HTTP_SERVER_HOST="127.0.0.1" \
+	HTTP_SERVER_PORT=7000 \
+	IPFS_SEED=1 \
+	IPFS_PORT=37000 \
+	IPFS_PATH="avail_ipfs_store" \
+	FULL_NODE_WS="ws://host.docker.internal:9944" \
+	APP_ID=0 \
+	CONFIDENCE=92.0 \
+	AVAIL_PATH="avail_path" \
+	BOOTSTRAPS="[]" \
+	RELAYS="[]" \
+	LOG_LEVEL="INFO" \
+	RUST_LOG_STYLE=never \
+	PARALLEL_TASKS=8 \
+	IPFS_SEED_RANDOM=false \
+	P2P_SEED=1 \
+	DISABLE_RPC=false \
+	BLOCK_PROCESSING_DELAY=0 \
+	DISABLE_PROOF_VERIFICATION=false \
+	BLOCK_MATRIX_PARTITION="\"None\"" \
+	QUERY_PROOF_RPC_PARALLEL_TASKS=10
+
+WORKDIR /app/avail-light
+COPY --from=builder /app/avail-light/target/release/avail-light-fat /app/avail-light
+ENTRYPOINT ["/app/avail-light/start.sh"]
