@@ -148,7 +148,7 @@ services:
       "/app/avail-light/start.sh"
     ]
     ports:
-      - 7000:7000
+      - 7005:7000
       - 7001:7001
     environment:
       - HTTP_SERVER_HOST=0.0.0.0
