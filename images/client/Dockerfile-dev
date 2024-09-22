@@ -47,6 +47,8 @@ ENV \
 	BLOCK_MATRIX_PARTITION="\"None\"" \
 	QUERY_PROOF_RPC_PARALLEL_TASKS=10
 
+EXPOSE 7000
+
 WORKDIR /app/avail-light
 COPY --from=builder /app/avail-light/target/release/avail-light-client /app/avail-light
 ENTRYPOINT ["/app/avail-light/start.sh"]
