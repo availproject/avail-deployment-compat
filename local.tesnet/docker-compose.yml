@@ -167,11 +167,8 @@ services:
       - "bootstraplc:17.0.0.101"
       - "relaylc:17.0.0.102"
     networks:
-      behindnat:
-        ipv4_address: 192.168.0.100
-    cap_add: 
-      - NET_ADMIN # needed to set the iptables rule
-  
+      beyondnat:
+        
   lightclient-1: # client with RPC disabled
     build:  
       context: ../images/client
@@ -236,7 +233,7 @@ services:
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
-      - beyondnat
+      beyondnat:
 
   bootstraplc:
     container_name: bootstraplc
