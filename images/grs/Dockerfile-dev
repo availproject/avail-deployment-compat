@@ -1,13 +1,3 @@
-FROM rust:1.76.0 AS builder
-WORKDIR app
-RUN apt-get update && \
-	apt-get install -y libssl3 gettext-base wait-for-it ca-certificates clang protobuf-compiler libpcap-dev && \
-	rm -rf /var/lib/apt/lists 
-
-ARG GRS_BRANCH=main
-# Build application
-RUN rm -rf avail-light && git clone --depth 1 -b ${LC_BRANCH} https://github.com/availproject/gas-relay-service.git
-# Build dependencies - this is the caching Docker layer!
 FROM docker.io/library/rust:1.78.0-bookworm AS base
 
 FROM docker.io/library/debian:bookworm-slim AS runtime
@@ -15,25 +5,32 @@ RUN apt update && apt install -y libssl-dev libpq-dev ca-certificates
 
 FROM base AS chef
 RUN cargo install --locked cargo-chef
-RUN apt update && apt install -y cmake
+RUN apt update && apt install -y cmake git
 
 FROM chef AS planner
-COPY . .
+WORKDIR /app
+RUN git clone https://github.com/availproject/gas-relay-service.git .
+
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS cacher
-COPY --from=planner /recipe.json recipe.json
+COPY --from=planner /app/recipe.json /app/recipe.json
+WORKDIR /app
 RUN cargo chef cook --recipe-path recipe.json
 
-FROM base AS builder2
-COPY . .
+FROM base AS builder
+WORKDIR /app
+RUN git clone https://github.com/availproject/gas-relay-service.git .
+
 COPY --from=cacher /target target
 COPY --from=cacher /usr/local/cargo /usr/local/cargo
 
-FROM builder2 AS service-builder
 RUN cargo build
 
 FROM runtime AS service
+WORKDIR /app
+
 COPY --from=service-builder /target/debug/ /
 COPY --from=service-builder /public_key.pem /public_key.pem /
+ENTRYPOINT ["/gas_relay_service"]
 ENTRYPOINT ["/gas_relay_service"]
