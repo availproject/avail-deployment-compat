@@ -33,4 +33,3 @@ WORKDIR /app
 COPY --from=service-builder /target/debug/ /
 COPY --from=service-builder /public_key.pem /public_key.pem /
 ENTRYPOINT ["/gas_relay_service"]
-ENTRYPOINT ["/gas_relay_service"]

@@ -4,18 +4,16 @@ RUN apt-get update && \
 	apt-get install -y libssl3 gettext-base wait-for-it ca-certificates clang protobuf-compiler libpcap-dev && \
 	rm -rf /var/lib/apt/lists 
 
-ARG LC_BRANCH=doesnt_exist
+ARG FAT_LC_BRANCH=doesnt_exist
 # Build application
-RUN rm -rf avail-light && git clone --depth 1 -b ${LC_BRANCH} https://github.com/availproject/avail-light.git
-# Build dependencies - this is the caching Docker layer!
-RUN cd avail-light && cargo build --release
+RUN rm -rf avail-light && git clone --depth 1 -b ${FAT_LC_BRANCH} https://github.com/availproject/avail-light.git
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
-ADD https://api.github.com/repos/availproject/avail-light/commits/${LC_BRANCH} last_commit.json
-RUN cd avail-light && git fetch origin && git reset --hard ${LC_BRANCH} -- && git pull --rebase
+# ADD https://api.github.com/repos/availproject/avail-light/commits/${FAT_LC_BRANCH} last_commit.json
+# RUN cd avail-light && git fetch origin && git reset --hard ${FAT_LC_BRANCH} -- && git pull --rebase
 
 COPY ./resources/download_or_build.sh /app/avail-light/
 RUN chmod +x /app/avail-light/download_or_build.sh
-RUN cd avail-light && ./download_or_build.sh ${LC_BRANCH}
+RUN cd avail-light && ./download_or_build.sh ${FAT_LC_BRANCH}
 RUN cd avail-light/target/release && pwd
 
 # We do not need the Rust toolchain to run the binary!
@@ -26,7 +24,7 @@ RUN apt-get update && \
 COPY ./resources/* /app/avail-light/
 ENV \
 	HTTP_SERVER_HOST="127.0.0.1" \
-	HTTP_SERVER_PORT=7000 \
+	HTTP_SERVER_PORT=7001 \
 	IPFS_SEED=1 \
 	IPFS_PORT=37000 \
 	IPFS_PATH="avail_ipfs_store" \
@@ -47,8 +45,6 @@ ENV \
 	BLOCK_MATRIX_PARTITION="\"None\"" \
 	QUERY_PROOF_RPC_PARALLEL_TASKS=10
 
-EXPOSE 7000
-
 WORKDIR /app/avail-light
-COPY --from=builder /app/avail-light/target/release/avail-light-client /app/avail-light
+COPY --from=builder /app/avail-light/target/release/avail-light-fat /app/avail-light
 ENTRYPOINT ["/app/avail-light/start.sh"]
