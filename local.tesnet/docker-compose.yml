@@ -301,59 +301,6 @@ services:
         ipv4_address: 17.0.0.42
     cap_add: 
       - NET_ADMIN # needed to set the iptables rule
-
-  grs:
-    build:
-      context: ../images/grs
-      dockerfile: Dockerfile-dev
-      args:
-        - GRS_BRANCH=nonexisting_branch
-    restart: always
-    ports:
-      - 8000:8000
-    depends_on:
-      - db
-    environment:
-      - DATABASE_URL=postgres://postgres:relayservice@db:5432?sslmode=disable
-      - AVAIL_RPC_ENDPOINT_1=wss://hex-rpc.avail.tools/ws
-      - AVAIL_RPC_ENDPOINT_2=wss://rpc-hex-devnet.avail.tools/ws
-      - AVAIL_RPC_ENDPOINT_3=wss://rpc-hex-devnet.avail.tools/ws
-      - PRIVATE_KEY_1=023fa10f0271dd004379deb5f1f32f9d51c483cb3cc700d46ce0b41be16309d3
-      - PRIVATE_KEY_2=3f7701fad16f6441849e0977afcdb898f8afdc3c7e76c2782f635628b215cf15
-      - PRIVATE_KEY_3=36080e283a46d3d19f77d29430fab5d26c1335a8e4bd96c26f8e9e27e56757e7
-      - PRIVATE_KEY_0=6a32eb73a647ac868f3994288eeb2dc0369861fe799b4302a8c91d6c1e32dbf1
-      - PRIVATE_KEY_4=3c7112abaa388649df1e04d2cb5dde98ec7922965308ce843555a82fbcaf361e
-      - PRIVATE_KEY_5=ca5e43835fd6522d814b8e28edfbb0c85446e86ef51f9b62a50662651736e3fe
-      - PRIVATE_KEY_6=533010cbc3b8eaa7052250fe294748fea7b88eee3d8749c6b582fefc7ba154a2
-      - PRIVATE_KEY_7=c0045664f64c6aa6861bf6786635d9708020981dab65515103719168a3726457
-      - NUMBER_OF_THREADS=3
-      - MAX_POOL_SIZE=8
-      - TOTAL_USERS_QUERY_LIMIT=2
-      - FAILURE_PRIVATE_KEY_NUMBER=5
-      - COINGECKO_API_URL=https://pro-api.coingecko.com/api/v3/simple/price
-      - COINGECKO_API_KEY=CG-1S4ELp3ggX3U3rqLHG4gtt6U
-      - BROADCAST_CHANNEL_SIZE=20
-      - PAYLOAD_SIZE=1048576
-      - ASSIGNED_WALLET=0x53Ba580C12745FdFb6b5Ad5f32F33C1bbf26F112
-    networks:
-      beyondnat:
-        ipv4_address: 17.0.0.107
-  db:
-    container_name: db
-    restart: always
-    image: postgres:16
-    environment:
-      POSTGRES_PASSWORD: relayservice
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      beyondnat:
-        ipv4_address: 17.0.0.108
       
 volumes:
   val_1_state:
