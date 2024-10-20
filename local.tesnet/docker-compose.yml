@@ -215,7 +215,7 @@ services:
         context: ../images/fat
         dockerfile: Dockerfile-dev
         args:
-          - LC_BRANCH=nonexisting_branch
+          - FAT_LC_BRANCH=nonexisting_branch
     depends_on:
       - sentry_node
       - bootstraplc
