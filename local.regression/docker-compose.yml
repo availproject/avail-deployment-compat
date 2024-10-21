@@ -27,7 +27,7 @@ services:
       --in-peers 10
       --out-peers 10
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   validator2:
     container_name: validator2
@@ -49,7 +49,7 @@ services:
       --in-peers 10
       --out-peers 10
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   validator3:
     container_name: validator3
@@ -72,7 +72,7 @@ services:
       --in-peers 10
       --out-peers 10
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   validator_alyssa:
     container_name: validator_alyssa
@@ -94,7 +94,7 @@ services:
       --in-peers 10
       --out-peers 10
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   sentry_node:
     container_name: sentry_node
@@ -125,7 +125,7 @@ services:
       --state-pruning archive
       --enable-kate-rpc
     networks:
-      beyondnat:
+      beyondnat_regression:
         ipv4_address: 17.0.0.100
 
   lightclient:
@@ -165,7 +165,7 @@ services:
       - "bootstraplc:17.0.0.101"
       - "relaylc:17.0.0.102"
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   lightserver_1:
     build:  
@@ -204,7 +204,7 @@ services:
       - "bootstraplc:17.0.0.101"
       - "relaylc:17.0.0.102"
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   lightserver_2:
     build:  
@@ -243,7 +243,7 @@ services:
       - "bootstraplc:17.0.0.101"
       - "relaylc:17.0.0.102"
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   lightserver_3:
     build:  
@@ -282,7 +282,7 @@ services:
       - "bootstraplc:17.0.0.101"
       - "relaylc:17.0.0.102"
     networks:
-      - beyondnat
+      - beyondnat_regression
   
   fatclient_1:
     build:  
@@ -304,7 +304,7 @@ services:
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
-      - beyondnat
+      - beyondnat_regression
   
   fatclient_2:
     build:  
@@ -326,7 +326,7 @@ services:
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   fatclient_3:
     build:  
@@ -348,7 +348,7 @@ services:
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   load-test-tool:
     image: availj/presto:latest
@@ -369,7 +369,7 @@ services:
       - 5369:5369
       - 5370:5370
     networks:
-      beyondnat:
+      beyondnat_regression:
         ipv4_address: 17.0.0.101
 
   relaylc:
@@ -383,7 +383,7 @@ services:
       - 38000:38000
       - 38001:38001
     networks:
-      beyondnat:
+      beyondnat_regression:
         ipv4_address: 17.0.0.102
 
   otc:
@@ -400,7 +400,7 @@ services:
       - 4318:4318
       - 55679:55679 
     networks:
-      - beyondnat
+      - beyondnat_regression
     depends_on:
       - jaeger
   
@@ -411,11 +411,11 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - beyondnat
+      - beyondnat_regression
 
   jaeger:
     networks:
-      - beyondnat
+      - beyondnat_regression
     image: jaegertracing/all-in-one:latest
     environment:
       - METRICS_STORAGE_TYPE=prometheus
@@ -434,7 +434,7 @@ volumes:
   alyssa_state:
 
 networks:
-  beyondnat:
+  beyondnat_regression:
     ipam:
       config:
         - subnet: 17.0.0.0/16
