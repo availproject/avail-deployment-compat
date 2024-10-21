@@ -126,7 +126,7 @@ services:
       --enable-kate-rpc
     networks:
       beyondnat_regression:
-        ipv4_address: 17.0.0.100
+        ipv4_address: 17.2.0.100
 
   lightclient:
     build:  
@@ -150,20 +150,20 @@ services:
       - BLOCK_MATRIX_PARTITION="None"
       - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
-      - BOOTSTRAPS=["/ip4/17.0.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
+      - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - BLOCK_PROCESSING_DELAY=120
       - APP_ID=1
       - P2P_SEED=210
-      - RELAYS=["/ip4/17.0.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
+      - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - OTEL_COLLECTOR="http://otc:4317"
       - MODE="client"
       - MODE_SWITCH=false
       - ORIGIN="internal"
     restart: always
     extra_hosts:
-      - "sentry_node:17.0.0.100"
-      - "bootstraplc:17.0.0.101"
-      - "relaylc:17.0.0.102"
+      - "sentry_node:17.2.0.100"
+      - "bootstraplc:17.2.0.101"
+      - "relaylc:17.2.0.102"
     networks:
       - beyondnat_regression
 
@@ -192,17 +192,17 @@ services:
       - LOG_LEVEL="INFO"
       - P2P_SEED=211
       - APP_ID=1
-      - BOOTSTRAPS=["/ip4/17.0.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
+      - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - BLOCK_PROCESSING_DELAY=0
-      - RELAYS=["/ip4/17.0.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
+      - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - OTEL_COLLECTOR="http://otc:4317"
       - MODE="server"
       - MODE_SWITCH=false
       - ORIGIN="internal"
     extra_hosts:
-      - "sentry_node:17.0.0.100"
-      - "bootstraplc:17.0.0.101"
-      - "relaylc:17.0.0.102"
+      - "sentry_node:17.2.0.100"
+      - "bootstraplc:17.2.0.101"
+      - "relaylc:17.2.0.102"
     networks:
       - beyondnat_regression
 
@@ -231,17 +231,17 @@ services:
       - LOG_LEVEL="INFO"
       - P2P_SEED=212
       - APP_ID=1
-      - BOOTSTRAPS=["/ip4/17.0.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
+      - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - BLOCK_PROCESSING_DELAY=0
-      - RELAYS=["/ip4/17.0.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
+      - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - OTEL_COLLECTOR="http://otc:4317"
       - MODE="server"
       - MODE_SWITCH=false
       - ORIGIN="internal"
     extra_hosts:
-      - "sentry_node:17.0.0.100"
-      - "bootstraplc:17.0.0.101"
-      - "relaylc:17.0.0.102"
+      - "sentry_node:17.2.0.100"
+      - "bootstraplc:17.2.0.101"
+      - "relaylc:17.2.0.102"
     networks:
       - beyondnat_regression
 
@@ -270,17 +270,17 @@ services:
       - LOG_LEVEL="INFO"
       - P2P_SEED=213
       - APP_ID=1
-      - BOOTSTRAPS=["/ip4/17.0.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
+      - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - BLOCK_PROCESSING_DELAY=0
-      - RELAYS=["/ip4/17.0.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
+      - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - OTEL_COLLECTOR="http://otc:4317"
       - MODE="server"
       - MODE_SWITCH=false
       - ORIGIN="internal"
     extra_hosts:
-      - "sentry_node:17.0.0.100"
-      - "bootstraplc:17.0.0.101"
-      - "relaylc:17.0.0.102"
+      - "sentry_node:17.2.0.100"
+      - "bootstraplc:17.2.0.101"
+      - "relaylc:17.2.0.102"
     networks:
       - beyondnat_regression
   
@@ -372,7 +372,7 @@ services:
       - 5370:5370
     networks:
       beyondnat_regression:
-        ipv4_address: 17.0.0.101
+        ipv4_address: 17.2.0.101
 
   relaylc:
     container_name: relaylc
@@ -386,7 +386,7 @@ services:
       - 38001:38001
     networks:
       beyondnat_regression:
-        ipv4_address: 17.0.0.102
+        ipv4_address: 17.2.0.102
 
   otc:
     image: otel/opentelemetry-collector-contrib:0.89.0
@@ -439,4 +439,4 @@ networks:
   beyondnat_regression:
     ipam:
       config:
-        - subnet: 17.0.0.0/16
+        - subnet: 17.2.0.0/16
