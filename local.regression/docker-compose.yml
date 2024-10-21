@@ -351,7 +351,9 @@ services:
       - beyondnat_regression
 
   load-test-tool:
-    image: availj/presto:latest
+    build:
+      context: ../../load-test-tool
+      dockerfile: Dockerfile
     depends_on:
       - sentry_node
       - bootstraplc
