@@ -151,7 +151,7 @@ services:
       - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
       - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
-      - BLOCK_PROCESSING_DELAY=120
+      - BLOCK_PROCESSING_DELAY=50
       - APP_ID=1
       - P2P_SEED=210
       - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
@@ -193,7 +193,7 @@ services:
       - P2P_SEED=211
       - APP_ID=1
       - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
-      - BLOCK_PROCESSING_DELAY=0
+      - BLOCK_PROCESSING_DELAY=20
       - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - OTEL_COLLECTOR="http://otc:4317"
       - MODE="server"
@@ -232,7 +232,7 @@ services:
       - P2P_SEED=212
       - APP_ID=1
       - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
-      - BLOCK_PROCESSING_DELAY=0
+      - BLOCK_PROCESSING_DELAY=20
       - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - OTEL_COLLECTOR="http://otc:4317"
       - MODE="server"
@@ -271,7 +271,7 @@ services:
       - P2P_SEED=213
       - APP_ID=1
       - BOOTSTRAPS=["/ip4/17.2.0.101/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
-      - BLOCK_PROCESSING_DELAY=0
+      - BLOCK_PROCESSING_DELAY=20
       - RELAYS=["/ip4/17.2.0.102/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
       - OTEL_COLLECTOR="http://otc:4317"
       - MODE="server"
@@ -301,6 +301,7 @@ services:
       - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
       - P2P_SEED=21
+      - BLOCK_PROCESSING_DELAY=0
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
@@ -323,6 +324,7 @@ services:
       - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
       - P2P_SEED=22
+      - BLOCK_PROCESSING_DELAY=0
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
@@ -345,6 +347,7 @@ services:
       - FULL_NODE_WS=["ws://sentry_node:9944"]
       - LOG_LEVEL="INFO"
       - P2P_SEED=23
+      - BLOCK_PROCESSING_DELAY=0
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
       - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
