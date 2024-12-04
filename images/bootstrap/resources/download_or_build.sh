@@ -5,9 +5,8 @@ if [ $# -ne 1 ]; then
     echo "Usage: $0 <binary_version>"
     exit 1
 fi
-
 binary_version="$1"
-binary_url="https://github.com/availproject/avail-light-bootstrap/releases/download/$binary_version/avail-light-bootstrap-linux-amd64.tar.gz"
+binary_url="https://github.com/availproject/avail-light/releases/tag/avail-light-bootstrap-$binary_version/avail-light-bootstrap-linux-amd64.tar.gz"
 
 
 binary_file="release.tar.gz"
