@@ -9,8 +9,9 @@ ARG BOOTSTRAPLC_BRANCH=doesnt_exist
 # Build application
 RUN rm -rf avail-light-bootstrap && git clone --depth 1 -b ${BOOTSTRAPLC_BRANCH} https://github.com/availproject/avail-light.git
 # This will utilize caching and check if rebuild is needed - if the branch has changed, so will this response
-ADD https://api.github.com/repos/availproject/avail-light/commits/${BOOTSTRAPLC_BRANCH} last_commit.json
-RUN cd avail-light && git fetch origin && git reset --hard ${BOOTSTRAPLC_BRANCH}
+# ADD https://api.github.com/repos/availproject/avail-light/commits/${BOOTSTRAPLC_BRANCH} last_commit.json
+# RUN cd avail-light # && git fetch origin && git reset --hard ${BOOTSTRAPLC_BRANCH}
+RUN cd avail-light
 
 COPY ./resources/download_or_build.sh /app/avail-light/
 RUN chmod +x /app/avail-light/download_or_build.sh
