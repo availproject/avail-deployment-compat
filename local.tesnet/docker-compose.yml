@@ -165,6 +165,7 @@ services:
     extra_hosts:
       - "sentry_node:17.0.0.100"
       - "bootstraplc:17.0.0.101"
+      - "relaylc:17.0.0.102"
     networks:
       beyondnat:
         ipv4_address: 17.0.0.109
@@ -202,6 +203,7 @@ services:
       - SUBNET=17.0.0.0/16
     extra_hosts:
       - "sentry_node:17.0.0.100"
+      - "relaylc:17.0.0.102"
     networks:
       behindnat:
         ipv4_address: 192.168.0.110
@@ -230,6 +232,7 @@ services:
       - LOG_LEVEL="INFO"
       - P2P_SEED=2
       - BOOTSTRAPS=["/dns4/bootstraplc/tcp/5369/p2p/12D3KooWSDaGuV1ewhyAEYsA6rk52hJyeN16hDE6bNgyRt62x7ie"]
+      - RELAYS=["/dns4/relaylc/tcp/38001/p2p/12D3KooWR3USn8DUFkm9v23yeY8vvtwHSqpnr5VnPptKXoiDK3E7"]
     networks:
       - beyondnat
 
@@ -247,10 +250,25 @@ services:
       beyondnat:
         ipv4_address: 17.0.0.101
 
+  relaylc:
+    container_name: relaylc
+    build:
+        context: ../images/relay
+        dockerfile: Dockerfile-dev
+        args:
+          - RELAY_BRANCH=nonexisting_branch
+    ports:
+      - 38000:38000
+      - 38001:38001
+    networks:
+      beyondnat:
+        ipv4_address: 17.0.0.102
+
   monitor:
     image: availj/monitor:v1.0.7
     container_name: monitor
     depends_on:
+      - relaylc
       - bootstraplc
     networks:
       beyondnat:
@@ -261,6 +279,7 @@ services:
     image: availj/monitor:test
     container_name: poison
     depends_on:
+      - relaylc
       - bootstraplc
     networks:
       beyondnat:
