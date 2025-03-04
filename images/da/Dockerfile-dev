@@ -19,6 +19,7 @@ RUN apt-get update && \
 
 RUN rustup install 1.82.0 && rustup default 1.82.0
 RUN rustup install nightly
+RUN rustup target add wasm32-unknown-unknown --toolchain 1.82.0
 RUN rustup target add wasm32-unknown-unknown --toolchain nightly
 
 ARG BRANCH=doesnt_exist
