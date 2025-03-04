@@ -16,6 +16,8 @@ FROM chef AS builder
 RUN apt-get update && \
 	apt-get install -y libssl3 gettext-base wait-for-it ca-certificates clang protobuf-compiler jq && \
 	rm -rf /var/lib/apt/lists 
+
+RUN rustup install 1.82.0 && rustup default 1.82.0
 RUN rustup install nightly
 RUN rustup target add wasm32-unknown-unknown --toolchain nightly
 
